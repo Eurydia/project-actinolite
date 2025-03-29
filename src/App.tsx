@@ -1,21 +1,57 @@
-import { DragDropProvider } from "@dnd-kit/react";
+import { SnapModifier } from "@dnd-kit/abstract/modifiers";
+import {
+  DragDropProvider,
+  useDroppable,
+} from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { Box } from "@mui/material";
-import { FC, ReactNode, useState } from "react";
+import { useState } from "react";
+import { ClassStruct } from "./components/ClassStruct";
+import { createFieldItems } from "./services/gen";
 
 export const App = () => {
-  const [items] = useState([1, 2, 3]);
-  return <DragDropProvider></DragDropProvider>;
-};
+  const [items, setItems] = useState(createFieldItems(5));
+  const { ref } = useSortable({
+    id: "class1",
+    index: 0,
+    type: "class",
+    accept: [],
+    modifiers: [
+      SnapModifier.configure({
+        size: { x: 20, y: 20 },
+      }),
+    ],
+  });
+  const { ref: workspaceRef, isDropTarget } = useDroppable({
+    id: "workspace",
+  });
 
-const Draggable: FC<{
-  id: string;
-  index: number;
-  children?: ReactNode;
-}> = (props) => {
-  const { children, id, index } = props;
-  const { ref } = useSortable({ id, index });
-
-  return <Box ref={ref}>{children}</Box>;
+  return (
+    <DragDropProvider>
+      <Box
+        ref={workspaceRef}
+        sx={{
+          backgroundColor: isDropTarget
+            ? "primary.light"
+            : undefined,
+          height: 6000,
+          width: "100%",
+        }}
+      >
+        <Box ref={ref}>
+          <ClassStruct
+            items={items}
+            onAdd={() =>
+              setItems((prev) => {
+                const next = [...prev];
+                next.push(...createFieldItems(1));
+                return next;
+              })
+            }
+          />
+        </Box>
+      </Box>
+    </DragDropProvider>
+  );
 };
 
