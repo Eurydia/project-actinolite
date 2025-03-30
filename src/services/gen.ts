@@ -1,18 +1,31 @@
-import { FieldItem } from "@/types/fields";
+import {
+  UMLClassAttribute,
+  UMLClassData,
+} from "@/types/figure";
 import { faker } from "@faker-js/faker";
-export const createFieldItems = (count: number) => {
+
+export const createClassAttributes = (count: number) => {
   return faker.helpers.multiple(
-    (): FieldItem => {
+    (): UMLClassAttribute => {
       return {
-        accessLevel: faker.helpers.arrayElement([
-          "private",
-          "public",
-          "protected",
-          "package protected",
+        name: faker.hacker.noun(),
+        type: faker.helpers.arrayElement([
+          "integer",
+          "string",
+          "boolean",
         ]),
-        name: faker.person.firstName(),
-        other: "",
-        type: faker.person.firstName(),
+      };
+    },
+    { count }
+  );
+};
+
+export const createUMLClass = (count: number) => {
+  return faker.helpers.multiple(
+    (): UMLClassData => {
+      return {
+        attributes: createClassAttributes(5),
+        className: faker.hacker.noun(),
       };
     },
     { count }
