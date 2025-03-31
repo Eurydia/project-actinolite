@@ -1,4 +1,4 @@
-export type UMLClassData = {
+export type UMLClass = {
   className: string;
   attributes: UMLClassAttribute[];
 };

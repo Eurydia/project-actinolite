@@ -1,4 +1,4 @@
-import { UMLClassData } from "@/types/figure";
+import { UMLClass } from "@/types/figure";
 import { AddRounded } from "@mui/icons-material";
 import {
   Box,
@@ -11,16 +11,16 @@ import {
   Typography,
 } from "@mui/material";
 import { FC, ReactNode } from "react";
-import { ClassFieldItem } from "./ClassFieldItem";
-import { Sortable } from "./ClassFieldRegion";
+import { ClassAttributeItem } from "./ClassAttributeItem";
+import { ClassAttributeRegion } from "./ClassAttributeRegion";
 
 type Props = {
-  classData: UMLClassData;
+  classData: UMLClass;
   children?: ReactNode;
   onAdd: () => void;
 };
 export const ClassFigure: FC<Props> = (props) => {
-  const { onAdd, classData } = props;
+  const { classData } = props;
   const { attributes, className } = classData;
   return (
     <Paper
@@ -52,18 +52,19 @@ export const ClassFigure: FC<Props> = (props) => {
               </IconButton>
             </Tooltip>
           </Toolbar>
-          <Sortable id={`${className}-attr-container`}>
+          <ClassAttributeRegion
+            id={`${className}-attr-container`}
+          >
             {attributes.map((item, index) => (
-              <ClassFieldItem
+              <ClassAttributeItem
                 key={`${className}-attr-${index}`}
                 id={`${className}-attr-${index}`}
                 group={className}
                 index={index}
-              >
-                <Typography fontFamily="monospace">{`${item.name}: ${item.type}`}</Typography>
-              </ClassFieldItem>
+                data={item}
+              />
             ))}
-          </Sortable>
+          </ClassAttributeRegion>
         </Box>
         <Typography>?</Typography>
       </Stack>

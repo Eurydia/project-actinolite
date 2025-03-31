@@ -1,6 +1,6 @@
 import {
+  UMLClass,
   UMLClassAttribute,
-  UMLClassData,
 } from "@/types/figure";
 import { faker } from "@faker-js/faker";
 
@@ -22,7 +22,7 @@ export const createClassAttributes = (count: number) => {
 
 export const createUMLClass = (count: number) => {
   return faker.helpers.multiple(
-    (): UMLClassData => {
+    (): UMLClass => {
       return {
         attributes: createClassAttributes(5),
         className: faker.hacker.noun(),
