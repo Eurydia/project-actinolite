@@ -5,7 +5,7 @@ import { Container, Grid } from "@mui/material";
 import { useState } from "react";
 
 export const App = () => {
-  const [classes] = useState(createUMLClass(2));
+  const [classes, setClasses] = useState(createUMLClass(2));
   console.debug(classes);
   return (
     <Container>
@@ -21,10 +21,14 @@ export const App = () => {
             >
               <ClassFigure
                 classData={item}
-                onAdd={function (): void {
-                  throw new Error(
-                    "Function not implemented."
-                  );
+                onAdd={() => {
+                  // setClasses((prev) => {
+                  //   const next = [...prev];
+                  //   next[index].attributes.push(
+                  //     ...createClassAttributes(1)
+                  //   );
+                  //   return next;
+                  // });
                 }}
               />
             </Grid>

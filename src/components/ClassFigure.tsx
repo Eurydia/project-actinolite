@@ -20,7 +20,7 @@ type Props = {
   onAdd: () => void;
 };
 export const ClassFigure: FC<Props> = (props) => {
-  const { classData } = props;
+  const { classData, onAdd } = props;
   const { attributes, className } = classData;
   return (
     <Paper
@@ -43,6 +43,7 @@ export const ClassFigure: FC<Props> = (props) => {
           <Toolbar
             variant="dense"
             disableGutters
+            onClick={onAdd}
           >
             <Tooltip
               title={<Typography>Add attribute</Typography>}
