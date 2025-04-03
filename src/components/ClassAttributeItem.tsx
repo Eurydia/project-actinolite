@@ -1,118 +1,132 @@
-import { UMLClassAttribute } from "@/types/figure";
+import { DiagramClassAttribute } from "@/types/figure";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { SaveRounded } from "@mui/icons-material";
+import { DragHandleRounded } from "@mui/icons-material";
 import {
   Box,
-  Button,
+  Grid,
+  InputBase,
   Stack,
-  TextField,
-  Toolbar,
   Typography,
-  useTheme,
 } from "@mui/material";
 import { FC, useState } from "react";
 
 type Props = {
   id: string;
   index: number;
+  data: DiagramClassAttribute;
   group: string;
-  data: UMLClassAttribute;
 };
-export const ClassAttributeItem: FC<Props> = (props) => {
-  const { group, id, index, data } = props;
-  const { ref, isDragging, sortable } = useSortable({
+export const ClassAttributeItem: FC<Props> = ({
+  id,
+  index,
+  data,
+  group,
+}) => {
+  const { ref, handleRef } = useSortable({
     id,
     index,
     group,
-    type: "attr",
-    accept: ["attr"],
   });
+
   const [attrName, setAttrName] = useState(data.name);
-  const [editing, setEditing] = useState(false);
-  const { palette } = useTheme();
+  const [attrAccess, setAttrAccess] = useState(
+    data.accessLevel
+  );
+  const [attrType, setAttrType] = useState(data.type);
 
   return (
     <Box
       ref={ref}
       sx={{
-        cursor: sortable.disabled
-          ? "auto"
-          : isDragging
-          ? "grabbing"
-          : "grab",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
         userSelect: "none",
-        width: "100%",
+        cursor: "auto",
+        fontSize: "inherit",
       }}
     >
-      <Stack
-        spacing={1}
-        sx={{
-          display: !editing ? "none" : undefined,
-        }}
+      <Grid
+        container
+        spacing={0.5}
+        columns={4}
       >
-        <TextField
-          slotProps={{
-            input: {
-              style: { fontFamily: "monospace" },
-            },
-          }}
-          value={attrName}
-          onChange={({ target }) => {
-            setAttrName(target.value);
-          }}
-        />
-        <Toolbar
-          variant="dense"
-          disableGutters
-        >
-          <Button
-            disableElevation
-            disableRipple
-            onClick={() => {
-              setEditing(false);
-              sortable.disabled = false;
+        <Grid size={1}>
+          <InputBase
+            value={attrAccess}
+            onChange={({ target }) => {
+              setAttrAccess(target.value);
             }}
-            startIcon={<SaveRounded />}
-            variant="contained"
+            slotProps={{
+              input: {
+                sx: {
+                  "fontFamily": "monospace",
+                  "&:focus": {
+                    textDecorationLine: "underline",
+                  },
+                },
+                autoCorrect: "off",
+                spellCheck: "false",
+              },
+            }}
+          />
+        </Grid>
+        <Grid size="grow">
+          <Stack
+            spacing={1}
+            direction="row"
+            divider={<Typography>:</Typography>}
+            alignItems="baseline"
           >
-            Save
-          </Button>
-        </Toolbar>
-      </Stack>
-      <Stack
-        direction="row"
-        spacing={1}
-        useFlexGap
-        divider={
-          <Typography fontFamily="monospace">:</Typography>
-        }
-        sx={{
-          display: editing ? "none" : undefined,
-        }}
-      >
-        <Typography
-          fontFamily="monospace"
-          sx={{
-            cursor: "text",
-          }}
-          onClick={() => {
-            setEditing(true);
-            sortable.disabled = true;
-          }}
-        >
-          {attrName}
-        </Typography>
-        <Typography
-          fontFamily="monospace"
-          fontStyle="italic"
-        >
-          {data.type}
-        </Typography>
-      </Stack>
+            <InputBase
+              value={attrName}
+              onChange={({ target }) => {
+                setAttrName(target.value);
+              }}
+              multiline
+              slotProps={{
+                input: {
+                  sx: {
+                    "maxWidth": 200,
+                    "fontFamily": "monospace",
+
+                    "&:focus": {
+                      textDecorationLine: "underline",
+                    },
+                  },
+                  autoCorrect: "off",
+                  spellCheck: "false",
+                },
+              }}
+            />
+            <InputBase
+              value={attrType}
+              onChange={({ target }) => {
+                setAttrType(target.value);
+              }}
+              multiline
+              slotProps={{
+                input: {
+                  sx: {
+                    "fontFamily": "monospace",
+                    "&:focus": {
+                      textDecorationLine: "underline",
+                    },
+                    "fontStyle": "italic",
+                    "maxWidth": 150,
+                  },
+                  autoCorrect: "off",
+                  spellCheck: "false",
+                },
+              }}
+            />
+          </Stack>
+        </Grid>
+        <Grid size="auto">
+          <DragHandleRounded
+            fontSize="small"
+            ref={handleRef}
+            sx={{ cursor: "grab" }}
+          />
+        </Grid>
+      </Grid>
     </Box>
   );
 };

@@ -1,18 +1,23 @@
 import {
-  UMLClass,
-  UMLClassAttribute,
+  DiagramClass,
+  DiagramClassAttribute,
 } from "@/types/figure";
 import { faker } from "@faker-js/faker";
 
 export const createClassAttributes = (count: number) => {
   return faker.helpers.multiple(
-    (): UMLClassAttribute => {
+    (): DiagramClassAttribute => {
       return {
         name: faker.hacker.noun(),
         type: faker.helpers.arrayElement([
           "integer",
           "string",
           "boolean",
+        ]),
+        accessLevel: faker.helpers.arrayElement([
+          "+",
+          "-",
+          "#",
         ]),
       };
     },
@@ -22,7 +27,7 @@ export const createClassAttributes = (count: number) => {
 
 export const createUMLClass = (count: number) => {
   return faker.helpers.multiple(
-    (): UMLClass => {
+    (): DiagramClass => {
       return {
         attributes: createClassAttributes(5),
         className: faker.hacker.noun(),

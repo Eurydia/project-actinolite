@@ -1,4 +1,4 @@
-import { UMLClass } from "@/types/figure";
+import { DiagramClass } from "@/types/figure";
 import { AddRounded } from "@mui/icons-material";
 import {
   Box,
@@ -15,7 +15,7 @@ import { ClassAttributeItem } from "./ClassAttributeItem";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
 
 type Props = {
-  classData: UMLClass;
+  classData: DiagramClass;
   children?: ReactNode;
   onAdd: () => void;
 };
@@ -58,9 +58,9 @@ export const ClassFigure: FC<Props> = (props) => {
           >
             {attributes.map((item, index) => (
               <ClassAttributeItem
+                group={className}
                 key={`${className}-attr-${index}`}
                 id={`${className}-attr-${index}`}
-                group={className}
                 index={index}
                 data={item}
               />

@@ -1,9 +1,10 @@
-export type UMLClass = {
+export type DiagramClass = {
   className: string;
-  attributes: UMLClassAttribute[];
+  attributes: DiagramClassAttribute[];
 };
 
-export type UMLClassAttribute = {
+export type DiagramClassAttribute = {
   name: string;
   type: string;
+  accessLevel: string;
 };
