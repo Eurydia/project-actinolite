@@ -15,7 +15,6 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.1",
     "@mui/material": "^7.0.1",
-    "@phosphor-icons/react": "^2.1.7",
     "@xyflow/react": "^12.5.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
