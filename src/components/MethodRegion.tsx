@@ -12,7 +12,7 @@ export const MethodRegion: FC<Props> = ({
   const { ref, isDropTarget } = useDroppable({
     id,
     accept: "method",
-    collisionPriority: CollisionPriority.High,
+    collisionPriority: CollisionPriority.Low,
     collisionDetector: pointerDistance,
   });
 

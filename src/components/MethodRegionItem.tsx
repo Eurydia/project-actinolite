@@ -13,15 +13,18 @@ type Props = {
   index: number;
   data: DiagramClassMethod;
   group: string;
+  disabled?: boolean;
+  hidden?: boolean;
 };
 export const MethodItem: FC<Props> = memo(
-  ({ id, index, data, group }) => {
+  ({ hidden, id, index, data, group, disabled }) => {
     const { ref } = useSortable({
       id,
       index,
       group,
       type: "method",
       accept: "method",
+      disabled,
     });
 
     const [access_, setAccess] = useState(data.access_);
@@ -51,6 +54,7 @@ export const MethodItem: FC<Props> = memo(
           flexDirection: "row",
           alignItems: "center",
           gap: 0.5,
+          visibility: hidden ? "hidden" : "visible",
         }}
       >
         <InputAdornment position="start">

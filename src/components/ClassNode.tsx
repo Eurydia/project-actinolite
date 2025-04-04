@@ -170,12 +170,12 @@ export const ClassNode: FC<NodeProps> = memo(
                 />
               ))}
             </ClassAttributeRegion>
-            <MethodRegion id={id + "-method-region"}>
+            <MethodRegion id={id + "-method"}>
               {_data.methods.map((method, index) => (
                 <MethodItem
-                  key={id + "methods" + index}
-                  id={id + "methods" + index}
-                  group={id + "-methods"}
+                  key={id + "method" + index}
+                  id={id + "method" + index}
+                  group={id + "-method"}
                   index={index}
                   data={method}
                 />
