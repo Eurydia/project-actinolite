@@ -1,4 +1,4 @@
-import { DiagramClassAttribute } from "@/types/figure";
+import { DiagramClassMethod } from "@/types/figure";
 import {
   Box,
   InputAdornment,
@@ -10,23 +10,23 @@ import { FC, memo, useCallback, useState } from "react";
 type Props = {
   id: string;
   index: number;
-  data: DiagramClassAttribute;
+  data: DiagramClassMethod;
   group: string;
 };
-export const ClassAttributeItem: FC<Props> = memo(
+export const MethodItem: FC<Props> = memo(
   ({ id, index, data, group }) => {
     // const { ref, handleRef } = useSortable({
     //   id,
     //   index,
     //   group,
+    //   data
     // });
 
-    const [access, setAccess] = useState(data.access_);
+    const [access_, setAccess] = useState(data.access_);
     const [primary, setPrimary] = useState(data.primary);
     const [secondary, setSecondary] = useState(
       data.secondary
     );
-
     const handleCycleAccess = useCallback(() => {
       setAccess((prev) => {
         switch (prev) {
@@ -39,6 +39,7 @@ export const ClassAttributeItem: FC<Props> = memo(
         }
       });
     }, []);
+
     return (
       <Box
         paddingX={1}
@@ -57,7 +58,7 @@ export const ClassAttributeItem: FC<Props> = memo(
             onClick={handleCycleAccess}
             sx={{ cursor: "pointer" }}
           >
-            {access}
+            {access_}
           </Typography>
         </InputAdornment>
         <InputBase

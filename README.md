@@ -1,4 +1,4 @@
 # Project Actinolite
 
-Let's build beautiful UML diagrams.
+Let's build beautiful class diagrams.
 

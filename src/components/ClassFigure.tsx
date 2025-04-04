@@ -21,7 +21,7 @@ type Props = {
 };
 export const ClassFigure: FC<Props> = (props) => {
   const { classData, onAdd } = props;
-  const { attributes, className } = classData;
+  const { attributes, name: className } = classData;
   return (
     <Paper
       variant="outlined"

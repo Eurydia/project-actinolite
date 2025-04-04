@@ -1,6 +1,10 @@
 import { ClassNode } from "@/components/ClassNode";
+import {
+  createClassAttributes,
+  createClassMethod,
+} from "@/services/gen";
 import { DragDropProvider } from "@dnd-kit/react";
-import { Box, Container } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   applyEdgeChanges,
   applyNodeChanges,
@@ -8,6 +12,7 @@ import {
   Controls,
   Edge,
   EdgeChange,
+  MiniMap,
   Node,
   NodeChange,
   NodeTypes,
@@ -17,28 +22,30 @@ import "@xyflow/react/dist/style.css";
 import { useCallback, useState } from "react";
 
 const initNodes: Node[] = [
-  {
-    id: "1",
-    data: { className: "hi", attributes: [] },
-    position: { x: 0, y: 0 },
-    type: "UMLClassNode",
-    dragHandle: ".handle",
-  },
+  // {
+  //   id: "1",
+  //   data: { className: "hi", attributes: [], methods: [] },
+  //   position: { x: 100, y: 100 },
+  //   type: "ClassNode",
+  // },
   {
     id: "2",
-    data: { className: "asdas", attributes: [] },
+    data: {
+      name: "asdas",
+      attributes: createClassAttributes(4),
+      methods: createClassMethod(3),
+    },
     position: { x: 0, y: 0 },
-    type: "UMLClassNode",
-    dragHandle: ".handle",
+    type: "ClassNode",
   },
 ];
 
 const initEdges: Edge[] = [
-  { id: "1-2", source: "1", target: "2" },
+  // { id: "1-2", source: "1", target: "2" },
 ];
 
 const NODE_TYPE: NodeTypes = {
-  UMLClassNode: ClassNode,
+  ClassNode: ClassNode,
 };
 export const App = () => {
   const [nodes, setNodes] = useState(initNodes);
@@ -58,25 +65,33 @@ export const App = () => {
   );
   return (
     <DragDropProvider>
-      <Container>
-        <Box sx={{ height: "90vh" }}>
-          <Box sx={{ height: "100%" }}>
-            <ReactFlow
-              nodes={nodes}
-              onNodesChange={onNodesChange}
-              edges={edges}
-              onEdgesChange={onEdgesChange}
-              fitView
-              snapToGrid
-              nodeTypes={NODE_TYPE}
-              snapGrid={[25, 25]}
-            >
-              <Background gap={25} />
-              <Controls />
-            </ReactFlow>
-          </Box>
+      <Box
+        sx={{
+          height: "98vh",
+        }}
+      >
+        <Box sx={{ height: "100%", width: "100%" }}>
+          <ReactFlow
+            nodes={nodes}
+            onNodesChange={onNodesChange}
+            edges={edges}
+            onEdgesChange={onEdgesChange}
+            fitView
+            snapToGrid
+            nodeTypes={NODE_TYPE}
+            zoomOnDoubleClick={false}
+            zoomOnScroll={false}
+            preventScrolling={false}
+          >
+            <Background
+              gap={40}
+              size={2.5}
+            />
+            <MiniMap />
+            <Controls />
+          </ReactFlow>
         </Box>
-      </Container>
+      </Box>
     </DragDropProvider>
   );
 };
