@@ -1,4 +1,5 @@
 import { DiagramClassAttribute } from "@/types/figure";
+import { useSortable } from "@dnd-kit/react/sortable";
 import {
   Box,
   InputAdornment,
@@ -15,11 +16,13 @@ type Props = {
 };
 export const ClassAttributeItem: FC<Props> = memo(
   ({ id, index, data, group }) => {
-    // const { ref, handleRef } = useSortable({
-    //   id,
-    //   index,
-    //   group,
-    // });
+    const { ref } = useSortable({
+      id,
+      index,
+      group,
+      type: "attr",
+      accept: "attr",
+    });
 
     const [access, setAccess] = useState(data.access_);
     const [primary, setPrimary] = useState(data.primary);
@@ -41,6 +44,7 @@ export const ClassAttributeItem: FC<Props> = memo(
     }, []);
     return (
       <Box
+        ref={ref}
         paddingX={1}
         sx={{
           cursor: "auto",

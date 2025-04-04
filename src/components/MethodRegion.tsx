@@ -1,3 +1,5 @@
+import { CollisionPriority } from "@dnd-kit/abstract";
+import { pointerDistance } from "@dnd-kit/collision";
 import { useDroppable } from "@dnd-kit/react";
 import { Box } from "@mui/material";
 import { FC, ReactNode } from "react";
@@ -7,10 +9,11 @@ export const MethodRegion: FC<Props> = ({
   id,
   children,
 }) => {
-  const { ref } = useDroppable({
+  const { ref, isDropTarget } = useDroppable({
     id,
-    type: "method-column",
-    accept: ["method"],
+    accept: "method",
+    collisionPriority: CollisionPriority.High,
+    collisionDetector: pointerDistance,
   });
 
   return (
@@ -20,21 +23,11 @@ export const MethodRegion: FC<Props> = ({
         display: "flex",
         flexDirection: "column",
         gap: 0.5,
+        minHeight: 50,
+        borderWidth: 4,
+        borderStyle: isDropTarget ? "dashed" : undefined,
       }}
     >
-      {/* <Toolbar
-        disableGutters
-        variant="dense"
-        sx={{
-          flexDirection: "row-reverse",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-        }}
-      >
-        <IconButton size="small">
-          <AddRounded fontSize="small" />
-        </IconButton>
-      </Toolbar> */}
       {children}
     </Box>
   );

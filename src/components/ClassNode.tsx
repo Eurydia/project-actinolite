@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import {
   Handle,
+  NodeProps,
   NodeResizer,
   Position,
 } from "@xyflow/react";
@@ -32,13 +33,11 @@ import { ClassAttributeRegion } from "./ClassAttributeRegion";
 import { MethodRegion } from "./MethodRegion";
 import { MethodItem } from "./MethodRegionItem";
 
-type Props = {
-  data: DiagramClass;
-  selected: boolean;
-};
-export const ClassNode: FC<Props> = memo(
-  ({ data, selected }) => {
-    const [name, setName] = useState(data.name);
+export const ClassNode: FC<NodeProps> = memo(
+  ({ id, data, selected, dragHandle }) => {
+    const _data = data as DiagramClass;
+
+    const [name, setName] = useState(_data.name);
     const menuAnchorRef = useRef<HTMLSpanElement | null>(
       null
     );
@@ -102,6 +101,8 @@ export const ClassNode: FC<Props> = memo(
           }}
         >
           <Box
+            component="div"
+            className="handle"
             sx={{
               backgroundColor: "pink",
               padding: 1,
@@ -158,25 +159,23 @@ export const ClassNode: FC<Props> = memo(
               scrollbarWidth: "thin",
             }}
           >
-            <ClassAttributeRegion
-              id={data.name + "-attrs-region"}
-            >
-              {data.attributes.map((attr, index) => (
+            <ClassAttributeRegion id={id + "-attrs-region"}>
+              {_data.attributes.map((attr, index) => (
                 <ClassAttributeItem
-                  group={data.name}
-                  key={data.name + "attrs" + index}
-                  id={data.name + "attrs" + index}
+                  key={id + "attrs" + index}
+                  id={id + "attrs" + index}
+                  group={id + "-attrs"}
                   index={index}
                   data={attr}
                 />
               ))}
             </ClassAttributeRegion>
-            <MethodRegion id={data.name + "-method-region"}>
-              {data.methods.map((method, index) => (
+            <MethodRegion id={id + "-method-region"}>
+              {_data.methods.map((method, index) => (
                 <MethodItem
-                  group={data.name}
-                  key={data.name + "method" + index}
-                  id={data.name + "method" + index}
+                  key={id + "methods" + index}
+                  id={id + "methods" + index}
+                  group={id + "-methods"}
                   index={index}
                   data={method}
                 />

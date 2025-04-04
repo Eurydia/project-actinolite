@@ -1,4 +1,5 @@
 import { DiagramClassMethod } from "@/types/figure";
+import { useSortable } from "@dnd-kit/react/sortable";
 import {
   Box,
   InputAdornment,
@@ -15,12 +16,13 @@ type Props = {
 };
 export const MethodItem: FC<Props> = memo(
   ({ id, index, data, group }) => {
-    // const { ref, handleRef } = useSortable({
-    //   id,
-    //   index,
-    //   group,
-    //   data
-    // });
+    const { ref } = useSortable({
+      id,
+      index,
+      group,
+      type: "method",
+      accept: "method",
+    });
 
     const [access_, setAccess] = useState(data.access_);
     const [primary, setPrimary] = useState(data.primary);
@@ -42,7 +44,7 @@ export const MethodItem: FC<Props> = memo(
 
     return (
       <Box
-        paddingX={1}
+        ref={ref}
         sx={{
           cursor: "auto",
           display: "flex",
