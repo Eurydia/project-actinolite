@@ -70,7 +70,10 @@ export const App = () => {
           height: "98vh",
         }}
       >
-        <Box sx={{ height: "100%", width: "100%" }}>
+        <Box
+          component="div"
+          sx={{ height: "100%", width: "100%" }}
+        >
           <ReactFlow
             nodes={nodes}
             onNodesChange={onNodesChange}

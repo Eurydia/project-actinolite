@@ -1,17 +1,25 @@
 import { DiagramClass } from "@/types/figure";
-import { MoreVert } from "@mui/icons-material";
+import {
+  DeleteRounded,
+  MoreVert,
+} from "@mui/icons-material";
 import {
   Box,
   Divider,
   IconButton,
   InputBase,
+  ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
   Paper,
   Stack,
 } from "@mui/material";
-import { NodeResizer } from "@xyflow/react";
+import {
+  Handle,
+  NodeResizer,
+  Position,
+} from "@xyflow/react";
 import {
   FC,
   memo,
@@ -31,22 +39,13 @@ type Props = {
 export const ClassNode: FC<Props> = memo(
   ({ data, selected }) => {
     const [name, setName] = useState(data.name);
-    const containerRef = useRef<HTMLDivElement | null>(
+    const menuAnchorRef = useRef<HTMLSpanElement | null>(
       null
     );
     const [menuOpen, setMenuOpen] = useState(false);
-    const handleClick = useCallback(
-      ({
-        button,
-        preventDefault,
-      }: React.MouseEvent<HTMLDivElement>) => {
-        if (button === 2) {
-          preventDefault();
-          setMenuOpen(true);
-        }
-      },
-      []
-    );
+    const handleClick = useCallback(() => {
+      setMenuOpen(true);
+    }, []);
     return (
       <>
         <NodeResizer
@@ -54,29 +53,43 @@ export const ClassNode: FC<Props> = memo(
           minWidth={400}
         />
 
-        {/* <Handle
+        <Handle
           type="target"
           position={Position.Top}
         />
         <Handle
           type="source"
           position={Position.Bottom}
-        /> */}
+        />
         <Menu
+          component="div"
           onClose={() => setMenuOpen(false)}
           open={menuOpen}
-          anchorEl={containerRef.current}
+          anchorEl={menuAnchorRef.current}
           anchorOrigin={{
             horizontal: "right",
-            vertical: "top",
+            vertical: "center",
           }}
         >
           <MenuItem>
-            <ListItemText>sadasd</ListItemText>
+            <ListItemText inset>New property</ListItemText>
+          </MenuItem>
+          <MenuItem>
+            <ListItemText inset>New method</ListItemText>
+          </MenuItem>
+          <Divider flexItem />
+          <MenuItem>
+            <ListItemText inset>Change color</ListItemText>
+          </MenuItem>
+          <Divider flexItem />
+          <MenuItem>
+            <ListItemIcon>
+              <DeleteRounded />
+            </ListItemIcon>
+            <ListItemText>Delete</ListItemText>
           </MenuItem>
         </Menu>
         <Paper
-          ref={containerRef}
           component="div"
           variant="outlined"
           sx={{
@@ -97,12 +110,6 @@ export const ClassNode: FC<Props> = memo(
               alignItems: "flex-start",
             }}
           >
-            <IconButton
-              size="small"
-              sx={{
-                visibility: "hidden",
-              }}
-            />
             <InputBase
               value={name}
               onChange={({ target }) => {
@@ -133,7 +140,12 @@ export const ClassNode: FC<Props> = memo(
                 },
               }}
             />
-            <IconButton size="small">
+            <IconButton
+              component="span"
+              size="small"
+              ref={menuAnchorRef}
+              onClick={handleClick}
+            >
               <MoreVert />
             </IconButton>
           </Box>
