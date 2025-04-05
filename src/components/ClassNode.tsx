@@ -159,24 +159,18 @@ export const ClassNode: FC<NodeProps> = memo(
               scrollbarWidth: "thin",
             }}
           >
-            <ClassAttributeRegion id={id + "-attrs-region"}>
+            <ClassAttributeRegion>
               {_data.attributes.map((attr, index) => (
                 <ClassAttributeItem
                   key={id + "attrs" + index}
-                  id={id + "attrs" + index}
-                  group={id + "-attrs"}
-                  index={index}
                   data={attr}
                 />
               ))}
             </ClassAttributeRegion>
-            <MethodRegion id={id + "-method"}>
+            <MethodRegion>
               {_data.methods.map((method, index) => (
                 <MethodItem
                   key={id + "method" + index}
-                  id={id + "method" + index}
-                  group={id + "-method"}
-                  index={index}
                   data={method}
                 />
               ))}

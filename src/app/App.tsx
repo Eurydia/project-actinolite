@@ -4,7 +4,6 @@ import {
   createClassMethod,
 } from "@/services/gen";
 import { DiagramClass } from "@/types/figure";
-import { DragDropProvider } from "@dnd-kit/react";
 import { Box } from "@mui/material";
 import {
   addEdge,
@@ -173,11 +172,9 @@ export const App = () => {
 // eslint-disable-next-line react-refresh/only-export-components
 export default () => {
   return (
-    <DragDropProvider>
-      <ReactFlowProvider>
-        <App />
-      </ReactFlowProvider>
-    </DragDropProvider>
+    <ReactFlowProvider>
+      <App />
+    </ReactFlowProvider>
   );
 };
 
