@@ -6,6 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import { FC, memo, useCallback, useState } from "react";
+import { StrictTextField } from "./StrictTextField";
 
 type Props = {
   data: DiagramClassAttribute;
@@ -51,7 +52,11 @@ export const ClassAttributeItem: FC<Props> = memo(
             {access}
           </Typography>
         </InputAdornment>
-        <InputBase
+        <StrictTextField
+          value={primary}
+          onTextChange={setPrimary}
+        />
+        {/* <InputBase
           value={primary}
           onChange={({ target }) => {
             setPrimary(target.value);
@@ -72,7 +77,7 @@ export const ClassAttributeItem: FC<Props> = memo(
               spellCheck: "false",
             },
           }}
-        />
+        /> */}
         <Typography paddingX={1}>:</Typography>
         <InputBase
           value={secondary}
