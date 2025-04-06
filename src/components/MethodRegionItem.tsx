@@ -31,14 +31,13 @@ export const MethodItem: FC<Props> = memo(({ data }) => {
 
   return (
     <Box
-      ref={ref}
+      component="li"
       sx={{
         cursor: "auto",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         gap: 0.5,
-        visibility: hidden ? "hidden" : "visible",
       }}
     >
       <InputAdornment position="start">

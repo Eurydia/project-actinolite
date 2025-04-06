@@ -31,10 +31,9 @@ import {
 import { ClassAttributeItem } from "./ClassAttributeItem";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
 import { MethodRegion } from "./MethodRegion";
-import { MethodItem } from "./MethodRegionItem";
 
 export const ClassNode: FC<NodeProps> = memo(
-  ({ id, data, selected, dragHandle }) => {
+  ({ id, data, selected }) => {
     const _data = data as DiagramClass;
 
     const [name, setName] = useState(_data.name);
@@ -51,7 +50,6 @@ export const ClassNode: FC<NodeProps> = memo(
           isVisible={selected}
           minWidth={400}
         />
-
         <Handle
           type="target"
           position={Position.Top}
@@ -102,7 +100,7 @@ export const ClassNode: FC<NodeProps> = memo(
         >
           <Box
             component="div"
-            className="handle"
+            className="node-handle"
             sx={{
               backgroundColor: "pink",
               padding: 1,
@@ -167,14 +165,10 @@ export const ClassNode: FC<NodeProps> = memo(
                 />
               ))}
             </ClassAttributeRegion>
-            <MethodRegion>
-              {_data.methods.map((method, index) => (
-                <MethodItem
-                  key={id + "method" + index}
-                  data={method}
-                />
-              ))}
-            </MethodRegion>
+            <MethodRegion
+              id={id}
+              items={_data.methods}
+            />
           </Stack>
         </Paper>
       </>
