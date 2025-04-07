@@ -50,12 +50,24 @@ export const ClassNode: FC<NodeProps> = memo(
           minWidth={400}
         />
         <Handle
-          type="target"
+          type="source"
           position={Position.Top}
+          id={id + "handle-top"}
+        />
+        <Handle
+          type="source"
+          position={Position.Right}
+          id={id + "handle-right"}
         />
         <Handle
           type="source"
           position={Position.Bottom}
+          id={id + "handle-bottom"}
+        />
+        <Handle
+          type="source"
+          position={Position.Left}
+          id={id + "handle-left"}
         />
         <Menu
           component="div"
