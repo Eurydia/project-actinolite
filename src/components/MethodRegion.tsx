@@ -21,7 +21,6 @@ export const MethodRegion: FC<Props> = ({ items, id }) => {
         flexDirection: "column",
         gap: 0.5,
         minHeight: 50,
-        borderWidth: 4,
         minWidth: 400,
       }}
     >
