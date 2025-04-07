@@ -2,10 +2,13 @@ import { DiagramClassMethod } from "@/types/figure";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { Box } from "@mui/material";
 import { FC } from "react";
-import { MethodItem } from "./MethodRegionItem";
+import { ClassMethodRegionItem } from "./ClassMethodRegionItem";
 
 type Props = { id: string; items: DiagramClassMethod[] };
-export const MethodRegion: FC<Props> = ({ items, id }) => {
+export const ClassMethodRegion: FC<Props> = ({
+  items,
+  id,
+}) => {
   const [parent, dndItems] = useDragAndDrop<
     HTMLUListElement,
     DiagramClassMethod
@@ -25,7 +28,7 @@ export const MethodRegion: FC<Props> = ({ items, id }) => {
       }}
     >
       {dndItems.map((item, index) => (
-        <MethodItem
+        <ClassMethodRegionItem
           key={"item" + index}
           data={item}
         />

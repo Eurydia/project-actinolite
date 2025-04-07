@@ -1,4 +1,4 @@
-import { DiagramClassAttribute } from "@/types/figure";
+import { DiagramClassMethod } from "@/types/figure";
 import {
   Box,
   InputAdornment,
@@ -8,16 +8,15 @@ import { FC, memo, useCallback, useState } from "react";
 import { StrictTextField } from "./StrictTextField";
 
 type Props = {
-  data: DiagramClassAttribute;
+  data: DiagramClassMethod;
 };
-export const ClassAttributeItem: FC<Props> = memo(
+export const ClassMethodRegionItem: FC<Props> = memo(
   ({ data }) => {
-    const [access, setAccess] = useState(data.access_);
+    const [access_, setAccess] = useState(data.access_);
     const [primary, setPrimary] = useState(data.primary);
     const [secondary, setSecondary] = useState(
       data.secondary
     );
-
     const handleCycleAccess = useCallback(() => {
       setAccess((prev) => {
         switch (prev) {
@@ -30,15 +29,16 @@ export const ClassAttributeItem: FC<Props> = memo(
         }
       });
     }, []);
+
     return (
       <Box
-        paddingX={1}
         sx={{
           cursor: "auto",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
           gap: 0.5,
+          width: "100%",
         }}
       >
         <InputAdornment position="start">
@@ -48,18 +48,18 @@ export const ClassAttributeItem: FC<Props> = memo(
             onClick={handleCycleAccess}
             sx={{ cursor: "pointer" }}
           >
-            {access}
+            {access_}
           </Typography>
         </InputAdornment>
         <StrictTextField
-          placeholder="unnamed"
           value={primary}
+          placeholder="unnamed"
           onTextChange={setPrimary}
         />
         <Typography paddingX={1}>:</Typography>
         <StrictTextField
-          placeholder="untyped"
           value={secondary}
+          placeholder="untyped"
           onTextChange={setSecondary}
         />
       </Box>

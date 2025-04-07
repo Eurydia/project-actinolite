@@ -29,7 +29,7 @@ import {
   useState,
 } from "react";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
-import { MethodRegion } from "./MethodRegion";
+import { ClassMethodRegion } from "./ClassMethodRegion";
 
 export const ClassNode: FC<NodeProps> = memo(
   ({ id, data, selected }) => {
@@ -159,7 +159,7 @@ export const ClassNode: FC<NodeProps> = memo(
             <ClassAttributeRegion
               items={_data.attributes}
             />
-            <MethodRegion
+            <ClassMethodRegion
               id={id}
               items={_data.methods}
             />

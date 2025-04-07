@@ -2,7 +2,7 @@ import { DiagramClassAttribute } from "@/types/figure";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { Box } from "@mui/material";
 import { FC } from "react";
-import { ClassAttributeItem } from "./ClassAttributeItem";
+import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
 
 type Props = { items: DiagramClassAttribute[] };
 export const ClassAttributeRegion: FC<Props> = ({
@@ -27,7 +27,7 @@ export const ClassAttributeRegion: FC<Props> = ({
       }}
     >
       {dndItems.map((item, index) => (
-        <ClassAttributeItem
+        <ClassAttributeRegionItem
           key={"item" + index}
           data={item}
         />
