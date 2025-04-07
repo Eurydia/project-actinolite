@@ -9,6 +9,7 @@ import {
   addEdge,
   Background,
   Connection,
+  ConnectionMode,
   Controls,
   Edge,
   FinalConnectionState,
@@ -140,6 +141,7 @@ export const App = () => {
           fitView
           fitViewOptions={{ padding: 2 }}
           edgeTypes={{ default: SmoothStepEdge }}
+          connectionMode={ConnectionMode.Loose}
         >
           <Background
             gap={40}
@@ -177,4 +179,3 @@ export default () => {
     </ReactFlowProvider>
   );
 };
-
