@@ -1,4 +1,15 @@
-import { DiagramClass } from "@/types/figure";
+import {
+  createClassAttribute,
+  createClassMethod,
+} from "@/services/models";
+import {
+  AccessLevel,
+  DiagramClass,
+  DiagramClassAttribute,
+  DiagramClassMethod,
+} from "@/types/figure";
+import { animations } from "@formkit/drag-and-drop";
+import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { DeleteRounded } from "@mui/icons-material";
 import {
   Box,
@@ -12,33 +23,125 @@ import {
 } from "@mui/material";
 import {
   Handle,
+  Node,
   NodeProps,
   NodeResizer,
   Position,
 } from "@xyflow/react";
-import {
-  FC,
-  memo,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import { FC, memo, useCallback, useState } from "react";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
 import { ClassMethodRegion } from "./ClassMethodRegion";
 import { StrictTextField } from "./StrictTextField";
 
-export const ClassNode: FC<NodeProps> = memo(
-  ({ id, data, selected }) => {
-    const _data = data as DiagramClass;
+export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
+  memo(({ id, data, selected }) => {
+    const [name, setName] = useState(data.name);
+    const [
+      attributeContainerRef,
+      attributeItems,
+      setAttributeItems,
+    ] = useDragAndDrop<
+      HTMLUListElement,
+      DiagramClassAttribute
+    >(data.attributes, {
+      group: "class-attribute",
+      plugins: [animations()],
+    });
 
-    const [name, setName] = useState(_data.name);
-    const menuAnchorRef = useRef<HTMLSpanElement | null>(
-      null
-    );
-    const [menuOpen, setMenuOpen] = useState(false);
-    const handleClick = useCallback(() => {
-      setMenuOpen(true);
+    const [
+      methodContainerRef,
+      methodItems,
+      setMethodItems,
+    ] = useDragAndDrop<
+      HTMLUListElement,
+      DiagramClassMethod
+    >(data.methods, {
+      group: "class-method",
+      plugins: [animations()],
+    });
+
+    const [contextMenu, setContextMenu] = useState<{
+      mouseX: number;
+      mouseY: number;
+    } | null>(null);
+
+    const handleContextMenu = (event: React.MouseEvent) => {
+      event.preventDefault();
+      setContextMenu(
+        contextMenu === null
+          ? {
+              mouseX: event.clientX + 2,
+              mouseY: event.clientY - 6,
+            }
+          : null
+      );
+
+      const selection = document.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+
+        setTimeout(() => {
+          selection.addRange(range);
+        });
+      }
+    };
+
+    const handleClose = useCallback(() => {
+      setContextMenu(null);
     }, []);
+
+    const handleAttributeItemChange = useCallback(
+      (value: DiagramClassAttribute, index: number) => {
+        setAttributeItems((prev) => {
+          const next = [...prev];
+          next[index] = value;
+          return next;
+        });
+      },
+      [setAttributeItems]
+    );
+
+    const handleMethodItemChange = useCallback(
+      (value: DiagramClassMethod, index: number) => {
+        setMethodItems((prev) => {
+          const next = [...prev];
+          next[index] = value;
+          return next;
+        });
+      },
+      [setMethodItems]
+    );
+
+    const handleAddAttribute = useCallback(() => {
+      setAttributeItems((prev) => {
+        const next = [...prev];
+        next.push(
+          createClassAttribute({
+            access_: AccessLevel.PUBLIC,
+            primary: "",
+            secondary: "",
+          })
+        );
+        return next;
+      });
+      handleClose();
+    }, [handleClose, setAttributeItems]);
+
+    const handleAddMethod = useCallback(() => {
+      setMethodItems((prev) => {
+        const next = [...prev];
+        next.push(
+          createClassMethod({
+            access_: AccessLevel.PUBLIC,
+            primary: "",
+            secondary: "",
+          })
+        );
+        return next;
+      });
+      handleClose();
+    }, [handleClose, setMethodItems]);
+
     return (
       <>
         <NodeResizer
@@ -66,19 +169,22 @@ export const ClassNode: FC<NodeProps> = memo(
           id={id + "handle-left"}
         />
         <Menu
-          component="div"
-          onClose={() => setMenuOpen(false)}
-          open={menuOpen}
-          anchorEl={menuAnchorRef.current}
-          anchorOrigin={{
-            horizontal: "right",
-            vertical: "center",
-          }}
+          open={contextMenu !== null}
+          onClose={handleClose}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            contextMenu !== null
+              ? {
+                  top: contextMenu.mouseY,
+                  left: contextMenu.mouseX,
+                }
+              : undefined
+          }
         >
-          <MenuItem>
+          <MenuItem onClick={handleAddAttribute}>
             <ListItemText inset>New property</ListItemText>
           </MenuItem>
-          <MenuItem>
+          <MenuItem onClick={handleAddMethod}>
             <ListItemText inset>New method</ListItemText>
           </MenuItem>
           <Divider flexItem />
@@ -94,8 +200,8 @@ export const ClassNode: FC<NodeProps> = memo(
           </MenuItem>
         </Menu>
         <Paper
-          component="div"
           variant="outlined"
+          onContextMenu={handleContextMenu}
           sx={{
             width: "100%",
             height: "100%",
@@ -106,7 +212,6 @@ export const ClassNode: FC<NodeProps> = memo(
           }}
         >
           <Box
-            component="div"
             className="node-handle"
             sx={{
               backgroundColor: "pink",
@@ -133,15 +238,19 @@ export const ClassNode: FC<NodeProps> = memo(
             }}
           >
             <ClassAttributeRegion
-              items={_data.attributes}
+              classId={id}
+              containerRef={attributeContainerRef}
+              items={attributeItems}
+              onItemChange={handleAttributeItemChange}
             />
             <ClassMethodRegion
-              id={id}
-              items={_data.methods}
+              classId={id}
+              items={methodItems}
+              containerRef={methodContainerRef}
+              onChange={handleMethodItemChange}
             />
           </Stack>
         </Paper>
       </>
     );
-  }
-);
+  });

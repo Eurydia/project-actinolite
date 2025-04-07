@@ -4,65 +4,97 @@ import {
   InputAdornment,
   Typography,
 } from "@mui/material";
-import { FC, memo, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { StrictTextField } from "./StrictTextField";
 
 type Props = {
   data: DiagramClassAttribute;
+  onChange: (value: DiagramClassAttribute) => void;
 };
-export const ClassAttributeRegionItem: FC<Props> = memo(
-  ({ data }) => {
-    const [access, setAccess] = useState(data.access_);
-    const [primary, setPrimary] = useState(data.primary);
-    const [secondary, setSecondary] = useState(
-      data.secondary
-    );
+export const ClassAttributeRegionItem: FC<Props> = ({
+  data: { id, access_, primary, secondary },
+  onChange,
+}) => {
+  const handleAccessChange = useCallback(() => {
+    let nextAccess: DiagramClassAttribute["access_"];
+    switch (access_) {
+      case "#":
+        nextAccess = "-";
+        break;
+      case "-":
+        nextAccess = "+";
+        break;
+      default:
+        nextAccess = "#";
+    }
+    onChange({
+      id,
+      access_: nextAccess,
+      secondary,
+      primary,
+    });
+  }, [access_, id, onChange, primary, secondary]);
 
-    const handleCycleAccess = useCallback(() => {
-      setAccess((prev) => {
-        switch (prev) {
-          case "#":
-            return "-";
-          case "-":
-            return "+";
-          default:
-            return "#";
-        }
+  const handlePrimaryChange = useCallback(
+    (value: string) => {
+      onChange({
+        id,
+        access_,
+        secondary,
+        primary: value,
       });
-    }, []);
-    return (
-      <Box
-        paddingX={1}
-        sx={{
-          cursor: "auto",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 0.5,
-        }}
-      >
-        <InputAdornment position="start">
-          <Typography
-            fontFamily="monospace"
-            fontWeight={900}
-            onClick={handleCycleAccess}
-            sx={{ cursor: "pointer" }}
-          >
-            {access}
-          </Typography>
-        </InputAdornment>
-        <StrictTextField
-          placeholder="unnamed"
-          value={primary}
-          onTextChange={setPrimary}
-        />
-        <Typography paddingX={1}>:</Typography>
-        <StrictTextField
-          placeholder="untyped"
-          value={secondary}
-          onTextChange={setSecondary}
-        />
-      </Box>
-    );
-  }
-);
+    },
+    [access_, id, onChange, secondary]
+  );
+
+  const handleSecondaryChange = useCallback(
+    (value: string) => {
+      onChange({
+        id,
+        access_,
+        primary,
+        secondary: value,
+      });
+    },
+    [access_, id, onChange, primary]
+  );
+
+  return (
+    <Box
+      component="li"
+      paddingX={1}
+      sx={{
+        cursor: "auto",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 0.5,
+
+        listStyle: "none",
+        height: 50,
+      }}
+    >
+      <InputAdornment position="start">
+        <Typography
+          fontFamily="monospace"
+          fontWeight={900}
+          onClick={handleAccessChange}
+          sx={{ cursor: "pointer" }}
+        >
+          {access_}
+        </Typography>
+      </InputAdornment>
+      <StrictTextField
+        placeholder="unnamed"
+        value={primary}
+        onTextChange={handlePrimaryChange}
+      />
+      <Typography paddingX={1}>:</Typography>
+      <StrictTextField
+        placeholder="untyped"
+        value={secondary}
+        onTextChange={handleSecondaryChange}
+      />
+    </Box>
+  );
+};

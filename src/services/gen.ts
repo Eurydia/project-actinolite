@@ -1,15 +1,20 @@
 import {
   AccessLevel,
   DiagramClass,
-  DiagramClassAttribute,
   DiagramClassMethod,
 } from "@/types/figure";
 import { faker } from "@faker-js/faker";
+import {
+  createClassAttribute,
+  createClassMethod,
+} from "./models";
 
-export const createClassAttributes = (count: number) => {
+export const createRandomClassAttributes = (
+  count: number
+) => {
   return faker.helpers.multiple(
-    (): DiagramClassAttribute => {
-      return {
+    () =>
+      createClassAttribute({
         primary: faker.hacker.noun(),
         secondary: faker.helpers.arrayElement([
           "integer",
@@ -19,22 +24,21 @@ export const createClassAttributes = (count: number) => {
         access_: faker.helpers.arrayElement(
           Object.values(AccessLevel)
         ),
-      };
-    },
+      }),
     { count }
   );
 };
 
-export const createClassMethod = (count: number) => {
+export const createRandomClassMethods = (count: number) => {
   return faker.helpers.multiple(
     (): DiagramClassMethod => {
-      return {
+      return createClassMethod({
         primary: faker.hacker.noun() + "()",
         secondary: "void",
         access_: faker.helpers.arrayElement(
           Object.values(AccessLevel)
         ),
-      };
+      });
     },
     { count }
   );
@@ -45,8 +49,8 @@ export const createUMLClass = (count: number) => {
     (): DiagramClass => {
       return {
         name: faker.hacker.noun(),
-        attributes: createClassAttributes(5),
-        methods: createClassMethod(5),
+        attributes: createRandomClassAttributes(5),
+        methods: createRandomClassMethods(5),
       };
     },
     { count }

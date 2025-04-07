@@ -1,4 +1,4 @@
-type ValueOf<T extends object> = T[keyof T];
+export type ValueOf<T extends object> = T[keyof T];
 
 export type DiagramClass = {
   name: string;
@@ -13,12 +13,14 @@ export const AccessLevel = {
 } as const;
 
 export type DiagramClassAttribute = {
+  id: number;
   access_: ValueOf<typeof AccessLevel>;
   primary: string;
   secondary: string;
 };
 
 export type DiagramClassMethod = {
+  id: number;
   access_: ValueOf<typeof AccessLevel>;
   primary: string;
   secondary: string;

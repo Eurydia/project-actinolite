@@ -1,7 +1,7 @@
 import { ClassNode } from "@/components/ClassNode";
 import {
-  createClassAttributes,
-  createClassMethod,
+  createRandomClassAttributes,
+  createRandomClassMethods,
 } from "@/services/gen";
 import { DiagramClass } from "@/types/figure";
 import { Box } from "@mui/material";
@@ -34,8 +34,8 @@ const initNodes: Node[] = [
     id: "0",
     data: {
       name: "asdas",
-      attributes: createClassAttributes(4),
-      methods: createClassMethod(3),
+      attributes: createRandomClassAttributes(4),
+      methods: createRandomClassMethods(3),
     },
     position: { x: 0, y: 0 },
     type: "ClassNode",
@@ -45,8 +45,8 @@ const initNodes: Node[] = [
     id: "1",
     data: {
       name: "q",
-      attributes: createClassAttributes(4),
-      methods: createClassMethod(3),
+      attributes: createRandomClassAttributes(4),
+      methods: createRandomClassMethods(3),
     },
     position: { x: 100, y: 100 },
     type: "ClassNode",

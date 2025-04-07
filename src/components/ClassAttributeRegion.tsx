@@ -1,23 +1,36 @@
 import { DiagramClassAttribute } from "@/types/figure";
-import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { Box } from "@mui/material";
-import { FC } from "react";
+import { FC, Ref, useCallback } from "react";
 import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
 
-type Props = { items: DiagramClassAttribute[] };
+type Props = {
+  classId: string;
+  containerRef: Ref<HTMLUListElement>;
+  items: DiagramClassAttribute[];
+  onItemChange: (
+    value: DiagramClassAttribute,
+    index: number
+  ) => void;
+};
 export const ClassAttributeRegion: FC<Props> = ({
+  classId,
+  containerRef,
   items,
+  onItemChange,
 }) => {
-  const [parent, dndItems] = useDragAndDrop<
-    HTMLUListElement,
-    DiagramClassAttribute
-  >(items, {
-    group: "class-method",
-  });
+  const itemChangeHandlerProvider = useCallback(
+    (index: number) => {
+      return (value: DiagramClassAttribute) => {
+        onItemChange(value, index);
+      };
+    },
+    [onItemChange]
+  );
 
   return (
     <Box
-      ref={parent}
+      component="ul"
+      ref={containerRef}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -26,10 +39,11 @@ export const ClassAttributeRegion: FC<Props> = ({
         minWidth: 400,
       }}
     >
-      {dndItems.map((item, index) => (
+      {items.map((item, index) => (
         <ClassAttributeRegionItem
-          key={"item" + index}
+          key={`class-${classId}-attribute-${item.id}`}
           data={item}
+          onChange={itemChangeHandlerProvider(index)}
         />
       ))}
     </Box>
