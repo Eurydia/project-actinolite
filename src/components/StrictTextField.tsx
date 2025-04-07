@@ -27,8 +27,6 @@ const StyledInput: FC<InputBaseProps> = ({
       slotProps={{
         ...slotProps,
         input: {
-          spellCheck: "false",
-          autoCapitalize: "none",
           sx: {
             "fontFamily": "monospace",
             "whiteSpace": "normal",
@@ -38,7 +36,10 @@ const StyledInput: FC<InputBaseProps> = ({
               caretColor: "transparent",
               textDecorationLine: "unset",
             },
+            "textAlign": "inherit",
           },
+          spellCheck: "false",
+          autoCapitalize: "none",
         },
       }}
     />
