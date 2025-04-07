@@ -12,9 +12,7 @@ export const ClassMethodRegion: FC<Props> = ({
   const [parent, dndItems] = useDragAndDrop<
     HTMLUListElement,
     DiagramClassMethod
-  >(items, {
-    group: "class-method",
-  });
+  >(items);
 
   return (
     <Box

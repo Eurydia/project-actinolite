@@ -1,30 +1,17 @@
-import { DiagramClass } from "@/types/figure";
-import { DeleteRounded } from "@mui/icons-material";
 import {
-  Box,
-  Divider,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Paper,
-  Stack,
-} from "@mui/material";
+  DiagramClass,
+  DiagramClassAttribute,
+} from "@/types/figure";
+import { useDragAndDrop } from "@formkit/drag-and-drop/react";
+import { Box, Divider, Paper, Stack } from "@mui/material";
 import {
   Handle,
   NodeProps,
   NodeResizer,
   Position,
 } from "@xyflow/react";
-import {
-  FC,
-  memo,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import { FC, memo, useCallback, useState } from "react";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
-import { ClassMethodRegion } from "./ClassMethodRegion";
 import { StrictTextField } from "./StrictTextField";
 
 export const ClassNode: FC<NodeProps> = memo(
@@ -32,13 +19,59 @@ export const ClassNode: FC<NodeProps> = memo(
     const _data = data as DiagramClass;
 
     const [name, setName] = useState(_data.name);
-    const menuAnchorRef = useRef<HTMLSpanElement | null>(
-      null
+    const [
+      attributeContainerRef,
+      attributeItems,
+      setAttributeItems,
+    ] = useDragAndDrop<
+      HTMLDivElement,
+      DiagramClassAttribute
+    >(_data.attributes);
+
+    // const [methodItems, setMethodItems] = useState(
+    //   _data.methods
+    // );
+    // const [contextMenu, setContextMenu] = useState<{
+    //   mouseX: number;
+    //   mouseY: number;
+    // } | null>(null);
+
+    // const handleContextMenu = (event: React.MouseEvent) => {
+    //   event.preventDefault();
+    //   setContextMenu(
+    //     contextMenu === null
+    //       ? {
+    //           mouseX: event.clientX + 2,
+    //           mouseY: event.clientY - 6,
+    //         }
+    //       : null
+    //   );
+
+    //   const selection = document.getSelection();
+    //   if (selection && selection.rangeCount > 0) {
+    //     const range = selection.getRangeAt(0);
+
+    //     setTimeout(() => {
+    //       selection.addRange(range);
+    //     });
+    //   }
+    // };
+
+    // const handleClose = useCallback(() => {
+    //   setContextMenu(null);
+    // }, []);
+
+    const handleAttributeItemChange = useCallback(
+      (value: DiagramClassAttribute, index: number) => {
+        setAttributeItems((prev) => {
+          const next = [...prev];
+          next[index] = value;
+          return next;
+        });
+      },
+      [setAttributeItems]
     );
-    const [menuOpen, setMenuOpen] = useState(false);
-    const handleClick = useCallback(() => {
-      setMenuOpen(true);
-    }, []);
+
     return (
       <>
         <NodeResizer
@@ -65,15 +98,18 @@ export const ClassNode: FC<NodeProps> = memo(
           position={Position.Left}
           id={id + "handle-left"}
         />
-        <Menu
-          component="div"
-          onClose={() => setMenuOpen(false)}
-          open={menuOpen}
-          anchorEl={menuAnchorRef.current}
-          anchorOrigin={{
-            horizontal: "right",
-            vertical: "center",
-          }}
+        {/* <Menu
+          open={contextMenu !== null}
+          onClose={handleClose}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            contextMenu !== null
+              ? {
+                  top: contextMenu.mouseY,
+                  left: contextMenu.mouseX,
+                }
+              : undefined
+          }
         >
           <MenuItem>
             <ListItemText inset>New property</ListItemText>
@@ -92,10 +128,10 @@ export const ClassNode: FC<NodeProps> = memo(
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </MenuItem>
-        </Menu>
+        </Menu> */}
         <Paper
-          component="div"
           variant="outlined"
+          // onContextMenu={handleContextMenu}
           sx={{
             width: "100%",
             height: "100%",
@@ -106,7 +142,6 @@ export const ClassNode: FC<NodeProps> = memo(
           }}
         >
           <Box
-            component="div"
             className="node-handle"
             sx={{
               backgroundColor: "pink",
@@ -133,12 +168,14 @@ export const ClassNode: FC<NodeProps> = memo(
             }}
           >
             <ClassAttributeRegion
-              items={_data.attributes}
+              containerRef={attributeContainerRef}
+              items={attributeItems}
+              onItemChange={handleAttributeItemChange}
             />
-            <ClassMethodRegion
+            {/* <ClassMethodRegion
               id={id}
-              items={_data.methods}
-            />
+              items={methodItems}
+            /> */}
           </Stack>
         </Paper>
       </>
