@@ -1,4 +1,7 @@
-import { newDiagramClassMethod } from "@/services/models";
+import {
+  createClassAttribute,
+  createClassMethod,
+} from "@/services/models";
 import {
   AccessLevel,
   DiagramClass,
@@ -107,12 +110,13 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
     const handleAddAttribute = useCallback(() => {
       setAttributeItems((prev) => {
         const next = [...prev];
-        next.push({
-          id: prev.length,
-          access_: AccessLevel.PUBLIC,
-          primary: "",
-          secondary: "",
-        });
+        next.push(
+          createClassAttribute({
+            access_: AccessLevel.PUBLIC,
+            primary: "",
+            secondary: "",
+          })
+        );
         return next;
       });
       handleClose();
@@ -122,7 +126,7 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
       setMethodItems((prev) => {
         const next = [...prev];
         next.push(
-          newDiagramClassMethod({
+          createClassMethod({
             access_: AccessLevel.PUBLIC,
             primary: "",
             secondary: "",
