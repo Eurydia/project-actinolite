@@ -8,6 +8,7 @@ import {
   DiagramClassAttribute,
   DiagramClassMethod,
 } from "@/types/figure";
+import { animations } from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { DeleteRounded } from "@mui/icons-material";
 import {
@@ -44,6 +45,7 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
       DiagramClassAttribute
     >(data.attributes, {
       group: "class-attribute",
+      plugins: [animations()],
     });
 
     const [
@@ -53,7 +55,10 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
     ] = useDragAndDrop<
       HTMLUListElement,
       DiagramClassMethod
-    >(data.methods, { group: "class-method" });
+    >(data.methods, {
+      group: "class-method",
+      plugins: [animations()],
+    });
 
     const [contextMenu, setContextMenu] = useState<{
       mouseX: number;
