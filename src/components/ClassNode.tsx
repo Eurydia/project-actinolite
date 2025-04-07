@@ -127,7 +127,7 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
       handleClose();
     }, [handleClose, setAttributeItems]);
 
-    const handleAddMehod = useCallback(() => {
+    const handleAddMethod = useCallback(() => {
       setMethodItems((prev) => {
         const next = [...prev];
         next.push(
@@ -184,7 +184,7 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
           <MenuItem onClick={handleAddAttribute}>
             <ListItemText inset>New property</ListItemText>
           </MenuItem>
-          <MenuItem onClick={handleAddMehod}>
+          <MenuItem onClick={handleAddMethod}>
             <ListItemText inset>New method</ListItemText>
           </MenuItem>
           <Divider flexItem />
