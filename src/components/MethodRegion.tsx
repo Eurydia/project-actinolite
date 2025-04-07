@@ -5,7 +5,7 @@ import { FC } from "react";
 import { MethodItem } from "./MethodRegionItem";
 
 type Props = { id: string; items: DiagramClassMethod[] };
-export const MethodRegion: FC<Props> = ({ id, items }) => {
+export const MethodRegion: FC<Props> = ({ items, id }) => {
   const [parent, dndItems] = useDragAndDrop<
     HTMLUListElement,
     DiagramClassMethod
@@ -15,7 +15,6 @@ export const MethodRegion: FC<Props> = ({ id, items }) => {
 
   return (
     <Box
-      component="ul"
       ref={parent}
       sx={{
         display: "flex",
@@ -24,7 +23,6 @@ export const MethodRegion: FC<Props> = ({ id, items }) => {
         minHeight: 50,
         borderWidth: 4,
         minWidth: 400,
-        backgroundColor: "pink",
       }}
     >
       {dndItems.map((item, index) => (

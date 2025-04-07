@@ -2,7 +2,6 @@ import { DiagramClassMethod } from "@/types/figure";
 import {
   Box,
   InputAdornment,
-  InputBase,
   Typography,
 } from "@mui/material";
 import { FC, memo, useCallback, useState } from "react";
@@ -32,13 +31,13 @@ export const MethodItem: FC<Props> = memo(({ data }) => {
 
   return (
     <Box
-      component="li"
       sx={{
         cursor: "auto",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         gap: 0.5,
+        width: "100%",
       }}
     >
       <InputAdornment position="start">
@@ -53,53 +52,14 @@ export const MethodItem: FC<Props> = memo(({ data }) => {
       </InputAdornment>
       <StrictTextField
         value={primary}
+        placeholder="unnamed"
         onTextChange={setPrimary}
       />
-      {/* <InputBase
-        value={primary}
-        onChange={({ target }) => {
-          setPrimary(target.value);
-        }}
-        placeholder="unnamed"
-        multiline
-        slotProps={{
-          input: {
-            sx: {
-              "&:focus": {
-                textDecorationLine: "underline",
-              },
-              "fontFamily": "monospace",
-              "whiteSpace": "normal",
-              "overflowWrap": "break-word",
-            },
-            autoCorrect: "off",
-            spellCheck: "false",
-          },
-        }}
-      /> */}
       <Typography paddingX={1}>:</Typography>
-      <InputBase
+      <StrictTextField
         value={secondary}
-        onChange={({ target }) => {
-          setSecondary(target.value);
-        }}
         placeholder="untyped"
-        multiline
-        slotProps={{
-          input: {
-            sx: {
-              "&:focus": {
-                textDecorationLine: "underline",
-              },
-              "fontFamily": "monospace",
-              "fontStyle": "italic",
-              "whiteSpace": "normal",
-              "overflowWrap": "break-word",
-            },
-            autoCorrect: "off",
-            spellCheck: "false",
-          },
-        }}
+        onTextChange={setSecondary}
       />
     </Box>
   );

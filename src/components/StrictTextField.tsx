@@ -1,6 +1,7 @@
 import {
   ClickAwayListener,
   InputBase,
+  InputBaseProps,
 } from "@mui/material";
 import {
   ChangeEvent,
@@ -11,12 +12,46 @@ import {
   useState,
 } from "react";
 
+const StyledInput: FC<InputBaseProps> = ({
+  slotProps,
+  sx,
+  ...rest
+}) => {
+  return (
+    <InputBase
+      {...rest}
+      sx={{
+        fontFamily: "monospace",
+        ...sx,
+      }}
+      slotProps={{
+        ...slotProps,
+        input: {
+          spellCheck: "false",
+          autoCapitalize: "none",
+          sx: {
+            "fontFamily": "monospace",
+            "whiteSpace": "normal",
+            "overflowWrap": "break-word",
+            "textDecorationLine": "underline",
+            "&:read-only": {
+              caretColor: "transparent",
+              textDecorationLine: "unset",
+            },
+          },
+        },
+      }}
+    />
+  );
+};
+
 type Props = {
+  placeholder?: string;
   value: string;
   onTextChange: (value: string) => void;
 };
 export const StrictTextField: FC<Props> = memo(
-  ({ onTextChange, value }) => {
+  ({ onTextChange, value, placeholder }) => {
     const handleTextChange = useCallback(
       ({
         target,
@@ -47,32 +82,16 @@ export const StrictTextField: FC<Props> = memo(
 
     return (
       <ClickAwayListener onClickAway={handleClickAway}>
-        <InputBase
+        <StyledInput
+          placeholder={placeholder}
           ref={ref}
           value={value}
           readOnly={readOnly}
           onChange={handleTextChange}
           onDoubleClick={handleEditRequest}
           onFocus={handleForceBlur}
-          sx={{
-            fontFamily: "monospace",
-            maxWidth: 200,
-          }}
           multiline
-          slotProps={{
-            input: {
-              spellCheck: "false",
-              autoCapitalize: "none",
-              sx: {
-                caretColor: readOnly
-                  ? "transparent"
-                  : "unset",
-                textDecorationLine: readOnly
-                  ? "unset"
-                  : "underline",
-              },
-            },
-          }}
+          fullWidth
         />
       </ClickAwayListener>
     );
