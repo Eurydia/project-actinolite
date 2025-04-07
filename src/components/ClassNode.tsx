@@ -1,3 +1,4 @@
+import { newDiagramClassMethod } from "@/services/models";
 import {
   AccessLevel,
   DiagramClass,
@@ -38,7 +39,9 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
     ] = useDragAndDrop<
       HTMLUListElement,
       DiagramClassAttribute
-    >(data.attributes);
+    >(data.attributes, {
+      group: "class-attribute",
+    });
 
     const [
       methodContainerRef,
@@ -47,11 +50,8 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
     ] = useDragAndDrop<
       HTMLUListElement,
       DiagramClassMethod
-    >(data.methods);
+    >(data.methods, { group: "class-method" });
 
-    // const [methodItems, setMethodItems] = useState(
-    //   data.methods
-    // );
     const [contextMenu, setContextMenu] = useState<{
       mouseX: number;
       mouseY: number;
@@ -121,12 +121,13 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
     const handleAddMehod = useCallback(() => {
       setMethodItems((prev) => {
         const next = [...prev];
-        next.push({
-          id: prev.length,
-          access_: AccessLevel.PUBLIC,
-          primary: "",
-          secondary: "",
-        });
+        next.push(
+          newDiagramClassMethod({
+            access_: AccessLevel.PUBLIC,
+            primary: "",
+            secondary: "",
+          })
+        );
         return next;
       });
       handleClose();

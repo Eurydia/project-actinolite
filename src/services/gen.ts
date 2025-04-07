@@ -5,6 +5,7 @@ import {
   DiagramClassMethod,
 } from "@/types/figure";
 import { faker } from "@faker-js/faker";
+import { newDiagramClassMethod } from "./models";
 
 export const createClassAttributes = (count: number) => {
   return faker.helpers.multiple(
@@ -28,15 +29,14 @@ export const createClassAttributes = (count: number) => {
 
 export const createClassMethod = (count: number) => {
   return faker.helpers.multiple(
-    (_, index): DiagramClassMethod => {
-      return {
-        id: index,
+    (): DiagramClassMethod => {
+      return newDiagramClassMethod({
         primary: faker.hacker.noun() + "()",
         secondary: "void",
         access_: faker.helpers.arrayElement(
           Object.values(AccessLevel)
         ),
-      };
+      });
     },
     { count }
   );
