@@ -60,6 +60,7 @@ export const ClassAttributeRegionItem: FC<Props> = ({
 
   return (
     <Box
+      component="li"
       paddingX={1}
       sx={{
         cursor: "auto",
@@ -67,6 +68,9 @@ export const ClassAttributeRegionItem: FC<Props> = ({
         flexDirection: "row",
         alignItems: "center",
         gap: 0.5,
+
+        listStyle: "none",
+        height: 50,
       }}
     >
       <InputAdornment position="start">

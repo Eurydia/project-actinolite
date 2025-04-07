@@ -4,7 +4,8 @@ import { FC, Ref, useCallback } from "react";
 import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
 
 type Props = {
-  containerRef: Ref<HTMLDivElement>;
+  classId: string;
+  containerRef: Ref<HTMLUListElement>;
   items: DiagramClassAttribute[];
   onItemChange: (
     value: DiagramClassAttribute,
@@ -12,6 +13,7 @@ type Props = {
   ) => void;
 };
 export const ClassAttributeRegion: FC<Props> = ({
+  classId,
   containerRef,
   items,
   onItemChange,
@@ -27,6 +29,7 @@ export const ClassAttributeRegion: FC<Props> = ({
 
   return (
     <Box
+      component="ul"
       ref={containerRef}
       sx={{
         display: "flex",
@@ -37,8 +40,11 @@ export const ClassAttributeRegion: FC<Props> = ({
       }}
     >
       {items.map((item, index) => (
+        // <li key={`class-${classId}-attribute-${index}`}>
+        //   {item.access_}
+        // </li>
         <ClassAttributeRegionItem
-          key={`class-attribute-item-${index}`}
+          key={`class-${classId}-attribute-${item.id}`}
           data={item}
           onChange={itemChangeHandlerProvider(index)}
         />

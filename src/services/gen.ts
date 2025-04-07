@@ -8,8 +8,9 @@ import { faker } from "@faker-js/faker";
 
 export const createClassAttributes = (count: number) => {
   return faker.helpers.multiple(
-    (): DiagramClassAttribute => {
+    (_, index): DiagramClassAttribute => {
       return {
+        id: index.toString(),
         primary: faker.hacker.noun(),
         secondary: faker.helpers.arrayElement([
           "integer",

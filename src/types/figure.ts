@@ -13,6 +13,7 @@ export const AccessLevel = {
 } as const;
 
 export type DiagramClassAttribute = {
+  id: string;
   access_: ValueOf<typeof AccessLevel>;
   primary: string;
   secondary: string;

@@ -24,7 +24,7 @@ export const ClassNode: FC<NodeProps> = memo(
       attributeItems,
       setAttributeItems,
     ] = useDragAndDrop<
-      HTMLDivElement,
+      HTMLUListElement,
       DiagramClassAttribute
     >(_data.attributes);
 
@@ -168,6 +168,7 @@ export const ClassNode: FC<NodeProps> = memo(
             }}
           >
             <ClassAttributeRegion
+              classId={id}
               containerRef={attributeContainerRef}
               items={attributeItems}
               onItemChange={handleAttributeItemChange}
