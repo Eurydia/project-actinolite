@@ -1,13 +1,8 @@
 import { DiagramClass } from "@/types/figure";
-import {
-  DeleteRounded,
-  MoreVert,
-} from "@mui/icons-material";
+import { DeleteRounded } from "@mui/icons-material";
 import {
   Box,
   Divider,
-  IconButton,
-  InputBase,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -30,6 +25,7 @@ import {
 } from "react";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
 import { ClassMethodRegion } from "./ClassMethodRegion";
+import { StrictTextField } from "./StrictTextField";
 
 export const ClassNode: FC<NodeProps> = memo(
   ({ id, data, selected }) => {
@@ -118,46 +114,14 @@ export const ClassNode: FC<NodeProps> = memo(
               display: "flex",
               flexDirection: "row",
               alignItems: "flex-start",
+              textAlign: "center",
             }}
           >
-            <InputBase
+            <StrictTextField
               value={name}
-              onChange={({ target }) => {
-                setName(target.value);
-              }}
-              fullWidth
+              onTextChange={setName}
               placeholder="unnamed"
-              multiline
-              sx={{
-                display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "flex-start",
-              }}
-              slotProps={{
-                input: {
-                  sx: {
-                    "&:focus": {
-                      textDecorationLine: "underline",
-                    },
-                    "fontFamily": "monospace",
-                    "whiteSpace": "normal",
-                    "overflowWrap": "break-word",
-                    "fontWeight": "bold",
-                    "textAlign": "center",
-                  },
-                  autoCorrect: "off",
-                  spellCheck: "false",
-                },
-              }}
             />
-            <IconButton
-              component="span"
-              size="small"
-              ref={menuAnchorRef}
-              onClick={handleClick}
-            >
-              <MoreVert />
-            </IconButton>
           </Box>
           <Stack
             spacing={1}
