@@ -28,9 +28,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { ClassAttributeItem } from "./ClassAttributeItem";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
-import { MethodRegion } from "./MethodRegion";
+import { ClassMethodRegion } from "./ClassMethodRegion";
 
 export const ClassNode: FC<NodeProps> = memo(
   ({ id, data, selected }) => {
@@ -157,15 +156,10 @@ export const ClassNode: FC<NodeProps> = memo(
               scrollbarWidth: "thin",
             }}
           >
-            <ClassAttributeRegion>
-              {_data.attributes.map((attr, index) => (
-                <ClassAttributeItem
-                  key={id + "attrs" + index}
-                  data={attr}
-                />
-              ))}
-            </ClassAttributeRegion>
-            <MethodRegion
+            <ClassAttributeRegion
+              items={_data.attributes}
+            />
+            <ClassMethodRegion
               id={id}
               items={_data.methods}
             />

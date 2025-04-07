@@ -1,21 +1,37 @@
+import { DiagramClassAttribute } from "@/types/figure";
+import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { Box } from "@mui/material";
-import { FC, ReactNode } from "react";
+import { FC } from "react";
+import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
 
-type Props = { children?: ReactNode };
+type Props = { items: DiagramClassAttribute[] };
 export const ClassAttributeRegion: FC<Props> = ({
-  children,
+  items,
 }) => {
+  const [parent, dndItems] = useDragAndDrop<
+    HTMLUListElement,
+    DiagramClassAttribute
+  >(items, {
+    group: "class-method",
+  });
+
   return (
     <Box
+      ref={parent}
       sx={{
         display: "flex",
         flexDirection: "column",
         gap: 0.5,
         minHeight: 50,
-        borderWidth: 4,
+        minWidth: 400,
       }}
     >
-      {children}
+      {dndItems.map((item, index) => (
+        <ClassAttributeRegionItem
+          key={"item" + index}
+          data={item}
+        />
+      ))}
     </Box>
   );
 };
