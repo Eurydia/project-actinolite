@@ -10,7 +10,7 @@ export const createClassAttributes = (count: number) => {
   return faker.helpers.multiple(
     (_, index): DiagramClassAttribute => {
       return {
-        id: index.toString(),
+        id: index,
         primary: faker.hacker.noun(),
         secondary: faker.helpers.arrayElement([
           "integer",
@@ -28,8 +28,9 @@ export const createClassAttributes = (count: number) => {
 
 export const createClassMethod = (count: number) => {
   return faker.helpers.multiple(
-    (): DiagramClassMethod => {
+    (_, index): DiagramClassMethod => {
       return {
+        id: index,
         primary: faker.hacker.noun() + "()",
         secondary: "void",
         access_: faker.helpers.arrayElement(

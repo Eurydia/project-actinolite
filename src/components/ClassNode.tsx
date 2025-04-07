@@ -2,6 +2,7 @@ import {
   AccessLevel,
   DiagramClass,
   DiagramClassAttribute,
+  DiagramClassMethod,
 } from "@/types/figure";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { DeleteRounded } from "@mui/icons-material";
@@ -24,6 +25,7 @@ import {
 } from "@xyflow/react";
 import { FC, memo, useCallback, useState } from "react";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
+import { ClassMethodRegion } from "./ClassMethodRegion";
 import { StrictTextField } from "./StrictTextField";
 
 export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
@@ -37,6 +39,15 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
       HTMLUListElement,
       DiagramClassAttribute
     >(data.attributes);
+
+    const [
+      methodContainerRef,
+      methodItems,
+      setMethodItems,
+    ] = useDragAndDrop<
+      HTMLUListElement,
+      DiagramClassMethod
+    >(data.methods);
 
     // const [methodItems, setMethodItems] = useState(
     //   data.methods
@@ -82,11 +93,22 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
       [setAttributeItems]
     );
 
+    const handleMethodItemChange = useCallback(
+      (value: DiagramClassMethod, index: number) => {
+        setMethodItems((prev) => {
+          const next = [...prev];
+          next[index] = value;
+          return next;
+        });
+      },
+      [setMethodItems]
+    );
+
     const handleAddAttribute = useCallback(() => {
       setAttributeItems((prev) => {
         const next = [...prev];
         next.push({
-          id: prev.length.toString(),
+          id: prev.length,
           access_: AccessLevel.PUBLIC,
           primary: "",
           secondary: "",
@@ -95,6 +117,20 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
       });
       handleClose();
     }, [handleClose, setAttributeItems]);
+
+    const handleAddMehod = useCallback(() => {
+      setMethodItems((prev) => {
+        const next = [...prev];
+        next.push({
+          id: prev.length,
+          access_: AccessLevel.PUBLIC,
+          primary: "",
+          secondary: "",
+        });
+        return next;
+      });
+      handleClose();
+    }, [handleClose, setMethodItems]);
 
     return (
       <>
@@ -138,7 +174,7 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
           <MenuItem onClick={handleAddAttribute}>
             <ListItemText inset>New property</ListItemText>
           </MenuItem>
-          <MenuItem>
+          <MenuItem onClick={handleAddMehod}>
             <ListItemText inset>New method</ListItemText>
           </MenuItem>
           <Divider flexItem />
@@ -197,10 +233,12 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
               items={attributeItems}
               onItemChange={handleAttributeItemChange}
             />
-            {/* <ClassMethodRegion
-              id={id}
+            <ClassMethodRegion
+              classId={id}
               items={methodItems}
-            /> */}
+              containerRef={methodContainerRef}
+              onChange={handleMethodItemChange}
+            />
           </Stack>
         </Paper>
       </>
