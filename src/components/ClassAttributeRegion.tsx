@@ -40,9 +40,6 @@ export const ClassAttributeRegion: FC<Props> = ({
       }}
     >
       {items.map((item, index) => (
-        // <li key={`class-${classId}-attribute-${index}`}>
-        //   {item.access_}
-        // </li>
         <ClassAttributeRegionItem
           key={`class-${classId}-attribute-${item.id}`}
           data={item}

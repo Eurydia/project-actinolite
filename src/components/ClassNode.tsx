@@ -1,11 +1,23 @@
 import {
+  AccessLevel,
   DiagramClass,
   DiagramClassAttribute,
 } from "@/types/figure";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
-import { Box, Divider, Paper, Stack } from "@mui/material";
+import { DeleteRounded } from "@mui/icons-material";
+import {
+  Box,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Paper,
+  Stack,
+} from "@mui/material";
 import {
   Handle,
+  Node,
   NodeProps,
   NodeResizer,
   Position,
@@ -14,11 +26,9 @@ import { FC, memo, useCallback, useState } from "react";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
 import { StrictTextField } from "./StrictTextField";
 
-export const ClassNode: FC<NodeProps> = memo(
-  ({ id, data, selected }) => {
-    const _data = data as DiagramClass;
-
-    const [name, setName] = useState(_data.name);
+export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
+  memo(({ id, data, selected }) => {
+    const [name, setName] = useState(data.name);
     const [
       attributeContainerRef,
       attributeItems,
@@ -26,40 +36,40 @@ export const ClassNode: FC<NodeProps> = memo(
     ] = useDragAndDrop<
       HTMLUListElement,
       DiagramClassAttribute
-    >(_data.attributes);
+    >(data.attributes);
 
     // const [methodItems, setMethodItems] = useState(
-    //   _data.methods
+    //   data.methods
     // );
-    // const [contextMenu, setContextMenu] = useState<{
-    //   mouseX: number;
-    //   mouseY: number;
-    // } | null>(null);
+    const [contextMenu, setContextMenu] = useState<{
+      mouseX: number;
+      mouseY: number;
+    } | null>(null);
 
-    // const handleContextMenu = (event: React.MouseEvent) => {
-    //   event.preventDefault();
-    //   setContextMenu(
-    //     contextMenu === null
-    //       ? {
-    //           mouseX: event.clientX + 2,
-    //           mouseY: event.clientY - 6,
-    //         }
-    //       : null
-    //   );
+    const handleContextMenu = (event: React.MouseEvent) => {
+      event.preventDefault();
+      setContextMenu(
+        contextMenu === null
+          ? {
+              mouseX: event.clientX + 2,
+              mouseY: event.clientY - 6,
+            }
+          : null
+      );
 
-    //   const selection = document.getSelection();
-    //   if (selection && selection.rangeCount > 0) {
-    //     const range = selection.getRangeAt(0);
+      const selection = document.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
 
-    //     setTimeout(() => {
-    //       selection.addRange(range);
-    //     });
-    //   }
-    // };
+        setTimeout(() => {
+          selection.addRange(range);
+        });
+      }
+    };
 
-    // const handleClose = useCallback(() => {
-    //   setContextMenu(null);
-    // }, []);
+    const handleClose = useCallback(() => {
+      setContextMenu(null);
+    }, []);
 
     const handleAttributeItemChange = useCallback(
       (value: DiagramClassAttribute, index: number) => {
@@ -71,6 +81,20 @@ export const ClassNode: FC<NodeProps> = memo(
       },
       [setAttributeItems]
     );
+
+    const handleAddAttribute = useCallback(() => {
+      setAttributeItems((prev) => {
+        const next = [...prev];
+        next.push({
+          id: prev.length.toString(),
+          access_: AccessLevel.PUBLIC,
+          primary: "",
+          secondary: "",
+        });
+        return next;
+      });
+      handleClose();
+    }, [handleClose, setAttributeItems]);
 
     return (
       <>
@@ -98,7 +122,7 @@ export const ClassNode: FC<NodeProps> = memo(
           position={Position.Left}
           id={id + "handle-left"}
         />
-        {/* <Menu
+        <Menu
           open={contextMenu !== null}
           onClose={handleClose}
           anchorReference="anchorPosition"
@@ -111,7 +135,7 @@ export const ClassNode: FC<NodeProps> = memo(
               : undefined
           }
         >
-          <MenuItem>
+          <MenuItem onClick={handleAddAttribute}>
             <ListItemText inset>New property</ListItemText>
           </MenuItem>
           <MenuItem>
@@ -128,10 +152,10 @@ export const ClassNode: FC<NodeProps> = memo(
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </MenuItem>
-        </Menu> */}
+        </Menu>
         <Paper
           variant="outlined"
-          // onContextMenu={handleContextMenu}
+          onContextMenu={handleContextMenu}
           sx={{
             width: "100%",
             height: "100%",
@@ -181,5 +205,4 @@ export const ClassNode: FC<NodeProps> = memo(
         </Paper>
       </>
     );
-  }
-);
+  });

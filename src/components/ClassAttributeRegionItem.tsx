@@ -12,11 +12,9 @@ type Props = {
   onChange: (value: DiagramClassAttribute) => void;
 };
 export const ClassAttributeRegionItem: FC<Props> = ({
-  data,
+  data: { id, access_, primary, secondary },
   onChange,
 }) => {
-  const { access_, primary, secondary } = data;
-
   const handleAccessChange = useCallback(() => {
     let nextAccess: DiagramClassAttribute["access_"];
     switch (access_) {
@@ -30,32 +28,35 @@ export const ClassAttributeRegionItem: FC<Props> = ({
         nextAccess = "#";
     }
     onChange({
+      id,
       access_: nextAccess,
-      secondary: secondary,
-      primary: primary,
+      secondary,
+      primary,
     });
-  }, [access_, primary, secondary, onChange]);
+  }, [access_, id, onChange, primary, secondary]);
 
   const handlePrimaryChange = useCallback(
     (value: string) => {
       onChange({
-        access_: access_,
-        secondary: secondary,
+        id,
+        access_,
+        secondary,
         primary: value,
       });
     },
-    [access_, secondary, onChange]
+    [access_, id, onChange, secondary]
   );
 
   const handleSecondaryChange = useCallback(
     (value: string) => {
       onChange({
-        access_: access_,
-        primary: primary,
+        id,
+        access_,
+        primary,
         secondary: value,
       });
     },
-    [access_, primary, onChange]
+    [access_, id, onChange, primary]
   );
 
   return (
