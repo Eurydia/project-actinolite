@@ -20,6 +20,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useRef } from "react";
+import { ToastContainer } from "react-toastify";
 
 const NODE_TYPE = {
   ClassNode: ClassNode,
@@ -172,6 +173,7 @@ export const App = () => {
 export default () => {
   return (
     <ReactFlowProvider>
+      <ToastContainer />
       <App />
     </ReactFlowProvider>
   );

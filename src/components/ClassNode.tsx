@@ -10,14 +10,20 @@ import {
 } from "@/types/figure";
 import { animations } from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
-import { ColorLensRounded } from "@mui/icons-material";
+import {
+  ContentCopyRounded,
+  DeleteRounded,
+} from "@mui/icons-material";
 import {
   Box,
   Divider,
+  IconButton,
+  InputAdornment,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
+  OutlinedInput,
   Paper,
   Stack,
   useTheme,
@@ -36,6 +42,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { HexColorPicker } from "react-colorful";
+import { toast } from "react-toastify";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
 import { ClassMethodRegion } from "./ClassMethodRegion";
 import { ColorPickerDialog } from "./ColorPickerDialog";
@@ -199,20 +207,64 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
               : undefined
           }
         >
+          <Box padding={2}>
+            <Stack spacing={1}>
+              <HexColorPicker
+                color={color}
+                onChange={setColor}
+                style={{ width: "100%" }}
+              />
+              <OutlinedInput
+                size="small"
+                value={color}
+                onChange={({ target }) =>
+                  setColor(target.value)
+                }
+                sx={{ fontFamily: "monospace" }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      disableRipple
+                      size="small"
+                      onClick={() => {
+                        navigator.clipboard
+                          .writeText(color)
+                          .then(
+                            () =>
+                              toast.success(
+                                "Copied to clipboard"
+                              ),
+                            () =>
+                              toast.error(
+                                "Cannot copy to clipboard"
+                              )
+                          );
+                      }}
+                    >
+                      <ContentCopyRounded />
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </Stack>
+          </Box>
+          <Divider flexItem />
           <MenuItem onClick={handleAddAttribute}>
-            <ListItemText inset>New property</ListItemText>
+            <ListItemText inset>New attribute</ListItemText>
           </MenuItem>
           <MenuItem onClick={handleAddMethod}>
             <ListItemText inset>New method</ListItemText>
           </MenuItem>
           <Divider flexItem />
-          <MenuItem
-            onClick={() => setColorPickerDialogOpen(true)}
-          >
+          <MenuItem>
+            <ListItemText inset>Duplicate</ListItemText>
+          </MenuItem>
+          <Divider flexItem />
+          <MenuItem>
             <ListItemIcon>
-              <ColorLensRounded />
+              <DeleteRounded />
             </ListItemIcon>
-            <ListItemText>Change color</ListItemText>
+            <ListItemText>Delete</ListItemText>
           </MenuItem>
         </Menu>
         <Paper
