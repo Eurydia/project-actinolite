@@ -1,8 +1,4 @@
 import { ClassNode } from "@/components/ClassNode";
-import {
-  createRandomClassAttributes,
-  createRandomClassMethods,
-} from "@/services/gen";
 import { DiagramClass } from "@/types/figure";
 import { Box } from "@mui/material";
 import {
@@ -24,6 +20,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useRef } from "react";
+import { ToastContainer } from "react-toastify";
 
 const NODE_TYPE = {
   ClassNode: ClassNode,
@@ -34,24 +31,24 @@ const initNodes: Node[] = [
     id: "0",
     data: {
       name: "asdas",
-      attributes: createRandomClassAttributes(4),
-      methods: createRandomClassMethods(3),
+      attributes: [],
+      methods: [],
     },
     position: { x: 0, y: 0 },
     type: "ClassNode",
     dragHandle: ".node-handle",
   },
-  {
-    id: "1",
-    data: {
-      name: "q",
-      attributes: createRandomClassAttributes(4),
-      methods: createRandomClassMethods(3),
-    },
-    position: { x: 100, y: 100 },
-    type: "ClassNode",
-    dragHandle: ".node-handle",
-  },
+  // {
+  //   id: "1",
+  //   data: {
+  //     name: "q",
+  //     attributes: createRandomClassAttributes(4),
+  //     methods: createRandomClassMethods(3),
+  //   },
+  //   position: { x: 100, y: 100 },
+  //   type: "ClassNode",
+  //   dragHandle: ".node-handle",
+  // },
 ];
 
 const initEdges: Edge[] = [
@@ -98,6 +95,7 @@ export const App = () => {
           data: { name: id, attributes: [], methods: [] },
           type: "ClassNode",
           dragHandle: ".handle",
+          style: { strokeWidth: 16 },
         };
 
         setNodes((nds) => nds.concat(newNode));
@@ -175,6 +173,7 @@ export const App = () => {
 export default () => {
   return (
     <ReactFlowProvider>
+      <ToastContainer />
       <App />
     </ReactFlowProvider>
   );

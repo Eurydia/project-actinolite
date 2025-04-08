@@ -10,16 +10,23 @@ import {
 } from "@/types/figure";
 import { animations } from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
-import { DeleteRounded } from "@mui/icons-material";
+import {
+  ContentCopyRounded,
+  DeleteRounded,
+} from "@mui/icons-material";
 import {
   Box,
   Divider,
+  IconButton,
+  InputAdornment,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
+  OutlinedInput,
   Paper,
   Stack,
+  useTheme,
 } from "@mui/material";
 import {
   Handle,
@@ -28,13 +35,32 @@ import {
   NodeResizer,
   Position,
 } from "@xyflow/react";
-import { FC, memo, useCallback, useState } from "react";
+import {
+  FC,
+  memo,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
+import { HexColorPicker } from "react-colorful";
+import { toast } from "react-toastify";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
 import { ClassMethodRegion } from "./ClassMethodRegion";
+import { ColorPickerDialog } from "./ColorPickerDialog";
 import { StrictTextField } from "./StrictTextField";
 
 export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
   memo(({ id, data, selected }) => {
+    const { palette } = useTheme();
+    const [color, setColor] = useState("#000");
+    const textColorContrast = useMemo(() => {
+      return palette.getContrastText(color);
+    }, [color, palette]);
+    const [
+      colorPickerDialogOpen,
+      setColorPickerDialogOpen,
+    ] = useState(false);
+
     const [name, setName] = useState(data.name);
     const [
       attributeContainerRef,
@@ -181,15 +207,57 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
               : undefined
           }
         >
+          <Box padding={2}>
+            <Stack spacing={1}>
+              <HexColorPicker
+                color={color}
+                onChange={setColor}
+                style={{ width: "100%" }}
+              />
+              <OutlinedInput
+                size="small"
+                value={color}
+                onChange={({ target }) =>
+                  setColor(target.value)
+                }
+                sx={{ fontFamily: "monospace" }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      disableRipple
+                      size="small"
+                      onClick={() => {
+                        navigator.clipboard
+                          .writeText(color)
+                          .then(
+                            () =>
+                              toast.success(
+                                "Copied to clipboard"
+                              ),
+                            () =>
+                              toast.error(
+                                "Cannot copy to clipboard"
+                              )
+                          );
+                      }}
+                    >
+                      <ContentCopyRounded />
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </Stack>
+          </Box>
+          <Divider flexItem />
           <MenuItem onClick={handleAddAttribute}>
-            <ListItemText inset>New property</ListItemText>
+            <ListItemText inset>New attribute</ListItemText>
           </MenuItem>
           <MenuItem onClick={handleAddMethod}>
             <ListItemText inset>New method</ListItemText>
           </MenuItem>
           <Divider flexItem />
           <MenuItem>
-            <ListItemText inset>Change color</ListItemText>
+            <ListItemText inset>Duplicate</ListItemText>
           </MenuItem>
           <Divider flexItem />
           <MenuItem>
@@ -209,23 +277,25 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
               palette.background.paper,
             display: "flex",
             flexDirection: "column",
+            overflow: "hidden",
           }}
         >
           <Box
             className="node-handle"
             sx={{
-              backgroundColor: "pink",
-              padding: 1,
+              backgroundColor: color,
               display: "flex",
               flexDirection: "row",
               alignItems: "flex-start",
               textAlign: "center",
+              padding: 1.5,
             }}
           >
             <StrictTextField
               value={name}
               onTextChange={setName}
               placeholder="unnamed"
+              sx={{ color: textColorContrast }}
             />
           </Box>
           <Stack
@@ -251,6 +321,12 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
             />
           </Stack>
         </Paper>
+        <ColorPickerDialog
+          open={colorPickerDialogOpen}
+          onClose={() => setColorPickerDialogOpen(false)}
+          value={color}
+          onChange={setColor}
+        />
       </>
     );
   });
