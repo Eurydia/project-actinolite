@@ -2,6 +2,8 @@ import {
   ClickAwayListener,
   InputBase,
   InputBaseProps,
+  SxProps,
+  Theme,
 } from "@mui/material";
 import {
   ChangeEvent,
@@ -37,6 +39,7 @@ const StyledInput: FC<InputBaseProps> = ({
               textDecorationLine: "unset",
             },
             "textAlign": "inherit",
+            "color": "inherit",
           },
           spellCheck: "false",
           autoCapitalize: "none",
@@ -50,9 +53,10 @@ type Props = {
   placeholder?: string;
   value: string;
   onTextChange: (value: string) => void;
+  sx?: SxProps<Theme>;
 };
 export const StrictTextField: FC<Props> = memo(
-  ({ onTextChange, value, placeholder }) => {
+  ({ onTextChange, value, placeholder, sx }) => {
     const handleTextChange = useCallback(
       ({
         target,
@@ -93,6 +97,7 @@ export const StrictTextField: FC<Props> = memo(
           onFocus={handleForceBlur}
           multiline
           fullWidth
+          sx={sx}
         />
       </ClickAwayListener>
     );
