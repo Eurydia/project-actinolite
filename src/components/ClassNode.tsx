@@ -194,6 +194,10 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
           id={id + "handle-left"}
         />
         <Menu
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           open={contextMenu !== null}
           onClose={handleClose}
           anchorReference="anchorPosition"

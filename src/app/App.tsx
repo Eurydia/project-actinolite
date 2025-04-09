@@ -3,6 +3,7 @@ import { DiagramClass } from "@/types/figure";
 import {
   Box,
   CssBaseline,
+  Divider,
   ListItemText,
   Menu,
   MenuItem,
@@ -97,15 +98,6 @@ export const App = () => {
             }
           : undefined
       );
-
-      // const selection = document.getSelection();
-      // if (selection && selection.rangeCount > 0) {
-      //   const range = selection.getRangeAt(0);
-
-      //   setTimeout(() => {
-      //     selection.addRange(range);
-      //   });
-      // }
     },
     [contextMenu]
   );
@@ -119,9 +111,7 @@ export const App = () => {
       event: MouseEvent | TouchEvent,
       connectionState: FinalConnectionState
     ) => {
-      // when a connection is dropped on the pane it's not valid
       if (!connectionState.isValid) {
-        // we need to remove the wrapper bounds, in order to get the correct position
         const id = getId();
         const { clientX, clientY } =
           "changedTouches" in event
@@ -174,13 +164,7 @@ export const App = () => {
     };
 
     setNodes((nds) => nds.concat(newNode));
-    handleClose();
-  }, [
-    contextMenu,
-    handleClose,
-    screenToFlowPosition,
-    setNodes,
-  ]);
+  }, [contextMenu, screenToFlowPosition, setNodes]);
 
   return (
     <>
@@ -216,8 +200,13 @@ export const App = () => {
         </ReactFlow>
       </Box>
       <Menu
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         open={contextMenu !== undefined}
         onClose={handleClose}
+        onClick={handleClose}
         anchorReference="anchorPosition"
         anchorPosition={contextMenu}
       >
@@ -229,6 +218,38 @@ export const App = () => {
             }}
           >
             Add class
+          </ListItemText>
+        </MenuItem>
+        <Divider flexItem />
+        <MenuItem>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Export as PNG
+          </ListItemText>
+        </MenuItem>
+        <MenuItem>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Export as SVG
+          </ListItemText>
+        </MenuItem>
+        <Divider />
+        <MenuItem>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Save workspace
           </ListItemText>
         </MenuItem>
       </Menu>
