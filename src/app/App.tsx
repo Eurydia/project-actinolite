@@ -1,6 +1,6 @@
 import { ClassNode } from "@/components/ClassNode";
 import { DiagramClass } from "@/types/figure";
-import { Box } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import {
   addEdge,
   Background,
@@ -151,6 +151,7 @@ export const App = () => {
 export default () => {
   return (
     <div style={{ height: "100vh" }}>
+      <CssBaseline />
       <ReactFlowProvider>
         <ToastContainer />
         <App />
