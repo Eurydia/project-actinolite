@@ -89,6 +89,7 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
     const handleContextMenu = useCallback(
       (event: React.MouseEvent) => {
         event.preventDefault();
+        event.stopPropagation();
         setContextMenu(
           contextMenu === null
             ? {

@@ -80,36 +80,38 @@ export const App = () => {
   );
 
   const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
+    left: number;
+    top: number;
+  }>();
 
   const handleContextMenu = useCallback(
     (event: React.MouseEvent) => {
       event.preventDefault();
+      event.stopPropagation();
+      const { clientX, clientY } = event;
       setContextMenu(
-        contextMenu === null
+        contextMenu === undefined
           ? {
-              mouseX: event.clientX + 2,
-              mouseY: event.clientY - 6,
+              left: clientX,
+              top: clientY,
             }
-          : null
+          : undefined
       );
 
-      const selection = document.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
+      // const selection = document.getSelection();
+      // if (selection && selection.rangeCount > 0) {
+      //   const range = selection.getRangeAt(0);
 
-        setTimeout(() => {
-          selection.addRange(range);
-        });
-      }
+      //   setTimeout(() => {
+      //     selection.addRange(range);
+      //   });
+      // }
     },
     [contextMenu]
   );
 
   const handleClose = useCallback(() => {
-    setContextMenu(null);
+    setContextMenu(undefined);
   }, []);
 
   const onConnectEnd = useCallback(
@@ -152,15 +154,15 @@ export const App = () => {
   );
 
   const handleNodeAdd = useCallback(() => {
-    if (contextMenu === null) {
+    if (contextMenu === undefined) {
       return;
     }
     const id = getId();
     const newNode: Node<DiagramClass> = {
       id,
       position: screenToFlowPosition({
-        x: contextMenu.mouseX,
-        y: contextMenu.mouseY,
+        x: contextMenu.left,
+        y: contextMenu.top,
       }),
       data: {
         name: `NewClass${id}`,
@@ -214,20 +216,20 @@ export const App = () => {
         </ReactFlow>
       </Box>
       <Menu
-        open={contextMenu !== null}
+        open={contextMenu !== undefined}
         onClose={handleClose}
         anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu !== null
-            ? {
-                top: contextMenu.mouseY,
-                left: contextMenu.mouseX,
-              }
-            : undefined
-        }
+        anchorPosition={contextMenu}
       >
         <MenuItem onClick={handleNodeAdd}>
-          <ListItemText inset>New class</ListItemText>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Add class
+          </ListItemText>
         </MenuItem>
       </Menu>
     </>
