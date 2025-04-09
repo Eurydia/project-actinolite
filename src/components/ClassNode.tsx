@@ -46,7 +46,6 @@ import { HexColorPicker } from "react-colorful";
 import { toast } from "react-toastify";
 import { ClassAttributeRegion } from "./ClassAttributeRegion";
 import { ClassMethodRegion } from "./ClassMethodRegion";
-import { ColorPickerDialog } from "./ColorPickerDialog";
 import { StrictTextField } from "./StrictTextField";
 
 export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
@@ -56,10 +55,6 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
     const textColorContrast = useMemo(() => {
       return palette.getContrastText(color);
     }, [color, palette]);
-    const [
-      colorPickerDialogOpen,
-      setColorPickerDialogOpen,
-    ] = useState(false);
 
     const [name, setName] = useState(data.name);
     const [
@@ -321,12 +316,6 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
             />
           </Stack>
         </Paper>
-        <ColorPickerDialog
-          open={colorPickerDialogOpen}
-          onClose={() => setColorPickerDialogOpen(false)}
-          value={color}
-          onChange={setColor}
-        />
       </>
     );
   });
