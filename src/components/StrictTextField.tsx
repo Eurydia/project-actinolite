@@ -1,18 +1,10 @@
 import {
-  ClickAwayListener,
   InputBase,
   InputBaseProps,
   SxProps,
   Theme,
 } from "@mui/material";
-import {
-  ChangeEvent,
-  FC,
-  memo,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, FC, memo, useCallback } from "react";
 
 const StyledInput: FC<InputBaseProps> = ({
   slotProps,
@@ -33,13 +25,11 @@ const StyledInput: FC<InputBaseProps> = ({
             "fontFamily": "monospace",
             "whiteSpace": "normal",
             "overflowWrap": "break-word",
-            "textDecorationLine": "underline",
-            "&:read-only": {
-              caretColor: "transparent",
-              textDecorationLine: "unset",
-            },
             "textAlign": "inherit",
             "color": "inherit",
+            "&:focus": {
+              textDecorationLine: "underline",
+            },
           },
           spellCheck: "false",
           autoCapitalize: "none",
@@ -68,38 +58,15 @@ export const StrictTextField: FC<Props> = memo(
       [onTextChange]
     );
 
-    const ref = useRef<HTMLDivElement>(null);
-    const [readOnly, setReadOnly] = useState(true);
-
-    const handleClickAway = useCallback(() => {
-      setReadOnly(true);
-    }, []);
-
-    const handleEditRequest = useCallback(() => {
-      setReadOnly(false);
-    }, []);
-
-    const handleForceBlur = useCallback(() => {
-      if (readOnly && ref.current !== null) {
-        ref.current.blur();
-      }
-    }, [readOnly]);
-
     return (
-      <ClickAwayListener onClickAway={handleClickAway}>
-        <StyledInput
-          placeholder={placeholder}
-          ref={ref}
-          value={value}
-          readOnly={readOnly}
-          onChange={handleTextChange}
-          onDoubleClick={handleEditRequest}
-          onFocus={handleForceBlur}
-          multiline
-          fullWidth
-          sx={sx}
-        />
-      </ClickAwayListener>
+      <StyledInput
+        placeholder={placeholder}
+        value={value}
+        onChange={handleTextChange}
+        multiline
+        fullWidth
+        sx={sx}
+      />
     );
   }
 );
