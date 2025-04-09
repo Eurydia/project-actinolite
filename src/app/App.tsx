@@ -1,6 +1,13 @@
 import { ClassNode } from "@/components/ClassNode";
 import { DiagramClass } from "@/types/figure";
-import { Box, CssBaseline } from "@mui/material";
+import {
+  Box,
+  CssBaseline,
+  Divider,
+  ListItemText,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import {
   addEdge,
   Background,
@@ -19,7 +26,7 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ToastContainer } from "react-toastify";
 
 const NODE_TYPE = {
@@ -73,14 +80,38 @@ export const App = () => {
     [setEdges]
   );
 
+  const [contextMenu, setContextMenu] = useState<{
+    left: number;
+    top: number;
+  }>();
+
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const { clientX, clientY } = event;
+      setContextMenu(
+        contextMenu === undefined
+          ? {
+              left: clientX,
+              top: clientY,
+            }
+          : undefined
+      );
+    },
+    [contextMenu]
+  );
+
+  const handleClose = useCallback(() => {
+    setContextMenu(undefined);
+  }, []);
+
   const onConnectEnd = useCallback(
     (
       event: MouseEvent | TouchEvent,
       connectionState: FinalConnectionState
     ) => {
-      // when a connection is dropped on the pane it's not valid
       if (!connectionState.isValid) {
-        // we need to remove the wrapper bounds, in order to get the correct position
         const id = getId();
         const { clientX, clientY } =
           "changedTouches" in event
@@ -94,8 +125,7 @@ export const App = () => {
           }),
           data: { name: id, attributes: [], methods: [] },
           type: "ClassNode",
-          dragHandle: ".handle",
-          style: { strokeWidth: 16 },
+          dragHandle: ".node-handle",
         };
 
         setNodes((nds) => nds.concat(newNode));
@@ -113,37 +143,117 @@ export const App = () => {
     [screenToFlowPosition, setEdges, setNodes]
   );
 
+  const handleNodeAdd = useCallback(() => {
+    if (contextMenu === undefined) {
+      return;
+    }
+    const id = getId();
+    const newNode: Node<DiagramClass> = {
+      id,
+      position: screenToFlowPosition({
+        x: contextMenu.left,
+        y: contextMenu.top,
+      }),
+      data: {
+        name: `NewClass${id}`,
+        attributes: [],
+        methods: [],
+      },
+      type: "ClassNode",
+      dragHandle: ".node-handle",
+    };
+
+    setNodes((nds) => nds.concat(newNode));
+  }, [contextMenu, screenToFlowPosition, setNodes]);
+
   return (
-    <Box
-      ref={reactFlowWrapper}
-      component="div"
-      sx={{ height: "100%", width: "100%" }}
-    >
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={NODE_TYPE}
-        zoomOnDoubleClick={false}
-        zoomOnScroll={false}
-        preventScrolling={false}
-        style={{ backgroundColor: "#F7F9FB" }}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onConnectEnd={onConnectEnd}
-        fitView
-        fitViewOptions={{ padding: 2 }}
-        edgeTypes={{ default: SmoothStepEdge }}
-        connectionMode={ConnectionMode.Loose}
+    <>
+      <Box
+        ref={reactFlowWrapper}
+        component="div"
+        sx={{ height: "100%", width: "100%" }}
       >
-        <Background
-          gap={40}
-          size={2.5}
-        />
-        <MiniMap position="top-left" />
-        <Controls position="top-right" />
-      </ReactFlow>
-    </Box>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={NODE_TYPE}
+          zoomOnDoubleClick={false}
+          zoomOnScroll={false}
+          preventScrolling={false}
+          style={{ backgroundColor: "#F7F9FB" }}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onConnectEnd={onConnectEnd}
+          fitView
+          fitViewOptions={{ padding: 2 }}
+          edgeTypes={{ default: SmoothStepEdge }}
+          connectionMode={ConnectionMode.Loose}
+          onContextMenu={handleContextMenu}
+        >
+          <Background
+            gap={40}
+            size={2.5}
+          />
+          <MiniMap position="top-left" />
+          <Controls position="top-right" />
+        </ReactFlow>
+      </Box>
+      <Menu
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        open={contextMenu !== undefined}
+        onClose={handleClose}
+        onClick={handleClose}
+        anchorReference="anchorPosition"
+        anchorPosition={contextMenu}
+      >
+        <MenuItem onClick={handleNodeAdd}>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Add class
+          </ListItemText>
+        </MenuItem>
+        <Divider flexItem />
+        <MenuItem>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Export as PNG
+          </ListItemText>
+        </MenuItem>
+        <MenuItem>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Export as SVG
+          </ListItemText>
+        </MenuItem>
+        <Divider />
+        <MenuItem>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Save workspace
+          </ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
   );
 };
 

@@ -86,26 +86,30 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
       mouseY: number;
     } | null>(null);
 
-    const handleContextMenu = (event: React.MouseEvent) => {
-      event.preventDefault();
-      setContextMenu(
-        contextMenu === null
-          ? {
-              mouseX: event.clientX + 2,
-              mouseY: event.clientY - 6,
-            }
-          : null
-      );
+    const handleContextMenu = useCallback(
+      (event: React.MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setContextMenu(
+          contextMenu === null
+            ? {
+                mouseX: event.clientX + 2,
+                mouseY: event.clientY - 6,
+              }
+            : null
+        );
 
-      const selection = document.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
+        const selection = document.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
 
-        setTimeout(() => {
-          selection.addRange(range);
-        });
-      }
-    };
+          setTimeout(() => {
+            selection.addRange(range);
+          });
+        }
+      },
+      [contextMenu]
+    );
 
     const handleClose = useCallback(() => {
       setContextMenu(null);
@@ -190,6 +194,10 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
           id={id + "handle-left"}
         />
         <Menu
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           open={contextMenu !== null}
           onClose={handleClose}
           anchorReference="anchorPosition"
