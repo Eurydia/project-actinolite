@@ -1,6 +1,6 @@
 import { ClassNode } from "@/components/ClassNode";
 import { DiagramClass } from "@/types/figure";
-import { Box } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import {
   addEdge,
   Background,
@@ -115,56 +115,34 @@ export const App = () => {
 
   return (
     <Box
-      sx={{
-        height: "98vh",
-      }}
+      ref={reactFlowWrapper}
+      component="div"
+      sx={{ height: "100%", width: "100%" }}
     >
-      <Box
-        ref={reactFlowWrapper}
-        component="div"
-        sx={{ height: "100%", width: "100%" }}
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={NODE_TYPE}
+        zoomOnDoubleClick={false}
+        zoomOnScroll={false}
+        preventScrolling={false}
+        style={{ backgroundColor: "#F7F9FB" }}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onConnectEnd={onConnectEnd}
+        fitView
+        fitViewOptions={{ padding: 2 }}
+        edgeTypes={{ default: SmoothStepEdge }}
+        connectionMode={ConnectionMode.Loose}
       >
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={NODE_TYPE}
-          zoomOnDoubleClick={false}
-          zoomOnScroll={false}
-          preventScrolling={false}
-          style={{ backgroundColor: "#F7F9FB" }}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onConnectEnd={onConnectEnd}
-          fitView
-          fitViewOptions={{ padding: 2 }}
-          edgeTypes={{ default: SmoothStepEdge }}
-          connectionMode={ConnectionMode.Loose}
-        >
-          <Background
-            gap={40}
-            size={2.5}
-          />
-          <MiniMap position="top-left" />
-          <Controls position="top-right" />
-        </ReactFlow>
-      </Box>
-      {/* <Drawer
-        variant="permanent"
-        anchor="bottom"
-      >
-        <ClassAttributeRegion id="-1">
-          {createClassAttributes(5).map((item, index) => (
-            <ClassAttributeItem
-              key={"key" + index}
-              id={"id" + index}
-              index={index}
-              data={item}
-              group={"-2"}
-            />
-          ))}
-        </ClassAttributeRegion>
-      </Drawer> */}
+        <Background
+          gap={40}
+          size={2.5}
+        />
+        <MiniMap position="top-left" />
+        <Controls position="top-right" />
+      </ReactFlow>
     </Box>
   );
 };
@@ -172,9 +150,12 @@ export const App = () => {
 // eslint-disable-next-line react-refresh/only-export-components
 export default () => {
   return (
-    <ReactFlowProvider>
-      <ToastContainer />
-      <App />
-    </ReactFlowProvider>
+    <div style={{ height: "100vh" }}>
+      <CssBaseline />
+      <ReactFlowProvider>
+        <ToastContainer />
+        <App />
+      </ReactFlowProvider>
+    </div>
   );
 };
