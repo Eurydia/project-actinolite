@@ -1,4 +1,5 @@
 import { ClassNode } from "@/components/ClassNode";
+import { StyledEdge } from "@/components/diagram/StyledEdge";
 import { DiagramClass } from "@/types/figure";
 import {
   Box,
@@ -12,15 +13,14 @@ import {
   addEdge,
   Background,
   Connection,
-  ConnectionMode,
   Controls,
   Edge,
+  EdgeTypes,
   FinalConnectionState,
   MiniMap,
   Node,
   ReactFlow,
   ReactFlowProvider,
-  SmoothStepEdge,
   useEdgesState,
   useNodesState,
   useReactFlow,
@@ -29,7 +29,7 @@ import "@xyflow/react/dist/style.css";
 import { useCallback, useRef, useState } from "react";
 import { ToastContainer } from "react-toastify";
 
-const NODE_TYPE = {
+const NODE_TYPES = {
   ClassNode: ClassNode,
 };
 
@@ -58,9 +58,9 @@ const initNodes: Node[] = [
   // },
 ];
 
-const initEdges: Edge[] = [
-  // { id: "1-2", source: "1", target: "2" },
-];
+const EDGE_TYPES: EdgeTypes = {
+  StyledEdge: StyledEdge,
+};
 
 let id = 2;
 const getId = () => `${id++}`;
@@ -71,9 +71,10 @@ export const App = () => {
   const [nodes, setNodes, onNodesChange] =
     useNodesState(initNodes);
   const [edges, setEdges, onEdgesChange] =
-    useEdgesState(initEdges);
+    useEdgesState<Edge>([]);
 
   const { screenToFlowPosition } = useReactFlow();
+
   const onConnect = useCallback(
     (params: Connection) =>
       setEdges((eds) => addEdge(params, eds)),
@@ -117,6 +118,7 @@ export const App = () => {
           "changedTouches" in event
             ? event.changedTouches[0]
             : event;
+
         const newNode: Node<DiagramClass> = {
           id,
           position: screenToFlowPosition({
@@ -129,14 +131,19 @@ export const App = () => {
         };
 
         setNodes((nds) => nds.concat(newNode));
-        setEdges((eds) => {
-          const fromId = connectionState.fromNode?.id;
+        setEdges((prev) => {
+          if (connectionState.fromNode === null) {
+            return prev;
+          }
+          const next = [...prev];
+          const fromId = connectionState.fromNode.id;
           const targetId = id;
-          return eds.concat({
+          next.push({
             id: `${fromId}-${targetId}`,
-            source: connectionState.fromNode?.id,
+            source: fromId,
             target: id,
-          } as (typeof eds)[number]);
+          });
+          return next;
         });
       }
     },
@@ -176,19 +183,23 @@ export const App = () => {
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          nodeTypes={NODE_TYPE}
+          nodeTypes={NODE_TYPES}
+          edgeTypes={EDGE_TYPES}
           zoomOnDoubleClick={false}
           zoomOnScroll={false}
           preventScrolling={false}
           style={{ backgroundColor: "#F7F9FB" }}
+          defaultEdgeOptions={{
+            style: { strokeWidth: 4 },
+            type: "StyledEdge",
+          }}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onConnectEnd={onConnectEnd}
           fitView
           fitViewOptions={{ padding: 2 }}
-          edgeTypes={{ default: SmoothStepEdge }}
-          connectionMode={ConnectionMode.Loose}
+          // connectionMode={ConnectionMode.Loose}
           onContextMenu={handleContextMenu}
         >
           <Background

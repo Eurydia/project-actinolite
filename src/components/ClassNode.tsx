@@ -175,15 +175,13 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
         />
         <Handle
           type="source"
+          position={Position.Bottom}
+        />
+        <Handle
+          type="target"
           position={Position.Top}
-          id={id + "handle-top"}
         />
-        <Handle
-          type="source"
-          position={Position.Right}
-          id={id + "handle-right"}
-        />
-        <Handle
+        {/* <Handle
           type="source"
           position={Position.Bottom}
           id={id + "handle-bottom"}
@@ -192,7 +190,7 @@ export const ClassNode: FC<NodeProps<Node<DiagramClass>>> =
           type="source"
           position={Position.Left}
           id={id + "handle-left"}
-        />
+        /> */}
         <Menu
           onContextMenu={(e) => {
             e.preventDefault();
