@@ -10,15 +10,9 @@ import {
   getSmoothStepPath,
   SmoothStepEdge,
 } from "@xyflow/react";
+import { FC, memo, useRef, useState } from "react";
 import {
-  FC,
-  memo,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
-import {
-  IoArrowBack,
+  IoChevronBack,
   IoSquare,
   IoSquareOutline,
   IoTriangle,
@@ -49,17 +43,6 @@ export const StyledEdge: FC<EdgeProps> = memo(
     });
 
     const fabRef = useRef<HTMLDivElement>(null);
-    const menuRef = useRef<HTMLButtonElement>(null);
-    const [contextMenuOpen, setContextMenuOpen] =
-      useState(false);
-    const handleContextMenuOpen = useCallback(() => {
-      setContextMenuOpen(true);
-    }, []);
-
-    const handleContextMenuClose = useCallback(() => {
-      setContextMenuOpen(false);
-    }, []);
-
     const [startMarker, setStartMarker] = useState(0);
 
     return (
@@ -77,21 +60,14 @@ export const StyledEdge: FC<EdgeProps> = memo(
           interactionWidth={4}
         />
         <EdgeLabelRenderer>
-          <div
-            ref={fabRef}
-            style={{
-              // width: "100%",
-              // height: "100%",
-              backgroundColor: selected ? "red" : undefined,
-            }}
-          />
+          <div ref={fabRef} />
         </EdgeLabelRenderer>
         <Menu
           onContextMenu={(e) => {
             e.preventDefault();
             e.stopPropagation();
           }}
-          open={true}
+          open={!!selected}
           anchorPosition={{
             left: labelX,
             top: labelY,
@@ -131,7 +107,7 @@ export const StyledEdge: FC<EdgeProps> = memo(
                       transform: "rotate(45deg)",
                     }}
                   />,
-                  <IoArrowBack />,
+                  <IoChevronBack />,
                 ]}
                 value={startMarker}
                 onChange={setStartMarker}

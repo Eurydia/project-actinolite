@@ -1,5 +1,6 @@
 import { ClassNode } from "@/components/ClassNode";
 import { StyledEdge } from "@/components/diagram/StyledEdge";
+import { MarkerProvider } from "@/components/flow/MarkerProvider";
 import { DiagramClass } from "@/types/figure";
 import {
   Box,
@@ -192,6 +193,8 @@ export const App = () => {
           defaultEdgeOptions={{
             style: { strokeWidth: 4 },
             type: "StyledEdge",
+            markerStart: "marker-arrow",
+            markerEnd: "marker-arrow",
           }}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
@@ -199,7 +202,6 @@ export const App = () => {
           onConnectEnd={onConnectEnd}
           fitView
           fitViewOptions={{ padding: 2 }}
-          // connectionMode={ConnectionMode.Loose}
           onContextMenu={handleContextMenu}
         >
           <Background
@@ -273,6 +275,7 @@ export default () => {
   return (
     <div style={{ height: "100vh" }}>
       <CssBaseline />
+      <MarkerProvider />
       <ReactFlowProvider>
         <ToastContainer />
         <App />

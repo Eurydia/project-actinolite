@@ -1,6 +1,5 @@
 import {
   Button,
-  Divider,
   ListItemText,
   Menu,
   MenuItem,
@@ -64,23 +63,21 @@ export const MenuButton: FC<Props> = memo(
           }}
         >
           {options.map((option, index) => (
-            <Fragment key={`menuitem-${index}`}>
-              <MenuItem
-                onClick={itemSelectHanlderProvider(index)}
+            <MenuItem
+              key={`menuitem-${index}`}
+              onClick={itemSelectHanlderProvider(index)}
+            >
+              <ListItemText
+                sx={{
+                  textAlign: "center",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
-                <ListItemText
-                  sx={{
-                    textAlign: "center",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {option}
-                </ListItemText>
-              </MenuItem>
-              <Divider />
-            </Fragment>
+                {option}
+              </ListItemText>
+            </MenuItem>
           ))}
         </Menu>
       </Fragment>
