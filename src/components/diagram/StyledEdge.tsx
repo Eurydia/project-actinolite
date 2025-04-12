@@ -1,5 +1,10 @@
 import {
+  DeleteRounded,
+  SwapHorizRounded,
+} from "@mui/icons-material";
+import {
   Divider,
+  IconButton,
   Menu,
   Stack,
   Toolbar,
@@ -13,6 +18,7 @@ import {
 import { FC, memo, useRef, useState } from "react";
 import {
   IoChevronBack,
+  IoChevronForward,
   IoSquare,
   IoSquareOutline,
   IoTriangle,
@@ -44,6 +50,8 @@ export const StyledEdge: FC<EdgeProps> = memo(
 
     const fabRef = useRef<HTMLDivElement>(null);
     const [startMarker, setStartMarker] = useState(0);
+    const [endMarker, setEndMarker] = useState(0);
+    const [lineType, setLineType] = useState(0);
 
     return (
       <>
@@ -74,17 +82,18 @@ export const StyledEdge: FC<EdgeProps> = memo(
           }}
           anchorReference="anchorPosition"
         >
-          <Toolbar variant="dense">
+          <Toolbar
+            variant="dense"
+            disableGutters
+            sx={{ gap: 1, padding: 1 }}
+          >
             <Stack
+              spacing={1}
               direction="row"
-              divider={
-                <Divider
-                  flexItem
-                  orientation="vertical"
-                />
-              }
             >
               <MenuButton
+                value={startMarker}
+                onChange={setStartMarker}
                 options={[
                   "None",
                   <IoTriangle
@@ -109,10 +118,55 @@ export const StyledEdge: FC<EdgeProps> = memo(
                   />,
                   <IoChevronBack />,
                 ]}
-                value={startMarker}
-                onChange={setStartMarker}
+              />
+              <IconButton>
+                <SwapHorizRounded />
+              </IconButton>
+              <MenuButton
+                value={endMarker}
+                onChange={setEndMarker}
+                options={[
+                  "None",
+                  <IoTriangle
+                    style={{
+                      transform: "rotate(90deg)",
+                    }}
+                  />,
+                  <IoTriangleOutline
+                    style={{
+                      transform: "rotate(90deg)",
+                    }}
+                  />,
+                  <IoSquare
+                    style={{
+                      transform: "rotate(45deg)",
+                    }}
+                  />,
+                  <IoSquareOutline
+                    style={{
+                      transform: "rotate(45deg)",
+                    }}
+                  />,
+                  <IoChevronForward />,
+                ]}
               />
             </Stack>
+            <Divider
+              flexItem
+              orientation="vertical"
+            />
+            <MenuButton
+              value={lineType}
+              onChange={setLineType}
+              options={["Solid", "Dashed"]}
+            />
+            <Divider
+              flexItem
+              orientation="vertical"
+            />
+            <IconButton color="error">
+              <DeleteRounded />
+            </IconButton>
           </Toolbar>
         </Menu>
       </>
