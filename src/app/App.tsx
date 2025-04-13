@@ -59,7 +59,7 @@ const initNodes = [
 ];
 
 const EDGE_TYPES: EdgeTypes = {
-  StyledEdge: StyledEdge,
+  default: StyledEdge,
 };
 
 let id = 2;
@@ -112,36 +112,46 @@ export const App = () => {
       event: MouseEvent | TouchEvent,
       connectionState: FinalConnectionState
     ) => {
-      if (!connectionState.isValid) {
-        const id = getId();
+      let targetNodeId: string | undefined = undefined;
+      if (
+        connectionState.isValid &&
+        connectionState.toNode !== null
+      ) {
+        targetNodeId = connectionState.toNode.id;
+      } else {
+        targetNodeId = getId();
         const { clientX, clientY } =
           "changedTouches" in event
             ? event.changedTouches[0]
             : event;
 
         const newNode: Node<DiagramNodeData> = {
-          id,
+          id: targetNodeId,
           position: screenToFlowPosition({
             x: clientX,
             y: clientY,
           }),
           data: {
-            name: `NewClass${id}`,
+            name: `NewClass${targetNodeId}`,
             attributes: [],
             methods: [],
           },
           type: "ClassNode",
           dragHandle: ".node-handle",
         };
-
         setNodes((nds) => nds.concat(newNode));
+      }
+
+      if (targetNodeId !== undefined) {
         setEdges((prev) => {
           if (connectionState.fromNode === null) {
             return prev;
           }
           const next = [...prev];
-          const source = connectionState.fromNode.id;
-          next.push(createNewEdge(source, id));
+          const sourceNodeId = connectionState.fromNode.id;
+          next.push(
+            createNewEdge(sourceNodeId, targetNodeId)
+          );
           return next;
         });
       }

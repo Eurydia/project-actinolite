@@ -167,7 +167,6 @@ export const useWrappedEdgeState = () => {
           markerEnd: undefined,
         },
         style: { strokeWidth: "4" },
-        type: "StyledEdge",
       };
     },
     [
@@ -182,10 +181,6 @@ export const useWrappedEdgeState = () => {
     edges,
     setEdges,
     onEdgesChange,
-    // handleEdgeLabelChange,
-    // handleEdgeLineTypeChange,
-    // handleEdgeStartMarkerChange,
-    // handleEdgeEndMarkerChange,
     createNewEdge,
   };
 };
