@@ -129,7 +129,6 @@ export const useWrappedEdgeState = () => {
             if (index !== edgeIndex) {
               return edge;
             }
-
             const { data, ...rest } = edge;
             return {
               ...rest,
@@ -166,7 +165,7 @@ export const useWrappedEdgeState = () => {
           markerStart: undefined,
           markerEnd: undefined,
         },
-        style: { strokeWidth: "4" },
+        style: { strokeWidth: 2 },
       };
     },
     [

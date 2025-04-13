@@ -10,7 +10,8 @@ import {
 import {
   Divider,
   IconButton,
-  Menu,
+  Paper,
+  Popper,
   Stack,
   Toolbar,
 } from "@mui/material";
@@ -21,7 +22,13 @@ import {
   getSmoothStepPath,
   SmoothStepEdge,
 } from "@xyflow/react";
-import { FC, memo, useCallback, useRef } from "react";
+import {
+  FC,
+  Fragment,
+  memo,
+  useCallback,
+  useRef,
+} from "react";
 import {
   IoChevronBack,
   IoChevronForward,
@@ -140,110 +147,81 @@ const MARKER_END_OPTIONS = [
 
 export const StyledEdge: FC<
   EdgeProps<Edge<DiagramEdgeData>>
-> = memo(
-  ({
-    id,
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition,
-    targetPosition,
-    markerEnd,
-    markerStart,
-    selected,
-    data,
-    style,
-  }) => {
-    const [, labelX, labelY] = getSmoothStepPath({
-      sourceX,
-      sourceY,
-      sourcePosition,
-      targetX,
-      targetY,
-      targetPosition,
-    });
+> = memo(({ id, selected, data, ...rest }) => {
+  const [, labelX, labelY] = getSmoothStepPath(rest);
 
-    const fabRef = useRef<HTMLDivElement>(null);
+  const fabRef = useRef<HTMLDivElement>(null);
 
-    const handleMarkerStartChange = useCallback(
-      (value: DiagramEdgeData["markerStart"]) => {
-        if (data === undefined) {
-          return;
-        }
-        data.onMarkerStartChange(
-          id,
-          value === "" ? undefined : value
-        );
-      },
-      [data, id]
-    );
+  const handleMarkerStartChange = useCallback(
+    (value: DiagramEdgeData["markerStart"]) => {
+      if (data === undefined) {
+        return;
+      }
+      data.onMarkerStartChange(
+        id,
+        value === "" ? undefined : value
+      );
+    },
+    [data, id]
+  );
 
-    const handleMarkerEndChange = useCallback(
-      (value: DiagramEdgeData["markerEnd"]) => {
-        if (data === undefined) {
-          return;
-        }
-        data.onMarkerEndChange(
-          id,
-          value === "" ? undefined : value
-        );
-      },
-      [data, id]
-    );
+  const handleMarkerEndChange = useCallback(
+    (value: DiagramEdgeData["markerEnd"]) => {
+      if (data === undefined) {
+        return;
+      }
+      data.onMarkerEndChange(
+        id,
+        value === "" ? undefined : value
+      );
+    },
+    [data, id]
+  );
 
-    const handleLineTypeChange = useCallback(
-      (value: DiagramEdgeData["lineType"]) => {
-        if (data === undefined) {
-          return;
-        }
-        data.onLineTypeChange(id, value);
-      },
-      [data, id]
-    );
+  const handleLineTypeChange = useCallback(
+    (value: DiagramEdgeData["lineType"]) => {
+      if (data === undefined) {
+        return;
+      }
+      data.onLineTypeChange(id, value);
+    },
+    [data, id]
+  );
 
-    if (data === undefined) {
-      return null;
-    }
+  if (data === undefined) {
+    return null;
+  }
 
-    return (
-      <>
-        <SmoothStepEdge
-          markerEnd={markerEnd}
-          markerStart={markerStart}
-          id={id}
-          sourceX={sourceX}
-          sourceY={sourceY}
-          targetX={targetX}
-          targetY={targetY}
-          sourcePosition={sourcePosition}
-          targetPosition={targetPosition}
-          style={style}
-        />
-        <EdgeLabelRenderer>
-          <div ref={fabRef} />
-        </EdgeLabelRenderer>
-        <Menu
-          onContextMenu={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
+  return (
+    <Fragment>
+      <SmoothStepEdge
+        id={id}
+        {...rest}
+      />
+      <EdgeLabelRenderer>
+        <div
+          ref={fabRef}
+          style={{
+            position: "absolute",
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
           }}
-          open={!!selected}
-          anchorPosition={{
-            left: labelX,
-            top: labelY,
-          }}
-          anchorReference="anchorPosition"
-        >
+        ></div>
+      </EdgeLabelRenderer>
+      <Popper
+        anchorEl={fabRef.current}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        open={!!selected}
+        placement="top"
+      >
+        <Paper sx={{ padding: 1 }}>
           <Toolbar
             variant="dense"
             disableGutters
-            sx={{ gap: 1, padding: 1 }}
           >
-            <Stack
-              spacing={1}
-              direction="row"
-            >
+            <Stack direction="row">
               <MenuButton
                 value={data.markerStart ?? ""}
                 onChange={handleMarkerStartChange}
@@ -275,8 +253,8 @@ export const StyledEdge: FC<
               <DeleteRounded />
             </IconButton>
           </Toolbar>
-        </Menu>
-      </>
-    );
-  }
-);
+        </Paper>
+      </Popper>
+    </Fragment>
+  );
+});
