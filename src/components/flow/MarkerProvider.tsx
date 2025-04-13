@@ -1,4 +1,4 @@
-import { MarkerType } from "@/types/figure";
+import { DiagramEdgeMarkerType } from "@/types/figure";
 import { FC } from "react";
 
 export const MarkerProvider: FC = () => {
@@ -9,7 +9,7 @@ export const MarkerProvider: FC = () => {
     >
       <defs>
         <marker
-          id={MarkerType.DIAMOND_OUTLINE}
+          id={DiagramEdgeMarkerType.DIAMOND_OUTLINE}
           viewBox="0 0 50 50"
           refX="48"
           refY="25"
@@ -27,7 +27,7 @@ export const MarkerProvider: FC = () => {
           />
         </marker>
         <marker
-          id={MarkerType.DIAMOND_FILLED}
+          id={DiagramEdgeMarkerType.DIAMOND_FILLED}
           viewBox="0 0 50 50"
           refX="48"
           refY="25"
@@ -44,7 +44,7 @@ export const MarkerProvider: FC = () => {
           />
         </marker>
         <marker
-          id={MarkerType.TRIANGLE_OUTLINE}
+          id={DiagramEdgeMarkerType.TRIANGLE_OUTLINE}
           viewBox="0 0 50 50"
           refX="45"
           refY="25"
@@ -62,7 +62,7 @@ export const MarkerProvider: FC = () => {
           />
         </marker>
         <marker
-          id={MarkerType.TRIANGLE_FILLED}
+          id={DiagramEdgeMarkerType.TRIANGLE_FILLED}
           viewBox="0 0 50 50"
           refX="45"
           refY="25"
@@ -79,7 +79,7 @@ export const MarkerProvider: FC = () => {
           />
         </marker>
         <marker
-          id={MarkerType.ARROW}
+          id={DiagramEdgeMarkerType.ARROW}
           markerWidth="48"
           markerHeight="48"
           viewBox="0 0 50 50"

@@ -1,10 +1,8 @@
 import { ClassNode } from "@/components/ClassNode";
 import { StyledEdge } from "@/components/diagram/StyledEdge";
 import { MarkerProvider } from "@/components/flow/MarkerProvider";
-import {
-  DiagramEdgeData,
-  DiagramNodeData,
-} from "@/types/figure";
+import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
+import { DiagramNodeData } from "@/types/figure";
 import {
   Box,
   CssBaseline,
@@ -12,21 +10,18 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Typography,
 } from "@mui/material";
 import {
   addEdge,
   Background,
   Connection,
   Controls,
-  Edge,
   EdgeTypes,
   FinalConnectionState,
   MiniMap,
   Node,
   ReactFlow,
   ReactFlowProvider,
-  useEdgesState,
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
@@ -75,9 +70,8 @@ export const App = () => {
 
   const [nodes, setNodes, onNodesChange] =
     useNodesState<Node<DiagramNodeData>>(initNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<
-    Edge<DiagramEdgeData>
-  >([]);
+  const { edges, setEdges, onEdgesChange, createNewEdge } =
+    useWrappedEdgeState();
 
   const { screenToFlowPosition } = useReactFlow();
 
@@ -131,7 +125,11 @@ export const App = () => {
             x: clientX,
             y: clientY,
           }),
-          data: { name: id, attributes: [], methods: [] },
+          data: {
+            name: `NewClass${id}`,
+            attributes: [],
+            methods: [],
+          },
           type: "ClassNode",
           dragHandle: ".node-handle",
         };
@@ -142,19 +140,18 @@ export const App = () => {
             return prev;
           }
           const next = [...prev];
-          const fromId = connectionState.fromNode.id;
-          const targetId = id;
-          next.push({
-            id: `${fromId}-${targetId}`,
-            source: fromId,
-            target: id,
-            label: <Typography>??</Typography>,
-          });
+          const source = connectionState.fromNode.id;
+          next.push(createNewEdge(source, id));
           return next;
         });
       }
     },
-    [screenToFlowPosition, setEdges, setNodes]
+    [
+      createNewEdge,
+      screenToFlowPosition,
+      setEdges,
+      setNodes,
+    ]
   );
 
   const handleNodeAdd = useCallback(() => {
@@ -196,12 +193,6 @@ export const App = () => {
           zoomOnScroll={false}
           preventScrolling={false}
           style={{ backgroundColor: "#F7F9FB" }}
-          defaultEdgeOptions={{
-            style: { strokeWidth: 4 },
-            type: "StyledEdge",
-            markerStart: "marker-arrow",
-            markerEnd: "marker-arrow",
-          }}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
