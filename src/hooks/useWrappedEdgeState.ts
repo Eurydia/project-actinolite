@@ -129,7 +129,6 @@ export const useWrappedEdgeState = () => {
             if (index !== edgeIndex) {
               return edge;
             }
-
             const { data, ...rest } = edge;
             return {
               ...rest,
@@ -142,6 +141,15 @@ export const useWrappedEdgeState = () => {
           }
         );
         return next;
+      });
+    },
+    [setEdges]
+  );
+
+  const handleEdgeDelete = useCallback(
+    (id: string) => {
+      setEdges((prev) => {
+        return prev.filter((edge) => edge.id !== id);
       });
     },
     [setEdges]
@@ -163,13 +171,15 @@ export const useWrappedEdgeState = () => {
           onMarkerStartChange: handleEdgeStartMarkerChange,
           onMarkerEndChange: handleEdgeEndMarkerChange,
           onLineTypeChange: handleEdgeLineTypeChange,
+          onDelete: handleEdgeDelete,
           markerStart: undefined,
           markerEnd: undefined,
         },
-        style: { strokeWidth: "4" },
+        style: { strokeWidth: 2 },
       };
     },
     [
+      handleEdgeDelete,
       handleEdgeEndMarkerChange,
       handleEdgeLabelChange,
       handleEdgeLineTypeChange,

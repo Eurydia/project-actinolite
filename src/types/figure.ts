@@ -44,6 +44,7 @@ export type DiagramEdgeData = {
     id: string,
     value: ValueOf<typeof DiagramEdgeLineType>
   ) => void;
+  onDelete: (id: string) => void;
 };
 
 export type DiagramNodeData = {

@@ -56,6 +56,7 @@ export const MenuButton: FC<Props> = memo(
         <Button
           disableElevation
           variant="text"
+          color="inherit"
           ref={anchorRef}
           onClick={handleMenuOpen}
         >
