@@ -1,7 +1,10 @@
 import { ClassNode } from "@/components/ClassNode";
 import { StyledEdge } from "@/components/diagram/StyledEdge";
 import { MarkerProvider } from "@/components/flow/MarkerProvider";
-import { DiagramClass } from "@/types/figure";
+import {
+  DiagramEdgeData,
+  DiagramNodeData,
+} from "@/types/figure";
 import {
   Box,
   CssBaseline,
@@ -9,6 +12,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import {
   addEdge,
@@ -34,14 +38,14 @@ const NODE_TYPES = {
   ClassNode: ClassNode,
 };
 
-const initNodes: Node[] = [
+const initNodes = [
   {
     id: "0",
     data: {
       name: "asdas",
       attributes: [],
       methods: [],
-    },
+    } as DiagramNodeData,
     position: { x: 0, y: 0 },
     type: "ClassNode",
     dragHandle: ".node-handle",
@@ -70,9 +74,10 @@ export const App = () => {
   const reactFlowWrapper = useRef(null);
 
   const [nodes, setNodes, onNodesChange] =
-    useNodesState(initNodes);
-  const [edges, setEdges, onEdgesChange] =
-    useEdgesState<Edge>([]);
+    useNodesState<Node<DiagramNodeData>>(initNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<
+    Edge<DiagramEdgeData>
+  >([]);
 
   const { screenToFlowPosition } = useReactFlow();
 
@@ -120,7 +125,7 @@ export const App = () => {
             ? event.changedTouches[0]
             : event;
 
-        const newNode: Node<DiagramClass> = {
+        const newNode: Node<DiagramNodeData> = {
           id,
           position: screenToFlowPosition({
             x: clientX,
@@ -143,6 +148,7 @@ export const App = () => {
             id: `${fromId}-${targetId}`,
             source: fromId,
             target: id,
+            label: <Typography>??</Typography>,
           });
           return next;
         });
@@ -156,7 +162,7 @@ export const App = () => {
       return;
     }
     const id = getId();
-    const newNode: Node<DiagramClass> = {
+    const newNode: Node<DiagramNodeData> = {
       id,
       position: screenToFlowPosition({
         x: contextMenu.left,

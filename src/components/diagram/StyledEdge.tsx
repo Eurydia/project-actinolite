@@ -1,3 +1,4 @@
+import { DiagramEdgeData } from "@/types/figure";
 import {
   DeleteRounded,
   SwapHorizRounded,
@@ -10,6 +11,7 @@ import {
   Toolbar,
 } from "@mui/material";
 import {
+  Edge,
   EdgeLabelRenderer,
   EdgeProps,
   getSmoothStepPath,
@@ -26,7 +28,9 @@ import {
 } from "react-icons/io5";
 import { MenuButton } from "../form/MenuButton";
 
-export const StyledEdge: FC<EdgeProps> = memo(
+export const StyledEdge: FC<
+  EdgeProps<Edge<DiagramEdgeData>>
+> = memo(
   ({
     id,
     sourceX,
@@ -35,9 +39,9 @@ export const StyledEdge: FC<EdgeProps> = memo(
     targetY,
     sourcePosition,
     targetPosition,
-    selected,
     markerEnd,
     markerStart,
+    label,
   }) => {
     const [, labelX, labelY] = getSmoothStepPath({
       sourceX,
@@ -66,6 +70,7 @@ export const StyledEdge: FC<EdgeProps> = memo(
           sourcePosition={sourcePosition}
           targetPosition={targetPosition}
           interactionWidth={4}
+          label={label}
         />
         <EdgeLabelRenderer>
           <div ref={fabRef} />
@@ -75,7 +80,7 @@ export const StyledEdge: FC<EdgeProps> = memo(
             e.preventDefault();
             e.stopPropagation();
           }}
-          open={!!selected}
+          open={false}
           anchorPosition={{
             left: labelX,
             top: labelY,

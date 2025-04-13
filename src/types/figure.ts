@@ -1,16 +1,21 @@
-export type ValueOf<T extends object> = T[keyof T];
-
-export type DiagramClass = {
-  name: string;
-  attributes: DiagramClassAttribute[];
-  methods: DiagramClassMethod[];
-};
+import { ValueOf } from "./generics";
 
 export const AccessLevel = {
   PRIVATE: "-",
   PROTECTED: "#",
   PUBLIC: "+",
 } as const;
+
+export type DiagramEdgeData = {
+  label?: string | undefined;
+  onLabelChange: (value: string | undefined) => void;
+};
+
+export type DiagramNodeData = {
+  name: string;
+  attributes: DiagramClassAttribute[];
+  methods: DiagramClassMethod[];
+};
 
 export type DiagramClassAttribute = {
   id: number;

@@ -1,7 +1,7 @@
 import {
   AccessLevel,
-  DiagramClass,
   DiagramClassMethod,
+  DiagramNodeData,
 } from "@/types/figure";
 import { faker } from "@faker-js/faker";
 import {
@@ -46,7 +46,7 @@ export const createRandomClassMethods = (count: number) => {
 
 export const createUMLClass = (count: number) => {
   return faker.helpers.multiple(
-    (): DiagramClass => {
+    (): DiagramNodeData => {
       return {
         name: faker.hacker.noun(),
         attributes: createRandomClassAttributes(5),
