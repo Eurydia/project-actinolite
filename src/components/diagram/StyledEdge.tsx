@@ -3,7 +3,10 @@ import {
   DiagramEdgeLineType,
   DiagramEdgeMarkerType,
 } from "@/types/figure";
-import { SwapHorizRounded } from "@mui/icons-material";
+import {
+  DeleteRounded,
+  SwapHorizRounded,
+} from "@mui/icons-material";
 import {
   Divider,
   IconButton,
@@ -193,6 +196,13 @@ export const StyledEdge: FC<
     [data, id]
   );
 
+  const handleDelete = useCallback(() => {
+    if (data === undefined) {
+      return;
+    }
+    data.onDelete(id);
+  }, [data, id]);
+
   if (data === undefined) {
     return null;
   }
@@ -210,7 +220,7 @@ export const StyledEdge: FC<
             position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
           }}
-        ></div>
+        />
       </EdgeLabelRenderer>
       <Popper
         anchorEl={fabRef.current}
@@ -226,33 +236,47 @@ export const StyledEdge: FC<
             variant="dense"
             disableGutters
           >
-            <Stack direction="row">
+            <Stack
+              direction="row"
+              spacing={1}
+              divider={
+                <Divider
+                  flexItem
+                  orientation="vertical"
+                />
+              }
+            >
+              <Stack direction="row">
+                <MenuButton
+                  value={data.markerStart ?? ""}
+                  onChange={handleMarkerStartChange}
+                  options={MARKER_START_OPTIONS}
+                />
+                <IconButton
+                  disableRipple
+                  onClick={handleMarkerSwap}
+                >
+                  <SwapHorizRounded />
+                </IconButton>
+                <MenuButton
+                  value={data.markerEnd ?? ""}
+                  onChange={handleMarkerEndChange}
+                  options={MARKER_END_OPTIONS}
+                />
+              </Stack>
               <MenuButton
-                value={data.markerStart ?? ""}
-                onChange={handleMarkerStartChange}
-                options={MARKER_START_OPTIONS}
+                value={data.lineType}
+                onChange={handleLineTypeChange}
+                options={lineTypeOptions}
               />
               <IconButton
                 disableRipple
-                onClick={handleMarkerSwap}
+                color="error"
+                onClick={handleDelete}
               >
-                <SwapHorizRounded />
+                <DeleteRounded />
               </IconButton>
-              <MenuButton
-                value={data.markerEnd ?? ""}
-                onChange={handleMarkerEndChange}
-                options={MARKER_END_OPTIONS}
-              />
             </Stack>
-            <Divider
-              flexItem
-              orientation="vertical"
-            />
-            <MenuButton
-              value={data.lineType}
-              onChange={handleLineTypeChange}
-              options={lineTypeOptions}
-            />
           </Toolbar>
         </Paper>
       </Popper>
