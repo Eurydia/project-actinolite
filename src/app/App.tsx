@@ -1,7 +1,8 @@
 import { ClassNode } from "@/components/ClassNode";
 import { StyledEdge } from "@/components/diagram/StyledEdge";
 import { MarkerProvider } from "@/components/flow/MarkerProvider";
-import { DiagramClass } from "@/types/figure";
+import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
+import { DiagramNodeData } from "@/types/figure";
 import {
   Box,
   CssBaseline,
@@ -15,14 +16,12 @@ import {
   Background,
   Connection,
   Controls,
-  Edge,
   EdgeTypes,
   FinalConnectionState,
   MiniMap,
   Node,
   ReactFlow,
   ReactFlowProvider,
-  useEdgesState,
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
@@ -34,14 +33,14 @@ const NODE_TYPES = {
   ClassNode: ClassNode,
 };
 
-const initNodes: Node[] = [
+const initNodes = [
   {
     id: "0",
     data: {
       name: "asdas",
       attributes: [],
       methods: [],
-    },
+    } as DiagramNodeData,
     position: { x: 0, y: 0 },
     type: "ClassNode",
     dragHandle: ".node-handle",
@@ -60,7 +59,7 @@ const initNodes: Node[] = [
 ];
 
 const EDGE_TYPES: EdgeTypes = {
-  StyledEdge: StyledEdge,
+  default: StyledEdge,
 };
 
 let id = 2;
@@ -70,9 +69,9 @@ export const App = () => {
   const reactFlowWrapper = useRef(null);
 
   const [nodes, setNodes, onNodesChange] =
-    useNodesState(initNodes);
-  const [edges, setEdges, onEdgesChange] =
-    useEdgesState<Edge>([]);
+    useNodesState<Node<DiagramNodeData>>(initNodes);
+  const { edges, setEdges, onEdgesChange, createNewEdge } =
+    useWrappedEdgeState();
 
   const { screenToFlowPosition } = useReactFlow();
 
@@ -113,42 +112,56 @@ export const App = () => {
       event: MouseEvent | TouchEvent,
       connectionState: FinalConnectionState
     ) => {
-      if (!connectionState.isValid) {
-        const id = getId();
+      let targetNodeId: string | undefined = undefined;
+      if (
+        connectionState.isValid &&
+        connectionState.toNode !== null
+      ) {
+        targetNodeId = connectionState.toNode.id;
+      } else {
+        targetNodeId = getId();
         const { clientX, clientY } =
           "changedTouches" in event
             ? event.changedTouches[0]
             : event;
 
-        const newNode: Node<DiagramClass> = {
-          id,
+        const newNode: Node<DiagramNodeData> = {
+          id: targetNodeId,
           position: screenToFlowPosition({
             x: clientX,
             y: clientY,
           }),
-          data: { name: id, attributes: [], methods: [] },
+          data: {
+            name: `NewClass${targetNodeId}`,
+            attributes: [],
+            methods: [],
+          },
           type: "ClassNode",
           dragHandle: ".node-handle",
         };
-
         setNodes((nds) => nds.concat(newNode));
+      }
+
+      if (targetNodeId !== undefined) {
         setEdges((prev) => {
           if (connectionState.fromNode === null) {
             return prev;
           }
           const next = [...prev];
-          const fromId = connectionState.fromNode.id;
-          const targetId = id;
-          next.push({
-            id: `${fromId}-${targetId}`,
-            source: fromId,
-            target: id,
-          });
+          const sourceNodeId = connectionState.fromNode.id;
+          next.push(
+            createNewEdge(sourceNodeId, targetNodeId)
+          );
           return next;
         });
       }
     },
-    [screenToFlowPosition, setEdges, setNodes]
+    [
+      createNewEdge,
+      screenToFlowPosition,
+      setEdges,
+      setNodes,
+    ]
   );
 
   const handleNodeAdd = useCallback(() => {
@@ -156,7 +169,7 @@ export const App = () => {
       return;
     }
     const id = getId();
-    const newNode: Node<DiagramClass> = {
+    const newNode: Node<DiagramNodeData> = {
       id,
       position: screenToFlowPosition({
         x: contextMenu.left,
@@ -190,12 +203,6 @@ export const App = () => {
           zoomOnScroll={false}
           preventScrolling={false}
           style={{ backgroundColor: "#F7F9FB" }}
-          defaultEdgeOptions={{
-            style: { strokeWidth: 4 },
-            type: "StyledEdge",
-            markerStart: "marker-arrow",
-            markerEnd: "marker-arrow",
-          }}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}

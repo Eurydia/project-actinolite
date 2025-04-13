@@ -10,16 +10,17 @@ import {
   memo,
   ReactNode,
   useCallback,
+  useMemo,
   useRef,
   useState,
 } from "react";
 
-type Option = ReactNode;
+type Option = { label: ReactNode; value: string };
 
 type Props = {
   options: Option[];
-  value: number;
-  onChange: (value: number) => void;
+  value: string;
+  onChange: (value: string) => void;
 };
 export const MenuButton: FC<Props> = memo(
   ({ onChange, options, value }) => {
@@ -33,14 +34,22 @@ export const MenuButton: FC<Props> = memo(
       setMenuOpen(true);
     }, []);
 
-    const itemSelectHanlderProvider = useCallback(
-      (value: number) => {
-        return () => {
-          onChange(value);
-        };
+    const handleItemChange = useCallback(
+      (value: string) => {
+        return () => onChange(value);
       },
       [onChange]
     );
+
+    const selectedOption = useMemo(() => {
+      const opt = options.find(
+        (option) => option.value === value
+      );
+      if (opt === undefined) {
+        return null;
+      }
+      return opt.label;
+    }, [value, options]);
 
     return (
       <Fragment>
@@ -50,7 +59,7 @@ export const MenuButton: FC<Props> = memo(
           ref={anchorRef}
           onClick={handleMenuOpen}
         >
-          {options[value]}
+          {selectedOption}
         </Button>
         <Menu
           open={menuOpen}
@@ -62,10 +71,10 @@ export const MenuButton: FC<Props> = memo(
             vertical: "top",
           }}
         >
-          {options.map((option, index) => (
+          {options.map(({ label, value }, index) => (
             <MenuItem
               key={`menuitem-${index}`}
-              onClick={itemSelectHanlderProvider(index)}
+              onClick={handleItemChange(value)}
             >
               <ListItemText
                 sx={{
@@ -75,7 +84,7 @@ export const MenuButton: FC<Props> = memo(
                   alignItems: "center",
                 }}
               >
-                {option}
+                {label}
               </ListItemText>
             </MenuItem>
           ))}
