@@ -41,7 +41,8 @@ export const StyledEdge: FC<
     targetPosition,
     markerEnd,
     markerStart,
-    label,
+    selected,
+    data,
   }) => {
     const [, labelX, labelY] = getSmoothStepPath({
       sourceX,
@@ -70,7 +71,6 @@ export const StyledEdge: FC<
           sourcePosition={sourcePosition}
           targetPosition={targetPosition}
           interactionWidth={4}
-          label={label}
         />
         <EdgeLabelRenderer>
           <div ref={fabRef} />
@@ -80,7 +80,7 @@ export const StyledEdge: FC<
             e.preventDefault();
             e.stopPropagation();
           }}
-          open={false}
+          open={!!selected}
           anchorPosition={{
             left: labelX,
             top: labelY,

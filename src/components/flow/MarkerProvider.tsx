@@ -1,3 +1,4 @@
+import { MarkerType } from "@/types/figure";
 import { FC } from "react";
 
 export const MarkerProvider: FC = () => {
@@ -8,7 +9,7 @@ export const MarkerProvider: FC = () => {
     >
       <defs>
         <marker
-          id="marker-diamond-outline"
+          id={MarkerType.DIAMOND_OUTLINE}
           viewBox="0 0 50 50"
           refX="48"
           refY="25"
@@ -26,7 +27,7 @@ export const MarkerProvider: FC = () => {
           />
         </marker>
         <marker
-          id="marker-diamond-filled"
+          id={MarkerType.DIAMOND_FILLED}
           viewBox="0 0 50 50"
           refX="48"
           refY="25"
@@ -43,7 +44,7 @@ export const MarkerProvider: FC = () => {
           />
         </marker>
         <marker
-          id="marker-triangle-outline"
+          id={MarkerType.TRIANGLE_OUTLINE}
           viewBox="0 0 50 50"
           refX="45"
           refY="25"
@@ -61,7 +62,7 @@ export const MarkerProvider: FC = () => {
           />
         </marker>
         <marker
-          id="marker-triangle-filled"
+          id={MarkerType.TRIANGLE_FILLED}
           viewBox="0 0 50 50"
           refX="45"
           refY="25"
@@ -78,7 +79,7 @@ export const MarkerProvider: FC = () => {
           />
         </marker>
         <marker
-          id="marker-arrow"
+          id={MarkerType.ARROW}
           markerWidth="48"
           markerHeight="48"
           viewBox="0 0 50 50"
