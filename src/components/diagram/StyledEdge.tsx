@@ -3,10 +3,7 @@ import {
   DiagramEdgeLineType,
   DiagramEdgeMarkerType,
 } from "@/types/figure";
-import {
-  DeleteRounded,
-  SwapHorizRounded,
-} from "@mui/icons-material";
+import { SwapHorizRounded } from "@mui/icons-material";
 import {
   Divider,
   IconButton,
@@ -178,6 +175,14 @@ export const StyledEdge: FC<
     [data, id]
   );
 
+  const handleMarkerSwap = useCallback(() => {
+    if (data === undefined) {
+      return;
+    }
+    data.onMarkerEndChange(id, data.markerStart);
+    data.onMarkerStartChange(id, data.markerEnd);
+  }, [data, id]);
+
   const handleLineTypeChange = useCallback(
     (value: DiagramEdgeData["lineType"]) => {
       if (data === undefined) {
@@ -227,7 +232,10 @@ export const StyledEdge: FC<
                 onChange={handleMarkerStartChange}
                 options={MARKER_START_OPTIONS}
               />
-              <IconButton>
+              <IconButton
+                disableRipple
+                onClick={handleMarkerSwap}
+              >
                 <SwapHorizRounded />
               </IconButton>
               <MenuButton
@@ -245,13 +253,6 @@ export const StyledEdge: FC<
               onChange={handleLineTypeChange}
               options={lineTypeOptions}
             />
-            <Divider
-              flexItem
-              orientation="vertical"
-            />
-            <IconButton color="error">
-              <DeleteRounded />
-            </IconButton>
           </Toolbar>
         </Paper>
       </Popper>
