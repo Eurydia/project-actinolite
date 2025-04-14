@@ -236,7 +236,7 @@ export const StyledEdge: FC<
     }
     data.onMultiplicityEndChange(
       id,
-      data.label === undefined ? "" : undefined
+      data.multiplicityEnd === undefined ? "" : undefined
     );
   }, [data, id]);
 
@@ -256,7 +256,7 @@ export const StyledEdge: FC<
     }
     data.onMultiplicityStartChange(
       id,
-      data.label === undefined ? "" : undefined
+      data.multiplicityStart === undefined ? "" : undefined
     );
   }, [data, id]);
 
