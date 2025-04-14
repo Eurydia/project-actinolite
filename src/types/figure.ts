@@ -20,9 +20,9 @@ export const DiagramEdgeLineType = {
 };
 
 export type DiagramEdgeData = {
-  multiplicityStart?: string | undefined;
-  multiplicityEnd?: string | undefined;
-  label?: string | undefined;
+  multiplicityStart: string | undefined;
+  multiplicityEnd: string | undefined;
+  label: string | undefined;
   markerStart:
     | ValueOf<typeof DiagramEdgeMarkerType>
     | undefined;
