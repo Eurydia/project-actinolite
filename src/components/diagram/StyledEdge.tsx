@@ -259,7 +259,7 @@ export const StyledEdge: FC<
             sx={{
               display: !hasLabel ? "none" : undefined,
               visibility: !hasLabel ? "hidden" : undefined,
-              backgroundColor: alpha("#fff", 0.8),
+              backgroundColor: alpha("#fff", 0.5),
               borderRadius: 1,
               padding: 1,
               textAlign: "center",
