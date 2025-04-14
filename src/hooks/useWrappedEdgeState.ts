@@ -146,6 +146,56 @@ export const useWrappedEdgeState = () => {
     [setEdges]
   );
 
+  const handleMultiplicityStartChange = useCallback(
+    (id: string, value: string | undefined) => {
+      setEdges((prev) => {
+        const next: typeof prev = [];
+        for (const edge of prev) {
+          if (edge.id !== id) {
+            next.push(edge);
+            continue;
+          }
+          const { data, ...rest } = edge;
+          const nextEdge: typeof edge = {
+            ...rest,
+            data: {
+              ...data!,
+              multiplicityStart: value,
+            },
+          };
+          next.push(nextEdge);
+        }
+        return next;
+      });
+    },
+    [setEdges]
+  );
+
+  const handleMultiplicityEndChange = useCallback(
+    (id: string, value: string | undefined) => {
+      setEdges((prev) => {
+        const next: typeof prev = [];
+        for (const edge of prev) {
+          if (edge.id !== id) {
+            next.push(edge);
+            continue;
+          }
+          const { data, ...rest } = edge;
+          const nextEdge: typeof edge = {
+            ...rest,
+            data: {
+              ...data!,
+              multiplicityEnd: value,
+            },
+          };
+          next.push(nextEdge);
+        }
+        return next;
+      });
+    },
+    [setEdges]
+  );
+
   const handleEdgeDelete = useCallback(
     (id: string) => {
       setEdges((prev) => {
@@ -167,13 +217,17 @@ export const useWrappedEdgeState = () => {
         target,
         data: {
           lineType: DiagramEdgeLineType.SOLID,
+          markerStart: undefined,
+          markerEnd: undefined,
           onLabelChange: handleEdgeLabelChange,
           onMarkerStartChange: handleEdgeStartMarkerChange,
           onMarkerEndChange: handleEdgeEndMarkerChange,
           onLineTypeChange: handleEdgeLineTypeChange,
           onDelete: handleEdgeDelete,
-          markerStart: undefined,
-          markerEnd: undefined,
+          onMultiplicityEndChange:
+            handleMultiplicityEndChange,
+          onMultiplicityStartChange:
+            handleMultiplicityStartChange,
         },
         style: { strokeWidth: 2 },
       };
@@ -184,6 +238,8 @@ export const useWrappedEdgeState = () => {
       handleEdgeLabelChange,
       handleEdgeLineTypeChange,
       handleEdgeStartMarkerChange,
+      handleMultiplicityEndChange,
+      handleMultiplicityStartChange,
     ]
   );
 

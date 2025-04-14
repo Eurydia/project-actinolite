@@ -20,6 +20,8 @@ export const DiagramEdgeLineType = {
 };
 
 export type DiagramEdgeData = {
+  multiplicityStart?: string | undefined;
+  multiplicityEnd?: string | undefined;
   label?: string | undefined;
   markerStart:
     | ValueOf<typeof DiagramEdgeMarkerType>
@@ -45,6 +47,14 @@ export type DiagramEdgeData = {
     value: ValueOf<typeof DiagramEdgeLineType>
   ) => void;
   onDelete: (id: string) => void;
+  onMultiplicityStartChange: (
+    id: string,
+    value: string | undefined
+  ) => void;
+  onMultiplicityEndChange: (
+    id: string,
+    value: string | undefined
+  ) => void;
 };
 
 export type DiagramNodeData = {
