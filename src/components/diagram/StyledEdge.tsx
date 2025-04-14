@@ -353,7 +353,7 @@ export const StyledEdge: FC<
         <div
           style={{
             position: "absolute",
-            transform: `translate(-50%,-100%) translate(${rest.targetX}px,${rest.targetY}px)`,
+            transform: `translate(-50%,-100%) translate(${rest.sourceX}px,${rest.sourceY}px)`,
             pointerEvents: "all",
           }}
         >
