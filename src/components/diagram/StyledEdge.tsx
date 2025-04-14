@@ -10,13 +10,14 @@ import {
   TextIncreaseRounded,
 } from "@mui/icons-material";
 import {
-  alpha,
   Divider,
   IconButton,
   Paper,
   Popper,
   Stack,
   Toolbar,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import {
   Edge,
@@ -229,8 +230,62 @@ export const StyledEdge: FC<
     );
   }, [data, id]);
 
+  const handleMultiplicityEndToggle = useCallback(() => {
+    if (data === undefined) {
+      return;
+    }
+    data.onMultiplicityEndChange(
+      id,
+      data.multiplicityEnd === undefined ? "" : undefined
+    );
+  }, [data, id]);
+
+  const handleMultiplicityEndChange = useCallback(
+    (value: string) => {
+      if (data === undefined) {
+        return;
+      }
+      data.onMultiplicityEndChange(id, value);
+    },
+    [data, id]
+  );
+
+  const handleMultiplicityStartToggle = useCallback(() => {
+    if (data === undefined) {
+      return;
+    }
+    data.onMultiplicityStartChange(
+      id,
+      data.multiplicityStart === undefined ? "" : undefined
+    );
+  }, [data, id]);
+
+  const handleMultiplicityStartChange = useCallback(
+    (value: string) => {
+      if (data === undefined) {
+        return;
+      }
+      data.onMultiplicityStartChange(id, value);
+    },
+    [data, id]
+  );
+
   const hasLabel = useMemo(() => {
     return data !== undefined && data.label !== undefined;
+  }, [data]);
+
+  const hasMultiplicityEnd = useMemo(() => {
+    return (
+      data !== undefined &&
+      data.multiplicityEnd !== undefined
+    );
+  }, [data]);
+
+  const hasMultiplicityStart = useMemo(() => {
+    return (
+      data !== undefined &&
+      data.multiplicityStart !== undefined
+    );
   }, [data]);
 
   if (data === undefined) {
@@ -257,14 +312,66 @@ export const StyledEdge: FC<
             value={data.label ?? ""}
             onTextChange={handleLabelChange}
             sx={{
-              display: !hasLabel ? "none" : undefined,
-              visibility: !hasLabel ? "hidden" : undefined,
-              backgroundColor: alpha("#fff", 0.5),
-              borderRadius: 1,
-              padding: 1,
               textAlign: "center",
               maxWidth: 200,
               minWidth: 70,
+              display: !hasLabel ? "none" : undefined,
+              visibility: !hasLabel ? "hidden" : undefined,
+              textShadow: TEXT_SHADOW,
+            }}
+          />
+        </div>
+      </EdgeLabelRenderer>
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            position: "absolute",
+            transform: `translate(-50%,-100%) translate(${rest.targetX}px,${rest.targetY}px)`,
+            pointerEvents: "all",
+          }}
+        >
+          <StrictTextField
+            placeholder="1..1"
+            value={data.multiplicityEnd ?? ""}
+            onTextChange={handleMultiplicityEndChange}
+            sx={{
+              textAlign: "center",
+              maxWidth: 200,
+              minWidth: 70,
+              display: !hasMultiplicityEnd
+                ? "none"
+                : undefined,
+              visibility: !hasMultiplicityEnd
+                ? "hidden"
+                : undefined,
+              textShadow: TEXT_SHADOW,
+            }}
+          />
+        </div>
+      </EdgeLabelRenderer>
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            position: "absolute",
+            transform: `translate(-50%,0%) translate(${rest.sourceX}px,${rest.sourceY}px)`,
+            pointerEvents: "all",
+          }}
+        >
+          <StrictTextField
+            placeholder="1..1"
+            value={data.multiplicityStart ?? ""}
+            onTextChange={handleMultiplicityStartChange}
+            sx={{
+              textAlign: "center",
+              maxWidth: 200,
+              minWidth: 70,
+              display: !hasMultiplicityStart
+                ? "none"
+                : undefined,
+              visibility: !hasMultiplicityStart
+                ? "hidden"
+                : undefined,
+              textShadow: TEXT_SHADOW,
             }}
           />
         </div>
@@ -316,14 +423,59 @@ export const StyledEdge: FC<
                 onChange={handleLineTypeChange}
                 options={lineTypeOptions}
               />
-              <IconButton
-                disableRipple
-                onClick={handleLabelToggle}
-                color="default"
+              <Stack
+                spacing={1}
+                direction="row"
               >
-                {hasLabel && <TextDecreaseRounded />}
-                {!hasLabel && <TextIncreaseRounded />}
-              </IconButton>
+                <IconButton
+                  disableRipple
+                  onClick={handleLabelToggle}
+                  color="default"
+                >
+                  {hasLabel && <TextDecreaseRounded />}
+                  {!hasLabel && <TextIncreaseRounded />}
+                </IconButton>
+                <Tooltip
+                  title={
+                    <Typography>
+                      Source multiplicity
+                    </Typography>
+                  }
+                >
+                  <IconButton
+                    disableRipple
+                    onClick={handleMultiplicityStartToggle}
+                    color="default"
+                  >
+                    {hasMultiplicityStart && (
+                      <TextDecreaseRounded />
+                    )}
+                    {!hasMultiplicityStart && (
+                      <TextIncreaseRounded />
+                    )}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip
+                  title={
+                    <Typography>
+                      Target multiplicity
+                    </Typography>
+                  }
+                >
+                  <IconButton
+                    disableRipple
+                    onClick={handleMultiplicityEndToggle}
+                    color="default"
+                  >
+                    {hasMultiplicityEnd && (
+                      <TextDecreaseRounded />
+                    )}
+                    {!hasMultiplicityEnd && (
+                      <TextIncreaseRounded />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              </Stack>
               <IconButton
                 disableRipple
                 color="error"
