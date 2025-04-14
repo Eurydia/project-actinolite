@@ -16,7 +16,6 @@ const StyledInput: FC<InputBaseProps> = ({
       {...rest}
       sx={{
         fontFamily: "monospace",
-        ...sx,
       }}
       slotProps={{
         ...slotProps,
@@ -30,6 +29,7 @@ const StyledInput: FC<InputBaseProps> = ({
             "&:focus": {
               textDecorationLine: "underline",
             },
+            ...sx,
           },
           spellCheck: "false",
           autoCapitalize: "none",
