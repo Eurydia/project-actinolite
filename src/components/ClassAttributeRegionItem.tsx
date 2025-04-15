@@ -1,22 +1,46 @@
+import { useContextMenu } from "@/hooks/useContextMenu";
 import { DiagramClassAttribute } from "@/types/figure";
+import { DeleteRounded } from "@mui/icons-material";
 import {
   Box,
+  Divider,
   InputAdornment,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  MenuList,
   Typography,
 } from "@mui/material";
 import { FC, useCallback } from "react";
 import { StrictTextField } from "./StrictTextField";
 
 type Props = {
-  data: DiagramClassAttribute;
-  onChange: (value: DiagramClassAttribute) => void;
+  classId: string;
+  id: number;
+  data: DiagramClassAttribute["data"];
+  handlers: DiagramClassAttribute["handlers"];
 };
 export const ClassAttributeRegionItem: FC<Props> = ({
-  data: { id, access_, primary, secondary },
-  onChange,
+  data: { access_, primary, secondary },
+  handlers: {
+    onAccessChange,
+    onDelete,
+    onDuplicate,
+    onPrimaryChange,
+    onSecondaryChange,
+  },
+  id,
+  classId,
 }) => {
+  const {
+    contextMenu,
+    handleContextMenuClose,
+    handleContextMenuOpen,
+    handlePreventDefaultContextMenu,
+  } = useContextMenu();
   const handleAccessChange = useCallback(() => {
-    let nextAccess: DiagramClassAttribute["access_"];
+    let nextAccess: DiagramClassAttribute["data"]["access_"];
     switch (access_) {
       case "#":
         nextAccess = "-";
@@ -27,74 +51,102 @@ export const ClassAttributeRegionItem: FC<Props> = ({
       default:
         nextAccess = "#";
     }
-    onChange({
-      id,
-      access_: nextAccess,
-      secondary,
-      primary,
-    });
-  }, [access_, id, onChange, primary, secondary]);
+    onAccessChange(classId, id, nextAccess);
+  }, [access_, classId, id, onAccessChange]);
 
   const handlePrimaryChange = useCallback(
     (value: string) => {
-      onChange({
-        id,
-        access_,
-        secondary,
-        primary: value,
-      });
+      onPrimaryChange(classId, id, value);
     },
-    [access_, id, onChange, secondary]
+    [classId, id, onPrimaryChange]
   );
 
   const handleSecondaryChange = useCallback(
     (value: string) => {
-      onChange({
-        id,
-        access_,
-        primary,
-        secondary: value,
-      });
+      onSecondaryChange(classId, id, value);
     },
-    [access_, id, onChange, primary]
+    [classId, id, onSecondaryChange]
   );
 
-  return (
-    <Box
-      component="li"
-      paddingX={1}
-      sx={{
-        cursor: "auto",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 0.5,
+  const handleDuplicate = useCallback(() => {
+    onDuplicate(classId, id);
+  }, [classId, id, onDuplicate]);
 
-        listStyle: "none",
-        height: 50,
-      }}
-    >
-      <InputAdornment position="start">
-        <Typography
-          fontFamily="monospace"
-          fontWeight={900}
-          onClick={handleAccessChange}
-          sx={{ cursor: "pointer" }}
-        >
-          {access_}
-        </Typography>
-      </InputAdornment>
-      <StrictTextField
-        placeholder="unnamed"
-        value={primary}
-        onTextChange={handlePrimaryChange}
-      />
-      <Typography paddingX={1}>:</Typography>
-      <StrictTextField
-        placeholder="untyped"
-        value={secondary}
-        onTextChange={handleSecondaryChange}
-      />
-    </Box>
+  const handleDelete = useCallback(() => {
+    onDelete(classId, id);
+  }, [classId, id, onDelete]);
+
+  return (
+    <>
+      <Box
+        component="li"
+        sx={{
+          cursor: "auto",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 0.5,
+          listStyle: "none",
+          height: 50,
+        }}
+        onContextMenu={handleContextMenuOpen}
+      >
+        <InputAdornment position="start">
+          <Typography
+            fontFamily="monospace"
+            fontWeight={900}
+            onClick={handleAccessChange}
+            sx={{ cursor: "pointer" }}
+          >
+            {access_}
+          </Typography>
+        </InputAdornment>
+        <StrictTextField
+          placeholder="unnamed"
+          value={primary}
+          onTextChange={handlePrimaryChange}
+        />
+        <Typography paddingX={1}>:</Typography>
+        <StrictTextField
+          placeholder="untyped"
+          value={secondary}
+          onTextChange={handleSecondaryChange}
+        />
+      </Box>
+      <Menu
+        onContextMenu={handlePreventDefaultContextMenu}
+        open={contextMenu !== undefined}
+        onClose={handleContextMenuClose}
+        onClick={handleContextMenuClose}
+        anchorReference="anchorPosition"
+        anchorPosition={contextMenu}
+      >
+        <MenuList>
+          <MenuItem onClick={handleDuplicate}>
+            <ListItemText
+              inset
+              slotProps={{
+                primary: { fontFamily: "monospace" },
+              }}
+            >
+              Duplicate
+            </ListItemText>
+          </MenuItem>
+          <Divider flexItem />
+          <MenuItem onClick={handleDelete}>
+            <ListItemIcon>
+              <DeleteRounded />
+            </ListItemIcon>
+            <ListItemText
+              slotProps={{
+                primary: { fontFamily: "monospace" },
+              }}
+            >
+              Delete
+            </ListItemText>
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    </>
   );
 };

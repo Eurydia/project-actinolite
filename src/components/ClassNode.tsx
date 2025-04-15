@@ -1,7 +1,5 @@
-import {
-  createClassAttribute,
-  createClassMethod,
-} from "@/services/models";
+import { useContextMenu } from "@/hooks/useContextMenu";
+import { createClassMethod } from "@/services/models";
 import {
   AccessLevel,
   DiagramClassAttribute,
@@ -58,6 +56,7 @@ export const ClassNode: FC<
   }, [color, palette]);
 
   const [name, setName] = useState(data.name);
+
   const [
     attributeContainerRef,
     attributeItems,
@@ -79,50 +78,12 @@ export const ClassNode: FC<
       }
     );
 
-  const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
-
-  const handleContextMenu = useCallback(
-    (event: React.MouseEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setContextMenu(
-        contextMenu === null
-          ? {
-              mouseX: event.clientX + 2,
-              mouseY: event.clientY - 6,
-            }
-          : null
-      );
-
-      const selection = document.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-
-        setTimeout(() => {
-          selection.addRange(range);
-        });
-      }
-    },
-    [contextMenu]
-  );
-
-  const handleClose = useCallback(() => {
-    setContextMenu(null);
-  }, []);
-
-  const handleAttributeItemChange = useCallback(
-    (value: DiagramClassAttribute, index: number) => {
-      setAttributeItems((prev) => {
-        const next = [...prev];
-        next[index] = value;
-        return next;
-      });
-    },
-    [setAttributeItems]
-  );
+  const {
+    contextMenu,
+    handleContextMenuClose,
+    handleContextMenuOpen,
+    handlePreventDefaultContextMenu,
+  } = useContextMenu();
 
   const handleMethodItemChange = useCallback(
     (value: DiagramClassMethod, index: number) => {
@@ -136,19 +97,18 @@ export const ClassNode: FC<
   );
 
   const handleAddAttribute = useCallback(() => {
-    setAttributeItems((prev) => {
-      const next = [...prev];
-      next.push(
-        createClassAttribute({
-          access_: AccessLevel.PUBLIC,
-          primary: "",
-          secondary: "",
-        })
-      );
-      return next;
-    });
-    handleClose();
-  }, [handleClose, setAttributeItems]);
+    // setAttributeItems((prev) => {
+    //   const next = [...prev];
+    //   next.push(
+    //     createClassAttribute({
+    //       access_: AccessLevel.PUBLIC,
+    //       primary: "",
+    //       secondary: "",
+    //     })
+    //   );
+    //   return next;
+    // });
+  }, [setAttributeItems]);
 
   const handleAddMethod = useCallback(() => {
     setMethodItems((prev) => {
@@ -179,32 +139,67 @@ export const ClassNode: FC<
         type="target"
         position={Position.Top}
       />
-      {/* <Handle
-          type="source"
-          position={Position.Bottom}
-          id={id + "handle-bottom"}
-        />
-        <Handle
-          type="source"
-          position={Position.Left}
-          id={id + "handle-left"}
-        /> */}
-      <Menu
-        onContextMenu={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+
+      <Paper
+        variant="outlined"
+        onContextMenu={handleContextMenuOpen}
+        sx={{
+          width: "100%",
+          height: "100%",
+          backgroundColor: ({ palette }) =>
+            palette.background.paper,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
         }}
-        open={contextMenu !== null}
-        onClose={handleClose}
+      >
+        <Box
+          className="node-handle"
+          sx={{
+            backgroundColor: color,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-start",
+            textAlign: "center",
+            padding: 1.5,
+          }}
+        >
+          <StrictTextField
+            value={name}
+            onTextChange={setName}
+            placeholder="unnamed"
+            sx={{ color: textColorContrast }}
+          />
+        </Box>
+        <Stack
+          spacing={1}
+          divider={<Divider variant="middle" />}
+          sx={{
+            height: "100%",
+            overflow: "auto",
+            scrollbarWidth: "thin",
+          }}
+        >
+          <ClassAttributeRegion
+            classId={id}
+            containerRef={attributeContainerRef}
+            items={attributeItems}
+          />
+          <ClassMethodRegion
+            classId={id}
+            items={methodItems}
+            containerRef={methodContainerRef}
+            onChange={handleMethodItemChange}
+          />
+        </Stack>
+      </Paper>
+      <Menu
+        open={contextMenu !== undefined}
+        onContextMenu={handlePreventDefaultContextMenu}
+        onClose={handleContextMenuClose}
+        onClick={handleContextMenuClose}
         anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu !== null
-            ? {
-                top: contextMenu.mouseY,
-                left: contextMenu.mouseX,
-              }
-            : undefined
-        }
+        anchorPosition={contextMenu}
       >
         <Box padding={2}>
           <Stack spacing={1}>
@@ -266,60 +261,6 @@ export const ClassNode: FC<
           <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
-      <Paper
-        variant="outlined"
-        onContextMenu={handleContextMenu}
-        sx={{
-          width: "100%",
-          height: "100%",
-          backgroundColor: ({ palette }) =>
-            palette.background.paper,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          className="node-handle"
-          sx={{
-            backgroundColor: color,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "flex-start",
-            textAlign: "center",
-            padding: 1.5,
-          }}
-        >
-          <StrictTextField
-            value={name}
-            onTextChange={setName}
-            placeholder="unnamed"
-            sx={{ color: textColorContrast }}
-          />
-        </Box>
-        <Stack
-          spacing={1}
-          divider={<Divider variant="middle" />}
-          sx={{
-            height: "100%",
-            overflow: "auto",
-            scrollbarWidth: "thin",
-          }}
-        >
-          <ClassAttributeRegion
-            classId={id}
-            containerRef={attributeContainerRef}
-            items={attributeItems}
-            onItemChange={handleAttributeItemChange}
-          />
-          <ClassMethodRegion
-            classId={id}
-            items={methodItems}
-            containerRef={methodContainerRef}
-            onChange={handleMethodItemChange}
-          />
-        </Stack>
-      </Paper>
     </>
   );
 });

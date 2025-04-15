@@ -1,8 +1,9 @@
 import { ClassNode } from "@/components/ClassNode";
 import { StyledEdge } from "@/components/diagram/StyledEdge";
 import { MarkerProvider } from "@/components/flow/MarkerProvider";
+import { useContextMenu } from "@/hooks/useContextMenu";
 import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
-import { DiagramNodeData } from "@/types/figure";
+import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import {
   Box,
   CssBaseline,
@@ -19,14 +20,11 @@ import {
   EdgeTypes,
   FinalConnectionState,
   MiniMap,
-  Node,
   ReactFlow,
   ReactFlowProvider,
-  useNodesState,
-  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { ToastContainer } from "react-toastify";
 
 const NODE_TYPES = {
@@ -34,17 +32,17 @@ const NODE_TYPES = {
 };
 
 const initNodes = [
-  {
-    id: "0",
-    data: {
-      name: "asdas",
-      attributes: [],
-      methods: [],
-    } as DiagramNodeData,
-    position: { x: 0, y: 0 },
-    type: "ClassNode",
-    dragHandle: ".node-handle",
-  },
+  // {
+  //   id: "0",
+  //   data: {
+  //     name: "asdas",
+  //     attributes: [],
+  //     methods: [],
+  //   } as DiagramNodeData,
+  //   position: { x: 0, y: 0 },
+  //   type: "ClassNode",
+  //   dragHandle: ".node-handle",
+  // },
   // {
   //   id: "1",
   //   data: {
@@ -62,18 +60,13 @@ const EDGE_TYPES: EdgeTypes = {
   default: StyledEdge,
 };
 
-let id = 2;
-const getId = () => `${id++}`;
-
 export const App = () => {
   const reactFlowWrapper = useRef(null);
 
-  const [nodes, setNodes, onNodesChange] =
-    useNodesState<Node<DiagramNodeData>>(initNodes);
+  const { nodes, createNewNode, onNodesChange } =
+    useWrappedNodeState();
   const { edges, setEdges, onEdgesChange, createNewEdge } =
     useWrappedEdgeState();
-
-  const { screenToFlowPosition } = useReactFlow();
 
   const onConnect = useCallback(
     (params: Connection) =>
@@ -81,31 +74,12 @@ export const App = () => {
     [setEdges]
   );
 
-  const [contextMenu, setContextMenu] = useState<{
-    left: number;
-    top: number;
-  }>();
-
-  const handleContextMenu = useCallback(
-    (event: React.MouseEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const { clientX, clientY } = event;
-      setContextMenu(
-        contextMenu === undefined
-          ? {
-              left: clientX,
-              top: clientY,
-            }
-          : undefined
-      );
-    },
-    [contextMenu]
-  );
-
-  const handleClose = useCallback(() => {
-    setContextMenu(undefined);
-  }, []);
+  const {
+    contextMenu,
+    handleContextMenuClose,
+    handleContextMenuOpen,
+    handlePreventDefaultContextMenu,
+  } = useContextMenu();
 
   const onConnectEnd = useCallback(
     (
@@ -113,33 +87,22 @@ export const App = () => {
       connectionState: FinalConnectionState
     ) => {
       let targetNodeId: string | undefined = undefined;
+
       if (
         connectionState.isValid &&
         connectionState.toNode !== null
       ) {
         targetNodeId = connectionState.toNode.id;
       } else {
-        targetNodeId = getId();
         const { clientX, clientY } =
           "changedTouches" in event
             ? event.changedTouches[0]
             : event;
 
-        const newNode: Node<DiagramNodeData> = {
-          id: targetNodeId,
-          position: screenToFlowPosition({
-            x: clientX,
-            y: clientY,
-          }),
-          data: {
-            name: `NewClass${targetNodeId}`,
-            attributes: [],
-            methods: [],
-          },
-          type: "ClassNode",
-          dragHandle: ".node-handle",
-        };
-        setNodes((nds) => nds.concat(newNode));
+        targetNodeId = createNewNode({
+          top: clientY,
+          left: clientX,
+        });
       }
 
       if (targetNodeId !== undefined) {
@@ -156,36 +119,15 @@ export const App = () => {
         });
       }
     },
-    [
-      createNewEdge,
-      screenToFlowPosition,
-      setEdges,
-      setNodes,
-    ]
+    [createNewEdge, createNewNode, setEdges]
   );
 
   const handleNodeAdd = useCallback(() => {
     if (contextMenu === undefined) {
       return;
     }
-    const id = getId();
-    const newNode: Node<DiagramNodeData> = {
-      id,
-      position: screenToFlowPosition({
-        x: contextMenu.left,
-        y: contextMenu.top,
-      }),
-      data: {
-        name: `NewClass${id}`,
-        attributes: [],
-        methods: [],
-      },
-      type: "ClassNode",
-      dragHandle: ".node-handle",
-    };
-
-    setNodes((nds) => nds.concat(newNode));
-  }, [contextMenu, screenToFlowPosition, setNodes]);
+    createNewNode(contextMenu);
+  }, [contextMenu, createNewNode]);
 
   return (
     <>
@@ -209,7 +151,7 @@ export const App = () => {
           onConnectEnd={onConnectEnd}
           fitView
           fitViewOptions={{ padding: 2 }}
-          onContextMenu={handleContextMenu}
+          onContextMenu={handleContextMenuOpen}
           defaultViewport={{ zoom: 1.2, x: 0, y: 0 }}
         >
           <Background
@@ -221,13 +163,10 @@ export const App = () => {
         </ReactFlow>
       </Box>
       <Menu
-        onContextMenu={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
         open={contextMenu !== undefined}
-        onClose={handleClose}
-        onClick={handleClose}
+        onContextMenu={handlePreventDefaultContextMenu}
+        onClose={handleContextMenuClose}
+        onClick={handleContextMenuClose}
         anchorReference="anchorPosition"
         anchorPosition={contextMenu}
       >
