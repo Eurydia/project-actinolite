@@ -19,11 +19,14 @@ export const createClassMethod = (
 let GLOBAL_ATTRIBUTE_ID = 0;
 export const createClassAttribute = (
   init: Partial<Omit<DiagramClassAttribute, "id">>
-): DiagramClassAttribute => {
+): Omit<DiagramClassAttribute, "handlers"> => {
   return {
     id: GLOBAL_ATTRIBUTE_ID++,
-    access_: init.access_ ?? AccessLevel.PRIVATE,
-    primary: init.primary ?? "",
-    secondary: init.secondary ?? "",
+
+    data: {
+      access_: init.access_ ?? AccessLevel.PRIVATE,
+      primary: init.primary ?? "",
+      secondary: init.secondary ?? "",
+    },
   };
 };

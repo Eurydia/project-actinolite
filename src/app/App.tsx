@@ -1,6 +1,7 @@
 import { ClassNode } from "@/components/ClassNode";
 import { StyledEdge } from "@/components/diagram/StyledEdge";
 import { MarkerProvider } from "@/components/flow/MarkerProvider";
+import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
@@ -31,31 +32,6 @@ const NODE_TYPES = {
   ClassNode: ClassNode,
 };
 
-const initNodes = [
-  // {
-  //   id: "0",
-  //   data: {
-  //     name: "asdas",
-  //     attributes: [],
-  //     methods: [],
-  //   } as DiagramNodeData,
-  //   position: { x: 0, y: 0 },
-  //   type: "ClassNode",
-  //   dragHandle: ".node-handle",
-  // },
-  // {
-  //   id: "1",
-  //   data: {
-  //     name: "q",
-  //     attributes: createRandomClassAttributes(4),
-  //     methods: createRandomClassMethods(3),
-  //   },
-  //   position: { x: 100, y: 100 },
-  //   type: "ClassNode",
-  //   dragHandle: ".node-handle",
-  // },
-];
-
 const EDGE_TYPES: EdgeTypes = {
   default: StyledEdge,
 };
@@ -63,8 +39,15 @@ const EDGE_TYPES: EdgeTypes = {
 export const App = () => {
   const reactFlowWrapper = useRef(null);
 
-  const { nodes, createNewNode, onNodesChange } =
-    useWrappedNodeState();
+  const {
+    nodes,
+    onNodeAdd,
+    onNodesChange,
+    onNodeAttributeAdd,
+    onNodeAttributeChange,
+    onNodeAttributeRemove,
+  } = useWrappedNodeState();
+
   const { edges, setEdges, onEdgesChange, createNewEdge } =
     useWrappedEdgeState();
 
@@ -99,7 +82,7 @@ export const App = () => {
             ? event.changedTouches[0]
             : event;
 
-        targetNodeId = createNewNode({
+        targetNodeId = onNodeAdd({
           top: clientY,
           left: clientX,
         });
@@ -119,18 +102,24 @@ export const App = () => {
         });
       }
     },
-    [createNewEdge, createNewNode, setEdges]
+    [createNewEdge, onNodeAdd, setEdges]
   );
 
   const handleNodeAdd = useCallback(() => {
     if (contextMenu === undefined) {
       return;
     }
-    createNewNode(contextMenu);
-  }, [contextMenu, createNewNode]);
+    onNodeAdd(contextMenu);
+  }, [contextMenu, onNodeAdd]);
 
   return (
-    <>
+    <WrappedNodeContext.Provider
+      value={{
+        onAttributeAdd: onNodeAttributeAdd,
+        onAttributeRemove: onNodeAttributeRemove,
+        onAttributeChange: onNodeAttributeChange,
+      }}
+    >
       <Box
         ref={reactFlowWrapper}
         component="div"
@@ -213,7 +202,7 @@ export const App = () => {
           </ListItemText>
         </MenuItem>
       </Menu>
-    </>
+    </WrappedNodeContext.Provider>
   );
 };
 

@@ -28,8 +28,8 @@ export const ClassAttributeRegion: FC<Props> = ({
       {items.map((item) => (
         <ClassAttributeRegionItem
           key={`class-${classId}-attribute-${item.id}`}
-          classId={classId}
-          {...item}
+          nodeId={classId}
+          data={item}
         />
       ))}
     </Box>

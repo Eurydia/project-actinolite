@@ -1,6 +1,5 @@
 import {
   DiagramClassAttribute,
-  DiagramClassMethod,
   DiagramNodeData,
 } from "@/types/figure";
 import {
@@ -13,30 +12,18 @@ import { useCallback } from "react";
 let currentNodeId = 0;
 const getNextNodeId = () => currentNodeId++;
 
+let currentNodeAttributeId = 0;
+const getNextNodeAttributeId = () =>
+  currentNodeAttributeId++;
+
 export const useWrappedNodeState = () => {
   const { screenToFlowPosition } = useReactFlow();
+
   const [nodes, setNodes, onNodesChange] = useNodesState<
     Node<DiagramNodeData>
   >([]);
 
-  const handleAttributeChange = useCallback(
-    (id: string, value: DiagramClassAttribute[]) => {
-      setNodes((prev) => {
-        const next: typeof prev = [];
-        for (const node of prev) {
-          if (node.id !== id) next.push(node);
-
-          const nextNode = structuredClone(node);
-          nextNode.data.attributes = value;
-          next.push(nextNode);
-        }
-        return next;
-      });
-    },
-    [setNodes]
-  );
-
-  const createNewNode = useCallback(
+  const onNodeAdd = useCallback(
     (position: { left: number; top: number }) => {
       const id = getNextNodeId().toString();
       const newNode: Node<DiagramNodeData> = {
@@ -51,24 +38,92 @@ export const useWrappedNodeState = () => {
           name: `NewClass${id}`,
           attributes: [],
           methods: [],
-          onAttributeChange: handleAttributeChange,
-          onMethodChange: function (
-            id: number,
-            value: DiagramClassMethod[]
-          ): void {
-            throw new Error("Function not implemented.");
-          },
         },
       };
       setNodes((nds) => nds.concat(newNode));
       return id;
     },
-    [handleAttributeChange, screenToFlowPosition, setNodes]
+    [screenToFlowPosition, setNodes]
   );
+
+  const onNodeAttributeAdd = useCallback(
+    (
+      nodeId: string,
+      value: Omit<DiagramClassAttribute, "id">
+    ) => {
+      setNodes((prev) => {
+        const next: typeof prev = [];
+        for (const node of prev) {
+          if (node.id !== nodeId) {
+            next.push(node);
+            continue;
+          }
+          const nextNode = structuredClone(node);
+          nextNode.data.attributes.push({
+            id: getNextNodeAttributeId(),
+            access_: value.access_,
+            primary: value.primary,
+            secondary: value.secondary,
+          });
+          next.push(nextNode);
+        }
+        return next;
+      });
+    },
+    [setNodes]
+  );
+
+  const onNodeAttributeChange = useCallback(
+    (nodeId: string, value: DiagramClassAttribute) => {
+      setNodes((prev) => {
+        const next: typeof prev = [];
+        for (const node of prev) {
+          if (node.id !== nodeId) {
+            next.push(node);
+            continue;
+          }
+          const nextNode = structuredClone(node);
+
+          nextNode.data.attributes =
+            nextNode.data.attributes.map((attr) =>
+              attr.id !== value.id ? attr : value
+            );
+        }
+        return next;
+      });
+    },
+    [setNodes]
+  );
+
+  const onNodeAttributeRemove = useCallback(
+    (nodeId: string, attrId: number) => {
+      setNodes((prev) => {
+        const next: typeof prev = [];
+        for (const node of prev) {
+          if (node.id !== nodeId) {
+            next.push(node);
+            continue;
+          }
+
+          const nextNode = structuredClone(node);
+          nextNode.data.attributes =
+            nextNode.data.attributes.filter(
+              ({ id }) => id !== attrId
+            );
+          next.push(nextNode);
+        }
+        return next;
+      });
+    },
+    [setNodes]
+  );
+
   return {
-    createNewNode,
     nodes,
-    setNodes,
     onNodesChange,
+    onNodeAdd,
+    onNodeAttributeAdd,
+    onNodeAttributeChange,
+    onNodeAttributeRemove,
   };
 };

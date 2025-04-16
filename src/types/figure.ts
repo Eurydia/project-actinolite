@@ -61,43 +61,13 @@ export type DiagramNodeData = {
   name: string;
   attributes: DiagramClassAttribute[];
   methods: DiagramClassMethod[];
-  onAttributeChange: (
-    id: string,
-    value: DiagramClassAttribute[]
-  ) => void;
-  onMethodChange: (
-    id: number,
-    value: DiagramClassMethod[]
-  ) => void;
 };
 
 export type DiagramClassAttribute = {
   id: number;
-  index: number;
-  data: {
-    access_: ValueOf<typeof AccessLevel>;
-    primary: string;
-    secondary: string;
-  };
-  handlers: {
-    onAccessChange: (
-      classId: number,
-      id: number,
-      value: ValueOf<typeof AccessLevel>
-    ) => void;
-    onPrimaryChange: (
-      classId: number,
-      id: number,
-      value: string
-    ) => void;
-    onSecondaryChange: (
-      classId: number,
-      id: number,
-      value: string
-    ) => void;
-    onDuplicate: (classId: number, id: number) => void;
-    onDelete: (classId: number, id: number) => void;
-  };
+  access_: ValueOf<typeof AccessLevel>;
+  primary: string;
+  secondary: string;
 };
 
 export type DiagramClassMethod = {
@@ -106,3 +76,23 @@ export type DiagramClassMethod = {
   primary: string;
   secondary: string;
 };
+
+// handlers: {
+//   onAccessChange: (
+//     classId: number,
+//     id: number,
+//     value: ValueOf<typeof AccessLevel>
+//   ) => void;
+//   onPrimaryChange: (
+//     classId: number,
+//     id: number,
+//     value: string
+//   ) => void;
+//   onSecondaryChange: (
+//     classId: number,
+//     id: number,
+//     value: string
+//   ) => void;
+//   onDuplicate: (classId: number, id: number) => void;
+//   onDelete: (classId: number, id: number) => void;
+// };

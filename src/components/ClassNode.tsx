@@ -1,3 +1,4 @@
+import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { createClassMethod } from "@/services/models";
 import {
@@ -37,6 +38,8 @@ import {
   FC,
   memo,
   useCallback,
+  useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -69,6 +72,10 @@ export const ClassNode: FC<
     plugins: [animations()],
   });
 
+  useEffect(() => {
+    setAttributeItems(data.attributes);
+  }, [data.attributes, setAttributeItems]);
+
   const [methodContainerRef, methodItems, setMethodItems] =
     useDragAndDrop<HTMLUListElement, DiagramClassMethod>(
       data.methods,
@@ -85,6 +92,16 @@ export const ClassNode: FC<
     handlePreventDefaultContextMenu,
   } = useContextMenu();
 
+  const { onAttributeAdd } = useContext(WrappedNodeContext);
+
+  const handleAttributeAdd = useCallback(() => {
+    onAttributeAdd(id, {
+      access_: AccessLevel.PRIVATE,
+      primary: "",
+      secondary: "",
+    });
+  }, [id, onAttributeAdd]);
+
   const handleMethodItemChange = useCallback(
     (value: DiagramClassMethod, index: number) => {
       setMethodItems((prev) => {
@@ -95,20 +112,6 @@ export const ClassNode: FC<
     },
     [setMethodItems]
   );
-
-  const handleAddAttribute = useCallback(() => {
-    // setAttributeItems((prev) => {
-    //   const next = [...prev];
-    //   next.push(
-    //     createClassAttribute({
-    //       access_: AccessLevel.PUBLIC,
-    //       primary: "",
-    //       secondary: "",
-    //     })
-    //   );
-    //   return next;
-    // });
-  }, [setAttributeItems]);
 
   const handleAddMethod = useCallback(() => {
     setMethodItems((prev) => {
@@ -122,8 +125,14 @@ export const ClassNode: FC<
       );
       return next;
     });
-    handleClose();
-  }, [handleClose, setMethodItems]);
+  }, [setMethodItems]);
+
+  const handleCopyColor = useCallback(() => {
+    navigator.clipboard.writeText(color).then(
+      () => toast.success("Copied to clipboard"),
+      () => toast.error("Cannot copy to clipboard")
+    );
+  }, [color]);
 
   return (
     <>
@@ -220,20 +229,7 @@ export const ClassNode: FC<
                   <IconButton
                     disableRipple
                     size="small"
-                    onClick={() => {
-                      navigator.clipboard
-                        .writeText(color)
-                        .then(
-                          () =>
-                            toast.success(
-                              "Copied to clipboard"
-                            ),
-                          () =>
-                            toast.error(
-                              "Cannot copy to clipboard"
-                            )
-                        );
-                    }}
+                    onClick={handleCopyColor}
                   >
                     <ContentCopyRounded />
                   </IconButton>
@@ -243,7 +239,7 @@ export const ClassNode: FC<
           </Stack>
         </Box>
         <Divider flexItem />
-        <MenuItem onClick={handleAddAttribute}>
+        <MenuItem onClick={handleAttributeAdd}>
           <ListItemText inset>New attribute</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleAddMethod}>

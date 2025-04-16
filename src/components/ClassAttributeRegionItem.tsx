@@ -1,3 +1,4 @@
+import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { DiagramClassAttribute } from "@/types/figure";
 import { DeleteRounded } from "@mui/icons-material";
@@ -12,26 +13,16 @@ import {
   MenuList,
   Typography,
 } from "@mui/material";
-import { FC, useCallback } from "react";
+import { FC, useCallback, useContext } from "react";
 import { StrictTextField } from "./StrictTextField";
 
 type Props = {
-  classId: string;
-  id: number;
-  data: DiagramClassAttribute["data"];
-  handlers: DiagramClassAttribute["handlers"];
+  nodeId: string;
+  data: DiagramClassAttribute;
 };
 export const ClassAttributeRegionItem: FC<Props> = ({
-  data: { access_, primary, secondary },
-  handlers: {
-    onAccessChange,
-    onDelete,
-    onDuplicate,
-    onPrimaryChange,
-    onSecondaryChange,
-  },
-  id,
-  classId,
+  data: { id, access_, primary, secondary },
+  nodeId,
 }) => {
   const {
     contextMenu,
@@ -39,8 +30,15 @@ export const ClassAttributeRegionItem: FC<Props> = ({
     handleContextMenuOpen,
     handlePreventDefaultContextMenu,
   } = useContextMenu();
+
+  const {
+    onAttributeAdd,
+    onAttributeChange,
+    onAttributeRemove,
+  } = useContext(WrappedNodeContext);
+
   const handleAccessChange = useCallback(() => {
-    let nextAccess: DiagramClassAttribute["data"]["access_"];
+    let nextAccess: DiagramClassAttribute["access_"];
     switch (access_) {
       case "#":
         nextAccess = "-";
@@ -51,30 +49,49 @@ export const ClassAttributeRegionItem: FC<Props> = ({
       default:
         nextAccess = "#";
     }
-    onAccessChange(classId, id, nextAccess);
-  }, [access_, classId, id, onAccessChange]);
+    onAttributeChange(nodeId, id, {
+      access_: nextAccess,
+      primary,
+      secondary,
+    });
+  }, [
+    onAttributeChange,
+    access_,
+    nodeId,
+    id,
+    primary,
+    secondary,
+  ]);
 
   const handlePrimaryChange = useCallback(
     (value: string) => {
-      onPrimaryChange(classId, id, value);
+      onAttributeChange(nodeId, id, {
+        access_,
+        primary: value,
+        secondary,
+      });
     },
-    [classId, id, onPrimaryChange]
+    [onAttributeChange, nodeId, id, access_, secondary]
   );
 
   const handleSecondaryChange = useCallback(
     (value: string) => {
-      onSecondaryChange(classId, id, value);
+      onAttributeChange(nodeId, id, {
+        access_,
+        primary,
+        secondary: value,
+      });
     },
-    [classId, id, onSecondaryChange]
+    [onAttributeChange, nodeId, id, access_, primary]
   );
 
   const handleDuplicate = useCallback(() => {
-    onDuplicate(classId, id);
-  }, [classId, id, onDuplicate]);
+    onAttributeAdd(nodeId, { access_, primary, secondary });
+  }, [access_, nodeId, onAttributeAdd, primary, secondary]);
 
   const handleDelete = useCallback(() => {
-    onDelete(classId, id);
-  }, [classId, id, onDelete]);
+    onAttributeRemove(nodeId, id);
+  }, [onAttributeRemove, nodeId, id]);
 
   return (
     <>
