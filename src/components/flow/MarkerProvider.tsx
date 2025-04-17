@@ -5,8 +5,8 @@ export const MarkerProvider: FC = memo(
   () => {
     return (
       <svg
+        className="custom-marker-provider"
         style={{ position: "absolute", top: 0, left: 0 }}
-        xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <marker
@@ -23,7 +23,6 @@ export const MarkerProvider: FC = memo(
               fill="white"
               fillRule="nonzero"
               opacity="1"
-              vectorEffect="non-scaling-stroke"
               points="25,0 50,25 25,50 0,25"
             />
           </marker>
@@ -40,7 +39,6 @@ export const MarkerProvider: FC = memo(
               fill="context-stroke"
               fillRule="nonzero"
               opacity="1"
-              vectorEffect="non-scaling-stroke"
               points="25,0 50,25 25,50 0,25"
             />
           </marker>
@@ -58,7 +56,6 @@ export const MarkerProvider: FC = memo(
               fill="white"
               fillRule="nonzero"
               opacity="1"
-              vectorEffect="non-scaling-stroke"
               points="1,1 49,25 1,50 1,1"
             />
           </marker>
@@ -75,7 +72,6 @@ export const MarkerProvider: FC = memo(
               fill="context-stroke"
               fillRule="nonzero"
               opacity="1"
-              vectorEffect="non-scaling-stroke"
               points="1,1 49,25 1,50 1,1"
             />
           </marker>
@@ -92,7 +88,6 @@ export const MarkerProvider: FC = memo(
               d="M 0 0 L 50 25 L 0 50"
               stroke="context-stroke"
               fill="none"
-              vectorEffect="non-scaling-stroke"
             />
           </marker>
         </defs>
