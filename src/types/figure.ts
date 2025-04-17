@@ -76,3 +76,23 @@ export type DiagramClassMethod = {
   primary: string;
   secondary: string;
 };
+
+// handlers: {
+//   onAccessChange: (
+//     classId: number,
+//     id: number,
+//     value: ValueOf<typeof AccessLevel>
+//   ) => void;
+//   onPrimaryChange: (
+//     classId: number,
+//     id: number,
+//     value: string
+//   ) => void;
+//   onSecondaryChange: (
+//     classId: number,
+//     id: number,
+//     value: string
+//   ) => void;
+//   onDuplicate: (classId: number, id: number) => void;
+//   onDelete: (classId: number, id: number) => void;
+// };

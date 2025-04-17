@@ -1,15 +1,8 @@
-import {
-  createClassAttribute,
-  createClassMethod,
-} from "@/services/models";
-import {
-  AccessLevel,
-  DiagramClassAttribute,
-  DiagramClassMethod,
-  DiagramNodeData,
-} from "@/types/figure";
-import { animations } from "@formkit/drag-and-drop";
-import { useDragAndDrop } from "@formkit/drag-and-drop/react";
+import { WrappedNodeContext } from "@/context/WrappedNodeContext";
+import { useContextMenu } from "@/hooks/useContextMenu";
+import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeState";
+import { useWrappedNodeMethodState } from "@/hooks/useWrappedNodeMethodState";
+import { DiagramNodeData } from "@/types/figure";
 import {
   ContentCopyRounded,
   DeleteRounded,
@@ -23,6 +16,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  MenuList,
   OutlinedInput,
   Paper,
   Stack,
@@ -39,6 +33,8 @@ import {
   FC,
   memo,
   useCallback,
+  useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -58,112 +54,119 @@ export const ClassNode: FC<
   }, [color, palette]);
 
   const [name, setName] = useState(data.name);
-  const [
+
+  const { onNodeAttributesChange, onNodeMethodsChange } =
+    useContext(WrappedNodeContext);
+
+  const {
+    containerRef: methodContainerRef,
+    items: methodItems,
+    onAdd: onMethodAdd,
+    onChange: onMethodChange,
+    onDuplicate: onMethodDuplicate,
+    onRemove: onMethodRemove,
+  } = useWrappedNodeMethodState(data.methods);
+
+  useEffect(() => {
+    onNodeMethodsChange(id, methodItems);
+  }, [id, methodItems, onNodeMethodsChange]);
+
+  const [contextMenuData, setContextMenuData] = useState<
+    | { origin: "attr"; attrId: number }
+    | { origin: "method"; methodId: number }
+  >();
+
+  const {
+    contextMenuPos,
+    handleContextMenuClose: onContextMenuClose,
+    handleContextMenuOpen: onContextMenuOpen,
+    handlePreventDefaultContextMenu,
+  } = useContextMenu();
+
+  const handleContextMenuOpenFromAttr = useCallback(
+    (event: React.MouseEvent, attrId: number) => {
+      setContextMenuData({ origin: "attr", attrId });
+      onContextMenuOpen(event);
+    },
+    [onContextMenuOpen]
+  );
+
+  const handleContextMenuOpenFromMethod = useCallback(
+    (event: React.MouseEvent, methodId: number) => {
+      setContextMenuData({ origin: "method", methodId });
+      onContextMenuOpen(event);
+    },
+    [onContextMenuOpen]
+  );
+
+  const handleContextMenuClose = useCallback(() => {
+    setContextMenuData(undefined);
+    onContextMenuClose();
+  }, [onContextMenuClose]);
+
+  const handleCopyColor = useCallback(() => {
+    navigator.clipboard.writeText(color).then(
+      () => toast.success("Copied to clipboard"),
+      () => toast.error("Cannot copy to clipboard")
+    );
+  }, [color]);
+
+  const {
     attributeContainerRef,
     attributeItems,
-    setAttributeItems,
-  ] = useDragAndDrop<
-    HTMLUListElement,
-    DiagramClassAttribute
-  >(data.attributes, {
-    group: "class-attribute",
-    plugins: [animations()],
-  });
+    onAttributeAdd,
+    onAttributeChange,
+    onAttributeDuplicate,
+    onAttributeRemove,
+  } = useWrappedNodeAttributeState(data.attributes);
 
-  const [methodContainerRef, methodItems, setMethodItems] =
-    useDragAndDrop<HTMLUListElement, DiagramClassMethod>(
-      data.methods,
-      {
-        group: "class-method",
-        plugins: [animations()],
-      }
-    );
+  const handleAttributeDuplicate = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "attr"
+    ) {
+      return;
+    }
+    onAttributeDuplicate(contextMenuData.attrId);
+  }, [contextMenuData, onAttributeDuplicate]);
 
-  const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
+  const handleAttributeRemove = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "attr"
+    ) {
+      return;
+    }
+    onAttributeRemove(contextMenuData.attrId);
+  }, [contextMenuData, onAttributeRemove]);
 
-  const handleContextMenu = useCallback(
-    (event: React.MouseEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setContextMenu(
-        contextMenu === null
-          ? {
-              mouseX: event.clientX + 2,
-              mouseY: event.clientY - 6,
-            }
-          : null
-      );
+  useEffect(() => {
+    onNodeAttributesChange(id, attributeItems);
+  }, [attributeItems, id, onNodeAttributesChange]);
 
-      const selection = document.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
+  const handleMethodDuplicate = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "method"
+    ) {
+      return;
+    }
+    onMethodDuplicate(contextMenuData.methodId);
+  }, [contextMenuData, onMethodDuplicate]);
 
-        setTimeout(() => {
-          selection.addRange(range);
-        });
-      }
-    },
-    [contextMenu]
-  );
+  const handleMethodRemove = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "method"
+    ) {
+      return;
+    }
+    onMethodRemove(contextMenuData.methodId);
+  }, [contextMenuData, onMethodRemove]);
 
-  const handleClose = useCallback(() => {
-    setContextMenu(null);
-  }, []);
-
-  const handleAttributeItemChange = useCallback(
-    (value: DiagramClassAttribute, index: number) => {
-      setAttributeItems((prev) => {
-        const next = [...prev];
-        next[index] = value;
-        return next;
-      });
-    },
-    [setAttributeItems]
-  );
-
-  const handleMethodItemChange = useCallback(
-    (value: DiagramClassMethod, index: number) => {
-      setMethodItems((prev) => {
-        const next = [...prev];
-        next[index] = value;
-        return next;
-      });
-    },
-    [setMethodItems]
-  );
-
-  const handleAddAttribute = useCallback(() => {
-    setAttributeItems((prev) => {
-      const next = [...prev];
-      next.push(
-        createClassAttribute({
-          access_: AccessLevel.PUBLIC,
-          primary: "",
-          secondary: "",
-        })
-      );
-      return next;
-    });
-    handleClose();
-  }, [handleClose, setAttributeItems]);
-
-  const handleAddMethod = useCallback(() => {
-    setMethodItems((prev) => {
-      const next = [...prev];
-      next.push(
-        createClassMethod({
-          access_: AccessLevel.PUBLIC,
-          primary: "",
-          secondary: "",
-        })
-      );
-      return next;
-    });
-    handleClose();
-  }, [handleClose, setMethodItems]);
+  useEffect(() => {
+    onNodeAttributesChange(id, attributeItems);
+  }, [attributeItems, id, onNodeAttributesChange]);
 
   return (
     <>
@@ -179,96 +182,10 @@ export const ClassNode: FC<
         type="target"
         position={Position.Top}
       />
-      {/* <Handle
-          type="source"
-          position={Position.Bottom}
-          id={id + "handle-bottom"}
-        />
-        <Handle
-          type="source"
-          position={Position.Left}
-          id={id + "handle-left"}
-        /> */}
-      <Menu
-        onContextMenu={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        open={contextMenu !== null}
-        onClose={handleClose}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu !== null
-            ? {
-                top: contextMenu.mouseY,
-                left: contextMenu.mouseX,
-              }
-            : undefined
-        }
-      >
-        <Box padding={2}>
-          <Stack spacing={1}>
-            <HexColorPicker
-              color={color}
-              onChange={setColor}
-              style={{ width: "100%" }}
-            />
-            <OutlinedInput
-              size="small"
-              value={color}
-              onChange={({ target }) =>
-                setColor(target.value)
-              }
-              sx={{ fontFamily: "monospace" }}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    disableRipple
-                    size="small"
-                    onClick={() => {
-                      navigator.clipboard
-                        .writeText(color)
-                        .then(
-                          () =>
-                            toast.success(
-                              "Copied to clipboard"
-                            ),
-                          () =>
-                            toast.error(
-                              "Cannot copy to clipboard"
-                            )
-                        );
-                    }}
-                  >
-                    <ContentCopyRounded />
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </Stack>
-        </Box>
-        <Divider flexItem />
-        <MenuItem onClick={handleAddAttribute}>
-          <ListItemText inset>New attribute</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleAddMethod}>
-          <ListItemText inset>New method</ListItemText>
-        </MenuItem>
-        <Divider flexItem />
-        <MenuItem>
-          <ListItemText inset>Duplicate</ListItemText>
-        </MenuItem>
-        <Divider flexItem />
-        <MenuItem>
-          <ListItemIcon>
-            <DeleteRounded />
-          </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
-      </Menu>
+
       <Paper
         variant="outlined"
-        onContextMenu={handleContextMenu}
+        onContextMenu={onContextMenuOpen}
         sx={{
           width: "100%",
           height: "100%",
@@ -307,19 +224,145 @@ export const ClassNode: FC<
           }}
         >
           <ClassAttributeRegion
-            classId={id}
+            nodeId={id}
             containerRef={attributeContainerRef}
             items={attributeItems}
-            onItemChange={handleAttributeItemChange}
+            onChange={onAttributeChange}
+            onContextMenu={handleContextMenuOpenFromAttr}
           />
           <ClassMethodRegion
-            classId={id}
+            nodeId={id}
             items={methodItems}
             containerRef={methodContainerRef}
-            onChange={handleMethodItemChange}
+            onChange={onMethodChange}
+            onContextMenu={handleContextMenuOpenFromMethod}
           />
         </Stack>
       </Paper>
+      <Menu
+        open={contextMenuPos !== undefined}
+        onContextMenu={handlePreventDefaultContextMenu}
+        onClose={handleContextMenuClose}
+        anchorReference="anchorPosition"
+        anchorPosition={contextMenuPos}
+        slotProps={{
+          paper: {
+            sx: { scrollbarWidth: "none" },
+          },
+        }}
+      >
+        <Box padding={2}>
+          <Stack spacing={1}>
+            <HexColorPicker
+              color={color}
+              onChange={setColor}
+              style={{ width: "100%" }}
+            />
+            <OutlinedInput
+              size="small"
+              value={color}
+              onChange={({ target }) =>
+                setColor(target.value)
+              }
+              sx={{ fontFamily: "monospace" }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    disableRipple
+                    size="small"
+                    onClick={handleCopyColor}
+                  >
+                    <ContentCopyRounded />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </Stack>
+        </Box>
+        <Divider flexItem />
+        <MenuList onClick={handleContextMenuClose}>
+          <MenuItem onClick={onAttributeAdd}>
+            <ListItemText inset>New attribute</ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={handleAttributeDuplicate}
+            sx={{
+              display:
+                contextMenuData !== undefined &&
+                contextMenuData.origin === "attr"
+                  ? undefined
+                  : "none",
+            }}
+          >
+            <ListItemText inset>
+              Duplicate attribute
+            </ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={handleAttributeRemove}
+            sx={{
+              display:
+                contextMenuData !== undefined &&
+                contextMenuData.origin === "attr"
+                  ? undefined
+                  : "none",
+            }}
+          >
+            <ListItemText inset>
+              Remove attribute
+            </ListItemText>
+          </MenuItem>
+        </MenuList>
+        <Divider flexItem />
+        <MenuList onClick={handleContextMenuClose}>
+          <MenuItem onClick={onMethodAdd}>
+            <ListItemText inset>New method</ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={handleMethodDuplicate}
+            sx={{
+              display:
+                contextMenuData !== undefined &&
+                contextMenuData.origin === "method"
+                  ? undefined
+                  : "none",
+            }}
+          >
+            <ListItemText inset>
+              Duplicate method
+            </ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={handleMethodRemove}
+            sx={{
+              display:
+                contextMenuData !== undefined &&
+                contextMenuData.origin === "method"
+                  ? undefined
+                  : "none",
+            }}
+          >
+            <ListItemText inset>Remove method</ListItemText>
+          </MenuItem>
+        </MenuList>
+        <Divider flexItem />
+        <MenuList onClick={handleContextMenuClose}>
+          <MenuItem>
+            <ListItemText inset>
+              Duplicate class
+            </ListItemText>
+          </MenuItem>
+        </MenuList>
+        <Divider flexItem />
+        <MenuList onClick={handleContextMenuClose}>
+          <MenuItem>
+            <ListItemIcon>
+              <DeleteRounded />
+            </ListItemIcon>
+            <ListItemText>Remove class</ListItemText>
+          </MenuItem>
+        </MenuList>
+      </Menu>
     </>
   );
 });

@@ -1,30 +1,29 @@
 import { DiagramClassAttribute } from "@/types/figure";
 import { Box } from "@mui/material";
-import { FC, Ref, useCallback } from "react";
+import React, { FC, Ref, useCallback } from "react";
 import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
 
 type Props = {
-  classId: string;
+  nodeId: string;
   containerRef: Ref<HTMLUListElement>;
   items: DiagramClassAttribute[];
-  onItemChange: (
-    value: DiagramClassAttribute,
-    index: number
+  onChange: (value: DiagramClassAttribute) => void;
+  onContextMenu: (
+    e: React.MouseEvent,
+    attrId: number
   ) => void;
 };
 export const ClassAttributeRegion: FC<Props> = ({
-  classId,
   containerRef,
+  nodeId,
   items,
-  onItemChange,
+  onChange,
+  onContextMenu,
 }) => {
-  const itemChangeHandlerProvider = useCallback(
-    (index: number) => {
-      return (value: DiagramClassAttribute) => {
-        onItemChange(value, index);
-      };
-    },
-    [onItemChange]
+  const onContextMenuHandlerProvider = useCallback(
+    (attrId: number) => (e: React.MouseEvent) =>
+      onContextMenu(e, attrId),
+    [onContextMenu]
   );
 
   return (
@@ -39,11 +38,14 @@ export const ClassAttributeRegion: FC<Props> = ({
         minWidth: 400,
       }}
     >
-      {items.map((item, index) => (
+      {items.map((item) => (
         <ClassAttributeRegionItem
-          key={`class-${classId}-attribute-${item.id}`}
+          key={`class-${nodeId}-attribute-${item.id}`}
           data={item}
-          onChange={itemChangeHandlerProvider(index)}
+          onChange={onChange}
+          onContextMenu={onContextMenuHandlerProvider(
+            item.id
+          )}
         />
       ))}
     </Box>

@@ -6,7 +6,7 @@ import {
 import { faker } from "@faker-js/faker";
 import {
   createClassAttribute,
-  createClassMethod,
+  createDiagramClassMethod,
 } from "./models";
 
 export const createRandomClassAttributes = (
@@ -32,7 +32,7 @@ export const createRandomClassAttributes = (
 export const createRandomClassMethods = (count: number) => {
   return faker.helpers.multiple(
     (): DiagramClassMethod => {
-      return createClassMethod({
+      return createDiagramClassMethod({
         primary: faker.hacker.noun() + "()",
         secondary: "void",
         access_: faker.helpers.arrayElement(

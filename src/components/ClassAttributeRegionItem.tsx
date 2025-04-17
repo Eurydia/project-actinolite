@@ -10,10 +10,12 @@ import { StrictTextField } from "./StrictTextField";
 type Props = {
   data: DiagramClassAttribute;
   onChange: (value: DiagramClassAttribute) => void;
+  onContextMenu: (e: React.MouseEvent) => void;
 };
 export const ClassAttributeRegionItem: FC<Props> = ({
   data: { id, access_, primary, secondary },
   onChange,
+  onContextMenu,
 }) => {
   const handleAccessChange = useCallback(() => {
     let nextAccess: DiagramClassAttribute["access_"];
@@ -30,8 +32,8 @@ export const ClassAttributeRegionItem: FC<Props> = ({
     onChange({
       id,
       access_: nextAccess,
-      secondary,
       primary,
+      secondary,
     });
   }, [access_, id, onChange, primary, secondary]);
 
@@ -40,11 +42,11 @@ export const ClassAttributeRegionItem: FC<Props> = ({
       onChange({
         id,
         access_,
-        secondary,
         primary: value,
+        secondary,
       });
     },
-    [access_, id, onChange, secondary]
+    [onChange, id, access_, secondary]
   );
 
   const handleSecondaryChange = useCallback(
@@ -56,23 +58,22 @@ export const ClassAttributeRegionItem: FC<Props> = ({
         secondary: value,
       });
     },
-    [access_, id, onChange, primary]
+    [onChange, id, access_, primary]
   );
 
   return (
     <Box
       component="li"
-      paddingX={1}
       sx={{
         cursor: "auto",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         gap: 0.5,
-
         listStyle: "none",
         height: 50,
       }}
+      onContextMenu={onContextMenu}
     >
       <InputAdornment position="start">
         <Typography

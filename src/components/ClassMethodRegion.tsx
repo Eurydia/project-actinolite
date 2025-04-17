@@ -4,27 +4,26 @@ import { FC, Ref, useCallback } from "react";
 import { ClassMethodRegionItem } from "./ClassMethodRegionItem";
 
 type Props = {
-  classId: string;
-  items: DiagramClassMethod[];
-  onChange: (
-    value: DiagramClassMethod,
-    index: number
-  ) => void;
   containerRef: Ref<HTMLUListElement>;
+  nodeId: string;
+  items: DiagramClassMethod[];
+  onChange: (value: DiagramClassMethod) => void;
+  onContextMenu: (
+    e: React.MouseEvent,
+    methodId: number
+  ) => void;
 };
 export const ClassMethodRegion: FC<Props> = ({
   items,
-  classId,
-  onChange,
+  nodeId,
   containerRef,
+  onChange,
+  onContextMenu,
 }) => {
   const onChangeHandlerProvider = useCallback(
-    (index: number) => {
-      return (value: DiagramClassMethod) => {
-        onChange(value, index);
-      };
-    },
-    [onChange]
+    (methodId: number) => (e: React.MouseEvent) =>
+      onContextMenu(e, methodId),
+    [onContextMenu]
   );
 
   return (
@@ -39,11 +38,12 @@ export const ClassMethodRegion: FC<Props> = ({
         minWidth: 400,
       }}
     >
-      {items.map((item, index) => (
+      {items.map((item) => (
         <ClassMethodRegionItem
-          key={`class-${classId}-method-${item.id}`}
+          key={`class-${nodeId}-method-${item.id}`}
           data={item}
-          onChange={onChangeHandlerProvider(index)}
+          onChange={onChange}
+          onContextMenu={onChangeHandlerProvider(item.id)}
         />
       ))}
     </Box>
