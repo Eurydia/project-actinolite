@@ -10,4 +10,7 @@ export const WrappedNodeContext = createContext<
   onNodeAttributesChange: () => {
     throw new Error();
   },
+  onNodeMethodsChange: () => {
+    throw new Error();
+  },
 });

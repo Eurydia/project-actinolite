@@ -1,5 +1,6 @@
 import {
   DiagramClassAttribute,
+  DiagramClassMethod,
   DiagramNodeData,
 } from "@/types/figure";
 import {
@@ -61,10 +62,30 @@ export const useWrappedNodeState = () => {
     [setNodes]
   );
 
+  const onNodeMethodsChange = useCallback(
+    (nodeId: string, value: DiagramClassMethod[]) => {
+      setNodes((prev) => {
+        const next: typeof prev = [];
+        for (const node of prev) {
+          if (node.id !== nodeId) {
+            next.push(node);
+            continue;
+          }
+          const nextNode = structuredClone(node);
+          nextNode.data.methods = value;
+          next.push(nextNode);
+        }
+        return next;
+      });
+    },
+    [setNodes]
+  );
+
   return {
     nodes,
     onNodesChange,
     onNodeAdd,
     onNodeAttributesChange,
+    onNodeMethodsChange,
   };
 };

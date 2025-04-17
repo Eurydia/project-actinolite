@@ -1,17 +1,8 @@
 import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
-import {
-  createClassAttribute,
-  createClassMethod,
-} from "@/services/models";
-import {
-  AccessLevel,
-  DiagramClassAttribute,
-  DiagramClassMethod,
-  DiagramNodeData,
-} from "@/types/figure";
-import { animations } from "@formkit/drag-and-drop";
-import { useDragAndDrop } from "@formkit/drag-and-drop/react";
+import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeState";
+import { useWrappedNodeMethodState } from "@/hooks/useWrappedNodeMethodState";
+import { DiagramNodeData } from "@/types/figure";
 import {
   ContentCopyRounded,
   DeleteRounded,
@@ -39,6 +30,7 @@ import {
 } from "@xyflow/react";
 import {
   FC,
+  Fragment,
   memo,
   useCallback,
   useContext,
@@ -63,107 +55,54 @@ export const ClassNode: FC<
 
   const [name, setName] = useState(data.name);
 
-  const [
-    attributeContainerRef,
-    attributeItems,
-    setAttributeItems,
-  ] = useDragAndDrop<
-    HTMLUListElement,
-    DiagramClassAttribute
-  >(data.attributes, {
-    group: "class-attribute",
-    plugins: [animations()],
-  });
+  const {
+    containerRef: methodContainerRef,
+    items: methodItems,
+    onAdd: onMethodAdd,
+    onChange: onMethodChange,
+    onDuplicate: onMethodDuplicated,
+    onRemove: onMethodRemove,
+  } = useWrappedNodeMethodState(data.methods);
 
-  const { onNodeAttributesChange } = useContext(
-    WrappedNodeContext
-  );
+  const { onNodeAttributesChange, onNodeMethodsChange } =
+    useContext(WrappedNodeContext);
 
   useEffect(() => {
-    onNodeAttributesChange(id, attributeItems);
-  }, [attributeItems, id, onNodeAttributesChange]);
+    onNodeMethodsChange(id, methodItems);
+  }, [id, methodItems, onNodeMethodsChange]);
 
-  const [methodContainerRef, methodItems, setMethodItems] =
-    useDragAndDrop<HTMLUListElement, DiagramClassMethod>(
-      data.methods,
-      {
-        group: "class-method",
-        plugins: [animations()],
-      }
-    );
+  const [contextMenuData, setContextMenuData] = useState<
+    | { origin: "attr"; attrId: number }
+    | { origin: "method"; methodId: number }
+  >();
 
   const {
-    contextMenu,
-    handleContextMenuClose,
-    handleContextMenuOpen,
+    contextMenuPos,
+    handleContextMenuClose: onContextMenuClose,
+    handleContextMenuOpen: onContextMenuOpen,
     handlePreventDefaultContextMenu,
   } = useContextMenu();
 
-  const handleAttributeChange = useCallback(
-    (value: DiagramClassAttribute) => {
-      setAttributeItems((prev) => {
-        return prev.map((attr) =>
-          attr.id !== value.id ? attr : value
-        );
-      });
+  const handleContextMenuOpenFromAttr = useCallback(
+    (event: React.MouseEvent, attrId: number) => {
+      setContextMenuData({ origin: "attr", attrId });
+      onContextMenuOpen(event);
     },
-    [setAttributeItems]
+    [onContextMenuOpen]
   );
 
-  const handleAttributeRemove = useCallback(
-    (attrId: number) => {
-      setAttributeItems((prev) => {
-        return prev.filter((attr) => attr.id !== attrId);
-      });
+  const handleContextMenuOpenFromMethod = useCallback(
+    (event: React.MouseEvent, methodId: number) => {
+      setContextMenuData({ origin: "method", methodId });
+      onContextMenuOpen(event);
     },
-    [setAttributeItems]
+    [onContextMenuOpen]
   );
 
-  const handleAttributeDuplicate = useCallback(
-    (value: Omit<DiagramClassAttribute, "id">) => {
-      setAttributeItems((prev) => {
-        const nextAttr = createClassAttribute(value);
-        return prev.concat(nextAttr);
-      });
-    },
-    [setAttributeItems]
-  );
-
-  const handleAttributeAdd = useCallback(() => {
-    setAttributeItems((prev) => {
-      const nextAttr = createClassAttribute({
-        access_: AccessLevel.PRIVATE,
-        primary: "",
-        secondary: "",
-      });
-      return prev.concat(nextAttr);
-    });
-  }, [setAttributeItems]);
-
-  const handleMethodItemChange = useCallback(
-    (value: DiagramClassMethod, index: number) => {
-      setMethodItems((prev) => {
-        const next = [...prev];
-        next[index] = value;
-        return next;
-      });
-    },
-    [setMethodItems]
-  );
-
-  const handleAddMethod = useCallback(() => {
-    setMethodItems((prev) => {
-      const next = [...prev];
-      next.push(
-        createClassMethod({
-          access_: AccessLevel.PUBLIC,
-          primary: "",
-          secondary: "",
-        })
-      );
-      return next;
-    });
-  }, [setMethodItems]);
+  const handleContextMenuClose = useCallback(() => {
+    setContextMenuData(undefined);
+    onContextMenuClose();
+  }, [onContextMenuClose]);
 
   const handleCopyColor = useCallback(() => {
     navigator.clipboard.writeText(color).then(
@@ -171,6 +110,39 @@ export const ClassNode: FC<
       () => toast.error("Cannot copy to clipboard")
     );
   }, [color]);
+
+  const {
+    attributeContainerRef,
+    attributeItems,
+    onAttributeAdd,
+    onAttributeChange,
+    onAttributeDuplicate,
+    onAttributeRemove,
+  } = useWrappedNodeAttributeState(data.attributes);
+
+  const handleAttributeDuplicate = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "attr"
+    ) {
+      return;
+    }
+    onAttributeDuplicate(contextMenuData.attrId);
+  }, [contextMenuData, onAttributeDuplicate]);
+
+  const handleAttributeRemove = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "attr"
+    ) {
+      return;
+    }
+    onAttributeRemove(contextMenuData.attrId);
+  }, [contextMenuData, onAttributeRemove]);
+
+  useEffect(() => {
+    onNodeAttributesChange(id, attributeItems);
+  }, [attributeItems, id, onNodeAttributesChange]);
 
   return (
     <>
@@ -189,7 +161,7 @@ export const ClassNode: FC<
 
       <Paper
         variant="outlined"
-        onContextMenu={handleContextMenuOpen}
+        onContextMenu={onContextMenuOpen}
         sx={{
           width: "100%",
           height: "100%",
@@ -231,25 +203,28 @@ export const ClassNode: FC<
             nodeId={id}
             containerRef={attributeContainerRef}
             items={attributeItems}
-            onChange={handleAttributeChange}
-            onDuplicate={handleAttributeDuplicate}
-            onRemove={handleAttributeRemove}
+            onChange={onAttributeChange}
+            onContextMenu={handleContextMenuOpenFromAttr}
           />
           <ClassMethodRegion
             classId={id}
             items={methodItems}
             containerRef={methodContainerRef}
-            onChange={handleMethodItemChange}
+            onChange={onMethodChange}
           />
         </Stack>
       </Paper>
       <Menu
-        open={contextMenu !== undefined}
+        open={contextMenuPos !== undefined}
         onContextMenu={handlePreventDefaultContextMenu}
         onClose={handleContextMenuClose}
-        onClick={handleContextMenuClose}
         anchorReference="anchorPosition"
-        anchorPosition={contextMenu}
+        anchorPosition={contextMenuPos}
+        slotProps={{
+          paper: {
+            sx: { scrollbarWidth: "none" },
+          },
+        }}
       >
         <Box padding={2}>
           <Stack spacing={1}>
@@ -279,13 +254,43 @@ export const ClassNode: FC<
             />
           </Stack>
         </Box>
-        <Divider flexItem />
-        <MenuItem onClick={handleAttributeAdd}>
+        <MenuItem onClick={onAttributeAdd}>
           <ListItemText inset>New attribute</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleAddMethod}>
+        {contextMenuData !== undefined &&
+          contextMenuData.origin === "attr" && (
+            <Fragment>
+              <MenuItem onClick={handleAttributeDuplicate}>
+                <ListItemText inset>
+                  Duplicate attribute
+                </ListItemText>
+              </MenuItem>
+              <MenuItem onClick={handleAttributeRemove}>
+                <ListItemText inset>
+                  Remove attribute
+                </ListItemText>
+              </MenuItem>
+            </Fragment>
+          )}
+        <Divider flexItem />
+        <MenuItem onClick={onMethodAdd}>
           <ListItemText inset>New method</ListItemText>
         </MenuItem>
+        {contextMenuData !== undefined &&
+          contextMenuData.origin === "method" && (
+            <Fragment>
+              <MenuItem onClick={handleAttributeDuplicate}>
+                <ListItemText inset>
+                  Duplicate method
+                </ListItemText>
+              </MenuItem>
+              <MenuItem onClick={handleAttributeRemove}>
+                <ListItemText inset>
+                  Remove method
+                </ListItemText>
+              </MenuItem>
+            </Fragment>
+          )}
         <Divider flexItem />
         <MenuItem>
           <ListItemText inset>Duplicate</ListItemText>

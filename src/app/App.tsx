@@ -39,12 +39,8 @@ const EDGE_TYPES: EdgeTypes = {
 export const App = () => {
   const reactFlowWrapper = useRef(null);
 
-  const {
-    nodes,
-    onNodeAdd,
-    onNodesChange,
-    onNodeAttributesChange,
-  } = useWrappedNodeState();
+  const { nodes, onNodeAdd, onNodesChange, ...rest } =
+    useWrappedNodeState();
 
   const { edges, setEdges, onEdgesChange, createNewEdge } =
     useWrappedEdgeState();
@@ -56,7 +52,7 @@ export const App = () => {
   );
 
   const {
-    contextMenu,
+    contextMenuPos: contextMenu,
     handleContextMenuClose,
     handleContextMenuOpen,
     handlePreventDefaultContextMenu,
@@ -111,11 +107,7 @@ export const App = () => {
   }, [contextMenu, onNodeAdd]);
 
   return (
-    <WrappedNodeContext.Provider
-      value={{
-        onNodeAttributesChange,
-      }}
-    >
+    <WrappedNodeContext.Provider value={rest}>
       <Box
         ref={reactFlowWrapper}
         component="div"

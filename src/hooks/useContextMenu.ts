@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 
 export const useContextMenu = () => {
-  const [contextMenu, setContextMenu] = useState<{
+  const [contextMenuPos, setContextMenu] = useState<{
     left: number;
     top: number;
   }>();
@@ -12,7 +12,7 @@ export const useContextMenu = () => {
       event.stopPropagation();
       const { clientX, clientY } = event;
       setContextMenu(
-        contextMenu === undefined
+        contextMenuPos === undefined
           ? {
               left: clientX,
               top: clientY,
@@ -20,7 +20,7 @@ export const useContextMenu = () => {
           : undefined
       );
     },
-    [contextMenu]
+    [contextMenuPos]
   );
 
   const handleContextMenuClose = useCallback(() => {
@@ -36,7 +36,7 @@ export const useContextMenu = () => {
   );
 
   return {
-    contextMenu,
+    contextMenuPos,
     handleContextMenuClose,
     handleContextMenuOpen,
     handlePreventDefaultContextMenu,

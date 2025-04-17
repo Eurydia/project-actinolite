@@ -1,6 +1,6 @@
 import { DiagramClassAttribute } from "@/types/figure";
 import { Box } from "@mui/material";
-import { FC, Ref, useCallback } from "react";
+import React, { FC, Ref, useCallback } from "react";
 import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
 
 type Props = {
@@ -8,28 +8,22 @@ type Props = {
   containerRef: Ref<HTMLUListElement>;
   items: DiagramClassAttribute[];
   onChange: (value: DiagramClassAttribute) => void;
-  onDuplicate: (
-    value: Omit<DiagramClassAttribute, "id">
+  onContextMenu: (
+    e: React.MouseEvent,
+    attrId: number
   ) => void;
-  onRemove: (attrId: number) => void;
 };
 export const ClassAttributeRegion: FC<Props> = ({
   containerRef,
   nodeId,
   items,
   onChange,
-  onDuplicate,
-  onRemove,
+  onContextMenu,
 }) => {
-  const onDuplicateHandlerProvider = useCallback(
-    (item: DiagramClassAttribute) => () =>
-      onDuplicate(item),
-    [onDuplicate]
-  );
-
-  const onRemoveHandlerProvider = useCallback(
-    (attrId: number) => () => onRemove(attrId),
-    [onRemove]
+  const onContextMenuHandlerProvider = useCallback(
+    (attrId: number) => (e: React.MouseEvent) =>
+      onContextMenu(e, attrId),
+    [onContextMenu]
   );
 
   return (
@@ -49,8 +43,9 @@ export const ClassAttributeRegion: FC<Props> = ({
           key={`class-${nodeId}-attribute-${item.id}`}
           data={item}
           onChange={onChange}
-          onDuplicate={onDuplicateHandlerProvider(item)}
-          onRemove={onRemoveHandlerProvider(item.id)}
+          onContextMenu={onContextMenuHandlerProvider(
+            item.id
+          )}
         />
       ))}
     </Box>
