@@ -12,10 +12,6 @@ import { useCallback } from "react";
 let currentNodeId = 0;
 const getNextNodeId = () => currentNodeId++;
 
-let currentNodeAttributeId = 0;
-const getNextNodeAttributeId = () =>
-  currentNodeAttributeId++;
-
 export const useWrappedNodeState = () => {
   const { screenToFlowPosition } = useReactFlow();
 
@@ -46,11 +42,8 @@ export const useWrappedNodeState = () => {
     [screenToFlowPosition, setNodes]
   );
 
-  const onNodeAttributeAdd = useCallback(
-    (
-      nodeId: string,
-      value: Omit<DiagramClassAttribute, "id">
-    ) => {
+  const onNodeAttributesChange = useCallback(
+    (nodeId: string, value: DiagramClassAttribute[]) => {
       setNodes((prev) => {
         const next: typeof prev = [];
         for (const node of prev) {
@@ -59,57 +52,7 @@ export const useWrappedNodeState = () => {
             continue;
           }
           const nextNode = structuredClone(node);
-          nextNode.data.attributes.push({
-            id: getNextNodeAttributeId(),
-            access_: value.access_,
-            primary: value.primary,
-            secondary: value.secondary,
-          });
-          next.push(nextNode);
-        }
-        return next;
-      });
-    },
-    [setNodes]
-  );
-
-  const onNodeAttributeChange = useCallback(
-    (nodeId: string, value: DiagramClassAttribute) => {
-      setNodes((prev) => {
-        const next: typeof prev = [];
-        for (const node of prev) {
-          if (node.id !== nodeId) {
-            next.push(node);
-            continue;
-          }
-          const nextNode = structuredClone(node);
-
-          nextNode.data.attributes =
-            nextNode.data.attributes.map((attr) =>
-              attr.id !== value.id ? attr : value
-            );
-        }
-        return next;
-      });
-    },
-    [setNodes]
-  );
-
-  const onNodeAttributeRemove = useCallback(
-    (nodeId: string, attrId: number) => {
-      setNodes((prev) => {
-        const next: typeof prev = [];
-        for (const node of prev) {
-          if (node.id !== nodeId) {
-            next.push(node);
-            continue;
-          }
-
-          const nextNode = structuredClone(node);
-          nextNode.data.attributes =
-            nextNode.data.attributes.filter(
-              ({ id }) => id !== attrId
-            );
+          nextNode.data.attributes = value;
           next.push(nextNode);
         }
         return next;
@@ -122,8 +65,6 @@ export const useWrappedNodeState = () => {
     nodes,
     onNodesChange,
     onNodeAdd,
-    onNodeAttributeAdd,
-    onNodeAttributeChange,
-    onNodeAttributeRemove,
+    onNodeAttributesChange,
   };
 };

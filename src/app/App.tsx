@@ -43,9 +43,7 @@ export const App = () => {
     nodes,
     onNodeAdd,
     onNodesChange,
-    onNodeAttributeAdd,
-    onNodeAttributeChange,
-    onNodeAttributeRemove,
+    onNodeAttributesChange,
   } = useWrappedNodeState();
 
   const { edges, setEdges, onEdgesChange, createNewEdge } =
@@ -115,9 +113,7 @@ export const App = () => {
   return (
     <WrappedNodeContext.Provider
       value={{
-        onAttributeAdd: onNodeAttributeAdd,
-        onAttributeRemove: onNodeAttributeRemove,
-        onAttributeChange: onNodeAttributeChange,
+        onNodeAttributesChange,
       }}
     >
       <Box

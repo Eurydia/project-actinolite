@@ -1,6 +1,9 @@
 import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
-import { createClassMethod } from "@/services/models";
+import {
+  createClassAttribute,
+  createClassMethod,
+} from "@/services/models";
 import {
   AccessLevel,
   DiagramClassAttribute,
@@ -72,9 +75,13 @@ export const ClassNode: FC<
     plugins: [animations()],
   });
 
+  const { onNodeAttributesChange } = useContext(
+    WrappedNodeContext
+  );
+
   useEffect(() => {
-    setAttributeItems(data.attributes);
-  }, [data.attributes, setAttributeItems]);
+    onNodeAttributesChange(id, attributeItems);
+  }, [attributeItems, id, onNodeAttributesChange]);
 
   const [methodContainerRef, methodItems, setMethodItems] =
     useDragAndDrop<HTMLUListElement, DiagramClassMethod>(
@@ -92,15 +99,46 @@ export const ClassNode: FC<
     handlePreventDefaultContextMenu,
   } = useContextMenu();
 
-  const { onAttributeAdd } = useContext(WrappedNodeContext);
+  const handleAttributeChange = useCallback(
+    (value: DiagramClassAttribute) => {
+      setAttributeItems((prev) => {
+        return prev.map((attr) =>
+          attr.id !== value.id ? attr : value
+        );
+      });
+    },
+    [setAttributeItems]
+  );
+
+  const handleAttributeRemove = useCallback(
+    (attrId: number) => {
+      setAttributeItems((prev) => {
+        return prev.filter((attr) => attr.id !== attrId);
+      });
+    },
+    [setAttributeItems]
+  );
+
+  const handleAttributeDuplicate = useCallback(
+    (value: Omit<DiagramClassAttribute, "id">) => {
+      setAttributeItems((prev) => {
+        const nextAttr = createClassAttribute(value);
+        return prev.concat(nextAttr);
+      });
+    },
+    [setAttributeItems]
+  );
 
   const handleAttributeAdd = useCallback(() => {
-    onAttributeAdd(id, {
-      access_: AccessLevel.PRIVATE,
-      primary: "",
-      secondary: "",
+    setAttributeItems((prev) => {
+      const nextAttr = createClassAttribute({
+        access_: AccessLevel.PRIVATE,
+        primary: "",
+        secondary: "",
+      });
+      return prev.concat(nextAttr);
     });
-  }, [id, onAttributeAdd]);
+  }, [setAttributeItems]);
 
   const handleMethodItemChange = useCallback(
     (value: DiagramClassMethod, index: number) => {
@@ -190,9 +228,12 @@ export const ClassNode: FC<
           }}
         >
           <ClassAttributeRegion
-            classId={id}
+            nodeId={id}
             containerRef={attributeContainerRef}
             items={attributeItems}
+            onChange={handleAttributeChange}
+            onDuplicate={handleAttributeDuplicate}
+            onRemove={handleAttributeRemove}
           />
           <ClassMethodRegion
             classId={id}

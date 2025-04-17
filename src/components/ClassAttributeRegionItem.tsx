@@ -1,4 +1,3 @@
-import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { DiagramClassAttribute } from "@/types/figure";
 import { DeleteRounded } from "@mui/icons-material";
@@ -13,16 +12,20 @@ import {
   MenuList,
   Typography,
 } from "@mui/material";
-import { FC, useCallback, useContext } from "react";
+import { FC, useCallback } from "react";
 import { StrictTextField } from "./StrictTextField";
 
 type Props = {
-  nodeId: string;
   data: DiagramClassAttribute;
+  onChange: (value: DiagramClassAttribute) => void;
+  onRemove: () => void;
+  onDuplicate: () => void;
 };
 export const ClassAttributeRegionItem: FC<Props> = ({
   data: { id, access_, primary, secondary },
-  nodeId,
+  onChange,
+  onDuplicate,
+  onRemove,
 }) => {
   const {
     contextMenu,
@@ -30,12 +33,6 @@ export const ClassAttributeRegionItem: FC<Props> = ({
     handleContextMenuOpen,
     handlePreventDefaultContextMenu,
   } = useContextMenu();
-
-  const {
-    onAttributeAdd,
-    onAttributeChange,
-    onAttributeRemove,
-  } = useContext(WrappedNodeContext);
 
   const handleAccessChange = useCallback(() => {
     let nextAccess: DiagramClassAttribute["access_"];
@@ -49,49 +46,37 @@ export const ClassAttributeRegionItem: FC<Props> = ({
       default:
         nextAccess = "#";
     }
-    onAttributeChange(nodeId, id, {
+    onChange({
+      id,
       access_: nextAccess,
       primary,
       secondary,
     });
-  }, [
-    onAttributeChange,
-    access_,
-    nodeId,
-    id,
-    primary,
-    secondary,
-  ]);
+  }, [access_, id, onChange, primary, secondary]);
 
   const handlePrimaryChange = useCallback(
     (value: string) => {
-      onAttributeChange(nodeId, id, {
+      onChange({
+        id,
         access_,
         primary: value,
         secondary,
       });
     },
-    [onAttributeChange, nodeId, id, access_, secondary]
+    [onChange, id, access_, secondary]
   );
 
   const handleSecondaryChange = useCallback(
     (value: string) => {
-      onAttributeChange(nodeId, id, {
+      onChange({
+        id,
         access_,
         primary,
         secondary: value,
       });
     },
-    [onAttributeChange, nodeId, id, access_, primary]
+    [onChange, id, access_, primary]
   );
-
-  const handleDuplicate = useCallback(() => {
-    onAttributeAdd(nodeId, { access_, primary, secondary });
-  }, [access_, nodeId, onAttributeAdd, primary, secondary]);
-
-  const handleDelete = useCallback(() => {
-    onAttributeRemove(nodeId, id);
-  }, [onAttributeRemove, nodeId, id]);
 
   return (
     <>
@@ -115,7 +100,7 @@ export const ClassAttributeRegionItem: FC<Props> = ({
             onClick={handleAccessChange}
             sx={{ cursor: "pointer" }}
           >
-            {access_}
+            {`${id} ${access_}`}
           </Typography>
         </InputAdornment>
         <StrictTextField
@@ -139,7 +124,7 @@ export const ClassAttributeRegionItem: FC<Props> = ({
         anchorPosition={contextMenu}
       >
         <MenuList>
-          <MenuItem onClick={handleDuplicate}>
+          <MenuItem onClick={onDuplicate}>
             <ListItemText
               inset
               slotProps={{
@@ -150,7 +135,7 @@ export const ClassAttributeRegionItem: FC<Props> = ({
             </ListItemText>
           </MenuItem>
           <Divider flexItem />
-          <MenuItem onClick={handleDelete}>
+          <MenuItem onClick={onRemove}>
             <ListItemIcon>
               <DeleteRounded />
             </ListItemIcon>
