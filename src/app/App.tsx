@@ -3,6 +3,7 @@ import { StyledEdge } from "@/components/diagram/StyledEdge";
 import { MarkerProvider } from "@/components/flow/MarkerProvider";
 import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
+import { useExportMedia } from "@/hooks/useExportMedia";
 import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import {
@@ -25,7 +26,8 @@ import {
   ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { ToastContainer } from "react-toastify";
 
 const NODE_TYPES = {
@@ -39,6 +41,8 @@ const EDGE_TYPES: EdgeTypes = {
 export const App = () => {
   const reactFlowWrapper = useRef(null);
 
+  const { exportAsJepg, exportAsPng, exportAsSvg } =
+    useExportMedia();
   const { nodes, onNodeAdd, onNodesChange, ...rest } =
     useWrappedNodeState();
 
@@ -52,7 +56,7 @@ export const App = () => {
   );
 
   const {
-    contextMenuPos: contextMenu,
+    contextMenuPos,
     handleContextMenuClose,
     handleContextMenuOpen,
     handlePreventDefaultContextMenu,
@@ -100,11 +104,25 @@ export const App = () => {
   );
 
   const handleNodeAdd = useCallback(() => {
-    if (contextMenu === undefined) {
+    if (contextMenuPos === undefined) {
       return;
     }
-    onNodeAdd(contextMenu);
-  }, [contextMenu, onNodeAdd]);
+    onNodeAdd(contextMenuPos);
+  }, [contextMenuPos, onNodeAdd]);
+
+  const injectedRef = useRef(false);
+
+  useEffect(() => {
+    if (injectedRef.current) {
+      return;
+    }
+    const targetElement = document.querySelector(
+      ".react-flow__viewport"
+    );
+    if (targetElement !== null) {
+      injectedRef.current = true;
+    }
+  }, []);
 
   return (
     <WrappedNodeContext.Provider value={rest}>
@@ -130,6 +148,7 @@ export const App = () => {
           fitViewOptions={{ padding: 2 }}
           onContextMenu={handleContextMenuOpen}
           defaultViewport={{ zoom: 1.2, x: 0, y: 0 }}
+          snapToGrid
         >
           <Background
             gap={40}
@@ -137,15 +156,22 @@ export const App = () => {
           />
           <MiniMap position="top-left" />
           <Controls position="top-right" />
+          {injectedRef.current &&
+            createPortal(
+              <MarkerProvider />,
+              document.querySelector(
+                ".react-flow__viewport"
+              )!
+            )}
         </ReactFlow>
       </Box>
       <Menu
-        open={contextMenu !== undefined}
+        open={contextMenuPos !== undefined}
         onContextMenu={handlePreventDefaultContextMenu}
         onClose={handleContextMenuClose}
         onClick={handleContextMenuClose}
         anchorReference="anchorPosition"
-        anchorPosition={contextMenu}
+        anchorPosition={contextMenuPos}
       >
         <MenuItem onClick={handleNodeAdd}>
           <ListItemText
@@ -158,7 +184,7 @@ export const App = () => {
           </ListItemText>
         </MenuItem>
         <Divider flexItem />
-        <MenuItem>
+        <MenuItem onClick={exportAsPng}>
           <ListItemText
             inset
             slotProps={{
@@ -168,7 +194,17 @@ export const App = () => {
             Export as PNG
           </ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={exportAsJepg}>
+          <ListItemText
+            inset
+            slotProps={{
+              primary: { fontFamily: "monospace" },
+            }}
+          >
+            Export as JPEG
+          </ListItemText>
+        </MenuItem>
+        <MenuItem onClick={exportAsSvg}>
           <ListItemText
             inset
             slotProps={{
@@ -199,7 +235,6 @@ export default () => {
   return (
     <div style={{ height: "100vh" }}>
       <CssBaseline />
-      <MarkerProvider />
       <ReactFlowProvider>
         <ToastContainer />
         <App />

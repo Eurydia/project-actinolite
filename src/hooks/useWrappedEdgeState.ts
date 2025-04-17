@@ -23,23 +23,14 @@ export const useWrappedEdgeState = () => {
       setEdges((prev) => {
         const edgeIndex = findEdgeWithId(id, prev);
 
-        const next: typeof prev = prev.map(
-          (edge, index) => {
-            if (index !== edgeIndex) {
-              return edge;
-            }
-            const { data, ...rest } = edge;
-            return {
-              ...rest,
-              data: {
-                ...data!,
-                label: value,
-              },
-            };
+        return prev.map((edge, index) => {
+          if (index !== edgeIndex) {
+            return edge;
           }
-        );
-
-        return next;
+          const nextEdge = structuredClone(edge);
+          nextEdge.data!.label = value;
+          return nextEdge;
+        });
       });
     },
     [setEdges]
