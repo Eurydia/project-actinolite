@@ -16,6 +16,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  MenuList,
   OutlinedInput,
   Paper,
   Stack,
@@ -30,7 +31,6 @@ import {
 } from "@xyflow/react";
 import {
   FC,
-  Fragment,
   memo,
   useCallback,
   useContext,
@@ -55,17 +55,17 @@ export const ClassNode: FC<
 
   const [name, setName] = useState(data.name);
 
+  const { onNodeAttributesChange, onNodeMethodsChange } =
+    useContext(WrappedNodeContext);
+
   const {
     containerRef: methodContainerRef,
     items: methodItems,
     onAdd: onMethodAdd,
     onChange: onMethodChange,
-    onDuplicate: onMethodDuplicated,
+    onDuplicate: onMethodDuplicate,
     onRemove: onMethodRemove,
   } = useWrappedNodeMethodState(data.methods);
-
-  const { onNodeAttributesChange, onNodeMethodsChange } =
-    useContext(WrappedNodeContext);
 
   useEffect(() => {
     onNodeMethodsChange(id, methodItems);
@@ -144,6 +144,30 @@ export const ClassNode: FC<
     onNodeAttributesChange(id, attributeItems);
   }, [attributeItems, id, onNodeAttributesChange]);
 
+  const handleMethodDuplicate = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "method"
+    ) {
+      return;
+    }
+    onMethodDuplicate(contextMenuData.methodId);
+  }, [contextMenuData, onMethodDuplicate]);
+
+  const handleMethodRemove = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "method"
+    ) {
+      return;
+    }
+    onMethodRemove(contextMenuData.methodId);
+  }, [contextMenuData, onMethodRemove]);
+
+  useEffect(() => {
+    onNodeAttributesChange(id, attributeItems);
+  }, [attributeItems, id, onNodeAttributesChange]);
+
   return (
     <>
       <NodeResizer
@@ -207,10 +231,11 @@ export const ClassNode: FC<
             onContextMenu={handleContextMenuOpenFromAttr}
           />
           <ClassMethodRegion
-            classId={id}
+            nodeId={id}
             items={methodItems}
             containerRef={methodContainerRef}
             onChange={onMethodChange}
+            onContextMenu={handleContextMenuOpenFromMethod}
           />
         </Stack>
       </Paper>
@@ -254,54 +279,89 @@ export const ClassNode: FC<
             />
           </Stack>
         </Box>
-        <MenuItem onClick={onAttributeAdd}>
-          <ListItemText inset>New attribute</ListItemText>
-        </MenuItem>
-        {contextMenuData !== undefined &&
-          contextMenuData.origin === "attr" && (
-            <Fragment>
-              <MenuItem onClick={handleAttributeDuplicate}>
-                <ListItemText inset>
-                  Duplicate attribute
-                </ListItemText>
-              </MenuItem>
-              <MenuItem onClick={handleAttributeRemove}>
-                <ListItemText inset>
-                  Remove attribute
-                </ListItemText>
-              </MenuItem>
-            </Fragment>
-          )}
         <Divider flexItem />
-        <MenuItem onClick={onMethodAdd}>
-          <ListItemText inset>New method</ListItemText>
-        </MenuItem>
-        {contextMenuData !== undefined &&
-          contextMenuData.origin === "method" && (
-            <Fragment>
-              <MenuItem onClick={handleAttributeDuplicate}>
-                <ListItemText inset>
-                  Duplicate method
-                </ListItemText>
-              </MenuItem>
-              <MenuItem onClick={handleAttributeRemove}>
-                <ListItemText inset>
-                  Remove method
-                </ListItemText>
-              </MenuItem>
-            </Fragment>
-          )}
+        <MenuList onClick={handleContextMenuClose}>
+          <MenuItem onClick={onAttributeAdd}>
+            <ListItemText inset>New attribute</ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={handleAttributeDuplicate}
+            sx={{
+              display:
+                contextMenuData !== undefined &&
+                contextMenuData.origin === "attr"
+                  ? undefined
+                  : "none",
+            }}
+          >
+            <ListItemText inset>
+              Duplicate attribute
+            </ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={handleAttributeRemove}
+            sx={{
+              display:
+                contextMenuData !== undefined &&
+                contextMenuData.origin === "attr"
+                  ? undefined
+                  : "none",
+            }}
+          >
+            <ListItemText inset>
+              Remove attribute
+            </ListItemText>
+          </MenuItem>
+        </MenuList>
         <Divider flexItem />
-        <MenuItem>
-          <ListItemText inset>Duplicate</ListItemText>
-        </MenuItem>
+        <MenuList onClick={handleContextMenuClose}>
+          <MenuItem onClick={onMethodAdd}>
+            <ListItemText inset>New method</ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={handleMethodDuplicate}
+            sx={{
+              display:
+                contextMenuData !== undefined &&
+                contextMenuData.origin === "method"
+                  ? undefined
+                  : "none",
+            }}
+          >
+            <ListItemText inset>
+              Duplicate method
+            </ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={handleMethodRemove}
+            sx={{
+              display:
+                contextMenuData !== undefined &&
+                contextMenuData.origin === "method"
+                  ? undefined
+                  : "none",
+            }}
+          >
+            <ListItemText inset>Remove method</ListItemText>
+          </MenuItem>
+        </MenuList>
         <Divider flexItem />
-        <MenuItem>
-          <ListItemIcon>
-            <DeleteRounded />
-          </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
+        <MenuList onClick={handleContextMenuClose}>
+          <MenuItem>
+            <ListItemText inset>
+              Duplicate class
+            </ListItemText>
+          </MenuItem>
+        </MenuList>
+        <Divider flexItem />
+        <MenuList onClick={handleContextMenuClose}>
+          <MenuItem>
+            <ListItemIcon>
+              <DeleteRounded />
+            </ListItemIcon>
+            <ListItemText>Remove class</ListItemText>
+          </MenuItem>
+        </MenuList>
       </Menu>
     </>
   );

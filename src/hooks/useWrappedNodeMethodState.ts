@@ -30,18 +30,24 @@ export const useWrappedNodeMethodState = (
   );
 
   const onRemove = useCallback(
-    (attrId: number) => {
+    (itemId: number) => {
       setItems((prev) => {
-        return prev.filter((attr) => attr.id !== attrId);
+        return prev.filter((attr) => attr.id !== itemId);
       });
     },
     [setItems]
   );
 
   const onDuplicate = useCallback(
-    (value: Omit<DiagramClassMethod, "id">) => {
+    (itemId: number) => {
       setItems((prev) => {
-        const nextItem = createDiagramClassMethod(value);
+        const item = prev.find(
+          (item) => item.id === itemId
+        );
+        if (item === undefined) {
+          return prev;
+        }
+        const nextItem = createDiagramClassMethod(item);
         return prev.concat(nextItem);
       });
     },

@@ -10,11 +10,13 @@ import { StrictTextField } from "./StrictTextField";
 type Props = {
   data: DiagramClassMethod;
   onChange: (value: DiagramClassMethod) => void;
+  onContextMenu: (e: React.MouseEvent) => void;
 };
 export const ClassMethodRegionItem: FC<Props> = memo(
   ({
     data: { access_, id, primary, secondary },
     onChange,
+    onContextMenu,
   }) => {
     const handleAccessChange = useCallback(() => {
       let nextAccess: DiagramClassMethod["access_"];
@@ -72,6 +74,7 @@ export const ClassMethodRegionItem: FC<Props> = memo(
           width: "100%",
           listStyle: "none",
         }}
+        onContextMenu={onContextMenu}
       >
         <InputAdornment position="start">
           <Typography
