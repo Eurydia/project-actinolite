@@ -6,6 +6,11 @@ import { useContextMenu } from "@/hooks/useContextMenu";
 import { useExportMedia } from "@/hooks/useExportMedia";
 import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
+import { exportWorkspace } from "@/services/session/export";
+import {
+  DiagramEdgeData,
+  DiagramNodeData,
+} from "@/types/figure";
 import {
   Box,
   CssBaseline,
@@ -19,14 +24,22 @@ import {
   Background,
   Connection,
   Controls,
+  Edge,
   EdgeTypes,
   FinalConnectionState,
   MiniMap,
+  Node,
   ReactFlow,
+  ReactFlowInstance,
   ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { ToastContainer } from "react-toastify";
 
@@ -40,6 +53,20 @@ const EDGE_TYPES: EdgeTypes = {
 
 export const App = () => {
   const reactFlowWrapper = useRef(null);
+
+  const [rInstance, setRInstance] =
+    useState<
+      ReactFlowInstance<
+        Node<DiagramNodeData>,
+        Edge<DiagramEdgeData>
+      >
+    >();
+
+  const handleExportWorkspace = useCallback(() => {
+    if (rInstance !== undefined) {
+      exportWorkspace(rInstance);
+    }
+  }, [rInstance]);
 
   const { exportAsJepg, exportAsPng, exportAsSvg } =
     useExportMedia();
@@ -132,6 +159,7 @@ export const App = () => {
         sx={{ height: "100%", width: "100%" }}
       >
         <ReactFlow
+          onInit={setRInstance}
           nodes={nodes}
           edges={edges}
           nodeTypes={NODE_TYPES}
@@ -218,6 +246,7 @@ export const App = () => {
         <MenuItem>
           <ListItemText
             inset
+            onClick={handleExportWorkspace}
             slotProps={{
               primary: { fontFamily: "monospace" },
             }}
