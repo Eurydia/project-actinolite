@@ -94,7 +94,7 @@ export const AppContextMenu: FC<Props> = memo(
         <MenuItem>
           <ListItemText
             inset
-            onClick={handleExportWorkspace}
+            // onClick={handleExportWorkspace}
             slotProps={{
               primary: { fontFamily: "monospace" },
             }}

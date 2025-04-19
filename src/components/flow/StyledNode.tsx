@@ -4,20 +4,8 @@ import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeSta
 import { useWrappedNodeMethodState } from "@/hooks/useWrappedNodeMethodState";
 import { DiagramNodeData } from "@/types/figure";
 import {
-  ContentCopyRounded,
-  DeleteRounded,
-} from "@mui/icons-material";
-import {
   Box,
   Divider,
-  IconButton,
-  InputAdornment,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  MenuList,
-  OutlinedInput,
   Paper,
   Stack,
   useTheme,
@@ -38,13 +26,12 @@ import {
   useMemo,
   useState,
 } from "react";
-import { HexColorPicker } from "react-colorful";
 import { toast } from "react-toastify";
-import { ClassAttributeRegion } from "./ClassAttributeRegion";
-import { ClassMethodRegion } from "./ClassMethodRegion";
-import { StrictTextField } from "./StrictTextField";
+import { ClassAttributeRegion } from "../ClassAttributeRegion";
+import { ClassMethodRegion } from "../ClassMethodRegion";
+import { StrictTextField } from "../StrictTextField";
 
-export const ClassNode: FC<
+export const StyledNode: FC<
   NodeProps<Node<DiagramNodeData>>
 > = memo(({ id, data, selected }) => {
   const { palette } = useTheme();
@@ -239,130 +226,6 @@ export const ClassNode: FC<
           />
         </Stack>
       </Paper>
-      <Menu
-        open={contextMenuPos !== undefined}
-        onContextMenu={handlePreventDefaultContextMenu}
-        onClose={handleContextMenuClose}
-        anchorReference="anchorPosition"
-        anchorPosition={contextMenuPos}
-        slotProps={{
-          paper: {
-            sx: { scrollbarWidth: "none" },
-          },
-        }}
-      >
-        <Box padding={2}>
-          <Stack spacing={1}>
-            <HexColorPicker
-              color={color}
-              onChange={setColor}
-              style={{ width: "100%" }}
-            />
-            <OutlinedInput
-              size="small"
-              value={color}
-              onChange={({ target }) =>
-                setColor(target.value)
-              }
-              sx={{ fontFamily: "monospace" }}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    disableRipple
-                    size="small"
-                    onClick={handleCopyColor}
-                  >
-                    <ContentCopyRounded />
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </Stack>
-        </Box>
-        <Divider flexItem />
-        <MenuList onClick={handleContextMenuClose}>
-          <MenuItem onClick={onAttributeAdd}>
-            <ListItemText inset>New attribute</ListItemText>
-          </MenuItem>
-          <MenuItem
-            onClick={handleAttributeDuplicate}
-            sx={{
-              display:
-                contextMenuData !== undefined &&
-                contextMenuData.origin === "attr"
-                  ? undefined
-                  : "none",
-            }}
-          >
-            <ListItemText inset>
-              Duplicate attribute
-            </ListItemText>
-          </MenuItem>
-          <MenuItem
-            onClick={handleAttributeRemove}
-            sx={{
-              display:
-                contextMenuData !== undefined &&
-                contextMenuData.origin === "attr"
-                  ? undefined
-                  : "none",
-            }}
-          >
-            <ListItemText inset>
-              Remove attribute
-            </ListItemText>
-          </MenuItem>
-        </MenuList>
-        <Divider flexItem />
-        <MenuList onClick={handleContextMenuClose}>
-          <MenuItem onClick={onMethodAdd}>
-            <ListItemText inset>New method</ListItemText>
-          </MenuItem>
-          <MenuItem
-            onClick={handleMethodDuplicate}
-            sx={{
-              display:
-                contextMenuData !== undefined &&
-                contextMenuData.origin === "method"
-                  ? undefined
-                  : "none",
-            }}
-          >
-            <ListItemText inset>
-              Duplicate method
-            </ListItemText>
-          </MenuItem>
-          <MenuItem
-            onClick={handleMethodRemove}
-            sx={{
-              display:
-                contextMenuData !== undefined &&
-                contextMenuData.origin === "method"
-                  ? undefined
-                  : "none",
-            }}
-          >
-            <ListItemText inset>Remove method</ListItemText>
-          </MenuItem>
-        </MenuList>
-        <Divider flexItem />
-        <MenuList onClick={handleContextMenuClose}>
-          <MenuItem>
-            <ListItemText inset>
-              Duplicate class
-            </ListItemText>
-          </MenuItem>
-        </MenuList>
-        <Divider flexItem />
-        <MenuList onClick={handleContextMenuClose}>
-          <MenuItem>
-            <ListItemIcon>
-              <DeleteRounded />
-            </ListItemIcon>
-            <ListItemText>Remove class</ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Menu>
     </>
   );
 });

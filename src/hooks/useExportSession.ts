@@ -24,4 +24,6 @@ export const useHandleExportSession = () => {
       exportWorkspace(rInstance);
     }
   }, [rInstance]);
+
+  return;
 };

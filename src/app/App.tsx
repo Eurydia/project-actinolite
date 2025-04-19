@@ -1,28 +1,29 @@
-import { ClassNode } from "@/components/ClassNode";
-import { StyledEdge } from "@/components/diagram/StyledEdge";
-import { MarkerProvider } from "@/components/flow/MarkerProvider";
-import { AppContextMenu } from "@/components/form/AppContextMenu";
+import { StyledEdge } from "@/components/flow/StyledEdge";
+import { StyledNode } from "@/components/flow/StyledNode";
+import { FileInput } from "@/components/form/SessionFIleInput";
 import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
-import { exportWorkspace } from "@/services/session/export";
 import {
   DiagramEdgeData,
   DiagramNodeData,
 } from "@/types/figure";
-import { Box, CssBaseline } from "@mui/material";
+import {
+  Button,
+  CssBaseline,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Divider,
+} from "@mui/material";
 import {
   addEdge,
-  Background,
   Connection,
-  Controls,
   Edge,
   EdgeTypes,
   FinalConnectionState,
-  MiniMap,
   Node,
-  ReactFlow,
   ReactFlowInstance,
   ReactFlowProvider,
 } from "@xyflow/react";
@@ -33,11 +34,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { createPortal } from "react-dom";
 import { ToastContainer } from "react-toastify";
 
 const NODE_TYPES = {
-  ClassNode: ClassNode,
+  ClassNode: StyledNode,
 };
 
 const EDGE_TYPES: EdgeTypes = {
@@ -55,11 +55,11 @@ export const App = () => {
       >
     >();
 
-  const handleExportWorkspace = useCallback(() => {
-    if (rInstance !== undefined) {
-      exportWorkspace(rInstance);
-    }
-  }, [rInstance]);
+  // const handleExportWorkspace = useCallback(() => {
+  //   if (rInstance !== undefined) {
+  //     exportWorkspace(rInstance);
+  //   }
+  // }, [rInstance]);
 
   const { nodes, onNodeAdd, onNodesChange, ...rest } =
     useWrappedNodeState();
@@ -136,7 +136,7 @@ export const App = () => {
     <WrappedNodeContext.Provider
       value={{ onNodeAdd, ...rest }}
     >
-      <Box
+      {/* <Box
         ref={reactFlowWrapper}
         component="div"
         sx={{ height: "100%", width: "100%" }}
@@ -175,11 +175,30 @@ export const App = () => {
               )!
             )}
         </ReactFlow>
-      </Box>
+      </Box> */}
+      {/*       
       <AppContextMenu
         onClose={handleContextMenuClose}
         anchorPosition={contextMenuPos}
-      />
+      /> */}
+      <Dialog
+        open
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogContent>
+          <FileInput />
+          <Divider />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            disableElevation
+            variant="text"
+          >
+            close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </WrappedNodeContext.Provider>
   );
 };
