@@ -2,8 +2,8 @@ import { TextField } from "@mui/material";
 import { ChangeEvent, FC, memo, useCallback } from "react";
 
 type Props = {
-  value: string | null;
-  onChange: (value: string | null) => void;
+  value: File | null;
+  onChange: (value: File | null) => void;
 };
 export const FileInput: FC<Props> = memo(
   ({ onChange, value }) => {
@@ -14,15 +14,7 @@ export const FileInput: FC<Props> = memo(
           return;
         }
         const file = e.target.files.item(0);
-        if (file === null) {
-          onChange(null);
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => {
-          onChange(reader.result as string | null);
-        };
-        reader.readAsText(file);
+        onChange(file);
       },
       [onChange]
     );

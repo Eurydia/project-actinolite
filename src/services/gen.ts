@@ -1,12 +1,12 @@
 import {
   AccessLevel,
-  DiagramClassMethod,
   DiagramNodeData,
+  DiagramNodeMethodData,
 } from "@/types/figure";
 import { faker } from "@faker-js/faker";
 import {
-  createClassAttribute,
-  createDiagramClassMethod,
+  createDiagramNodeAttributeData,
+  createDiagramNodeMethodData,
 } from "./models";
 
 export const createRandomClassAttributes = (
@@ -14,7 +14,7 @@ export const createRandomClassAttributes = (
 ) => {
   return faker.helpers.multiple(
     () =>
-      createClassAttribute({
+      createDiagramNodeAttributeData({
         primary: faker.hacker.noun(),
         secondary: faker.helpers.arrayElement([
           "integer",
@@ -31,8 +31,8 @@ export const createRandomClassAttributes = (
 
 export const createRandomClassMethods = (count: number) => {
   return faker.helpers.multiple(
-    (): DiagramClassMethod => {
-      return createDiagramClassMethod({
+    (): DiagramNodeMethodData => {
+      return createDiagramNodeMethodData({
         primary: faker.hacker.noun() + "()",
         secondary: "void",
         access_: faker.helpers.arrayElement(

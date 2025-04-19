@@ -1,4 +1,4 @@
-import { DiagramClassMethod } from "@/types/figure";
+import { DiagramNodeMethodData } from "@/types/figure";
 import { Box } from "@mui/material";
 import { FC, Ref, useCallback } from "react";
 import { ClassMethodRegionItem } from "./ClassMethodRegionItem";
@@ -6,8 +6,8 @@ import { ClassMethodRegionItem } from "./ClassMethodRegionItem";
 type Props = {
   containerRef: Ref<HTMLUListElement>;
   nodeId: string;
-  items: DiagramClassMethod[];
-  onChange: (value: DiagramClassMethod) => void;
+  items: DiagramNodeMethodData[];
+  onChange: (value: DiagramNodeMethodData) => void;
   onContextMenu: (
     e: React.MouseEvent,
     methodId: number

@@ -1,4 +1,4 @@
-import { DiagramClassMethod } from "@/types/figure";
+import { DiagramNodeMethodData } from "@/types/figure";
 import {
   Box,
   InputAdornment,
@@ -8,8 +8,8 @@ import { FC, memo, useCallback } from "react";
 import { StrictTextField } from "./StrictTextField";
 
 type Props = {
-  data: DiagramClassMethod;
-  onChange: (value: DiagramClassMethod) => void;
+  data: DiagramNodeMethodData;
+  onChange: (value: DiagramNodeMethodData) => void;
   onContextMenu: (e: React.MouseEvent) => void;
 };
 export const ClassMethodRegionItem: FC<Props> = memo(
@@ -19,7 +19,7 @@ export const ClassMethodRegionItem: FC<Props> = memo(
     onContextMenu,
   }) => {
     const handleAccessChange = useCallback(() => {
-      let nextAccess: DiagramClassMethod["access_"];
+      let nextAccess: DiagramNodeMethodData["access_"];
       switch (access_) {
         case "#":
           nextAccess = "-";

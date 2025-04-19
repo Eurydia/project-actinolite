@@ -1,8 +1,5 @@
-import { StyledEdge } from "@/components/flow/StyledEdge";
-import { StyledNode } from "@/components/flow/StyledNode";
-import { FileInput } from "@/components/form/SessionFIleInput";
+import { WrappedEdgeContext } from "@/context/WrappedEdgeContext";
 import { WrappedNodeContext } from "@/context/WrappedNodeContext";
-import { useContextMenu } from "@/hooks/useContextMenu";
 import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import {
@@ -18,35 +15,16 @@ import {
   Divider,
 } from "@mui/material";
 import {
-  addEdge,
-  Connection,
   Edge,
-  EdgeTypes,
-  FinalConnectionState,
   Node,
   ReactFlowInstance,
   ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useState } from "react";
 import { ToastContainer } from "react-toastify";
 
-const NODE_TYPES = {
-  ClassNode: StyledNode,
-};
-
-const EDGE_TYPES: EdgeTypes = {
-  default: StyledEdge,
-};
-
 export const App = () => {
-  const reactFlowWrapper = useRef(null);
-
   const [rInstance, setRInstance] =
     useState<
       ReactFlowInstance<
@@ -55,88 +33,21 @@ export const App = () => {
       >
     >();
 
-  // const handleExportWorkspace = useCallback(() => {
-  //   if (rInstance !== undefined) {
-  //     exportWorkspace(rInstance);
-  //   }
-  // }, [rInstance]);
+  const wrappedNodeState = useWrappedNodeState();
+  const wrappedEdgeState = useWrappedEdgeState();
 
-  const { nodes, onNodeAdd, onNodesChange, ...rest } =
-    useWrappedNodeState();
-  const { edges, setEdges, onEdgesChange, createNewEdge } =
-    useWrappedEdgeState();
-  const {
-    contextMenuPos,
-    handleContextMenuClose,
-    handleContextMenuOpen,
-  } = useContextMenu();
-
-  const onConnect = useCallback(
-    (params: Connection) =>
-      setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
-
-  const onConnectEnd = useCallback(
-    (
-      event: MouseEvent | TouchEvent,
-      connectionState: FinalConnectionState
-    ) => {
-      let targetNodeId: string | undefined = undefined;
-
-      if (
-        connectionState.isValid &&
-        connectionState.toNode !== null
-      ) {
-        targetNodeId = connectionState.toNode.id;
-      } else {
-        const { clientX, clientY } =
-          "changedTouches" in event
-            ? event.changedTouches[0]
-            : event;
-
-        targetNodeId = onNodeAdd({
-          top: clientY,
-          left: clientX,
-        });
-      }
-
-      if (targetNodeId !== undefined) {
-        setEdges((prev) => {
-          if (connectionState.fromNode === null) {
-            return prev;
-          }
-          const next = [...prev];
-          const sourceNodeId = connectionState.fromNode.id;
-          next.push(
-            createNewEdge(sourceNodeId, targetNodeId)
-          );
-          return next;
-        });
-      }
-    },
-    [createNewEdge, onNodeAdd, setEdges]
-  );
-
-  const injectedRef = useRef(false);
-
-  useEffect(() => {
-    if (injectedRef.current) {
-      return;
-    }
-    const targetElement = document.querySelector(
-      ".react-flow__viewport"
-    );
-    if (targetElement !== null) {
-      injectedRef.current = true;
-    }
-  }, []);
+  const handleRestoreSession = useCallback(() => {
+    wrappedNodeState.onNodesChange([]);
+    wrappedEdgeState.onEdgesChange([]);
+  }, [
+    wrappedNodeState.onNodesChange,
+    wrappedEdgeState.onEdgesChange,
+  ]);
 
   return (
-    <WrappedNodeContext.Provider
-      value={{ onNodeAdd, ...rest }}
-    >
-      {/* <Box
+    <WrappedNodeContext.Provider value={wrappedNodeState}>
+      <WrappedEdgeContext.Provider value={wrappedEdgeState}>
+        {/* <Box
         ref={reactFlowWrapper}
         component="div"
         sx={{ height: "100%", width: "100%" }}
@@ -176,29 +87,29 @@ export const App = () => {
             )}
         </ReactFlow>
       </Box> */}
-      {/*       
+        {/*       
       <AppContextMenu
         onClose={handleContextMenuClose}
         anchorPosition={contextMenuPos}
       /> */}
-      <Dialog
-        open
-        maxWidth="lg"
-        fullWidth
-      >
-        <DialogContent>
-          <FileInput />
-          <Divider />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            disableElevation
-            variant="text"
-          >
-            close
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog
+          open
+          maxWidth="lg"
+          fullWidth
+        >
+          <DialogContent>
+            <Divider />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              disableElevation
+              variant="text"
+            >
+              close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </WrappedEdgeContext.Provider>
     </WrappedNodeContext.Provider>
   );
 };

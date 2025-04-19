@@ -1,15 +1,11 @@
 import { WrappedNodeContext } from "@/context/WrappedNodeContext";
-import { useContextMenu } from "@/hooks/useContextMenu";
-import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeState";
-import { useWrappedNodeMethodState } from "@/hooks/useWrappedNodeMethodState";
-import { DiagramNodeData } from "@/types/figure";
 import {
-  Box,
-  Divider,
-  Paper,
-  Stack,
-  useTheme,
-} from "@mui/material";
+  DiagramNodeAttributeData,
+  DiagramNodeData,
+} from "@/types/figure";
+import { animations } from "@formkit/drag-and-drop";
+import { useDragAndDrop } from "@formkit/drag-and-drop/react";
+import { Box, Divider, Paper, Stack } from "@mui/material";
 import {
   Handle,
   Node,
@@ -17,16 +13,7 @@ import {
   NodeResizer,
   Position,
 } from "@xyflow/react";
-import {
-  FC,
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { toast } from "react-toastify";
+import { FC, memo, useContext, useState } from "react";
 import { ClassAttributeRegion } from "../ClassAttributeRegion";
 import { ClassMethodRegion } from "../ClassMethodRegion";
 import { StrictTextField } from "../StrictTextField";
@@ -34,126 +21,135 @@ import { StrictTextField } from "../StrictTextField";
 export const StyledNode: FC<
   NodeProps<Node<DiagramNodeData>>
 > = memo(({ id, data, selected }) => {
-  const { palette } = useTheme();
-  const [color, setColor] = useState("#000");
-  const textColorContrast = useMemo(() => {
-    return palette.getContrastText(color);
-  }, [color, palette]);
+  // const { palette } = useTheme();
+  // const [color, setColor] = useState("#000");
+  // const textColorContrast = useMemo(() => {
+  //   return palette.getContrastText(color);
+  // }, [color, palette]);
 
   const [name, setName] = useState(data.name);
 
   const { onNodeAttributesChange, onNodeMethodsChange } =
     useContext(WrappedNodeContext);
 
-  const {
-    containerRef: methodContainerRef,
-    items: methodItems,
-    onAdd: onMethodAdd,
-    onChange: onMethodChange,
-    onDuplicate: onMethodDuplicate,
-    onRemove: onMethodRemove,
-  } = useWrappedNodeMethodState(data.methods);
+  // const {
+  //   containerRef: methodContainerRef,
+  //   items: methodItems,
+  //   onAdd: onMethodAdd,
+  //   onChange: onMethodChange,
+  //   onDuplicate: onMethodDuplicate,
+  //   onRemove: onMethodRemove,
+  // } = useWrappedNodeMethodState(data.methods);
 
-  useEffect(() => {
-    onNodeMethodsChange(id, methodItems);
-  }, [id, methodItems, onNodeMethodsChange]);
+  // useEffect(() => {
+  //   onNodeMethodsChange(id, methodItems);
+  // }, [id, methodItems, onNodeMethodsChange]);
 
-  const [contextMenuData, setContextMenuData] = useState<
-    | { origin: "attr"; attrId: number }
-    | { origin: "method"; methodId: number }
-  >();
+  // const [contextMenuData, setContextMenuData] = useState<
+  //   | { origin: "attr"; attrId: number }
+  //   | { origin: "method"; methodId: number }
+  // >();
 
-  const {
-    contextMenuPos,
-    handleContextMenuClose: onContextMenuClose,
-    handleContextMenuOpen: onContextMenuOpen,
-    handlePreventDefaultContextMenu,
-  } = useContextMenu();
+  // const {
+  //   contextMenuPos,
+  //   handleContextMenuClose: onContextMenuClose,
+  //   handleContextMenuOpen: onContextMenuOpen,
+  //   handlePreventDefaultContextMenu,
+  // } = useContextMenu();
 
-  const handleContextMenuOpenFromAttr = useCallback(
-    (event: React.MouseEvent, attrId: number) => {
-      setContextMenuData({ origin: "attr", attrId });
-      onContextMenuOpen(event);
-    },
-    [onContextMenuOpen]
-  );
+  // const handleContextMenuOpenFromAttr = useCallback(
+  //   (event: React.MouseEvent, attrId: number) => {
+  //     setContextMenuData({ origin: "attr", attrId });
+  //     onContextMenuOpen(event);
+  //   },
+  //   [onContextMenuOpen]
+  // );
 
-  const handleContextMenuOpenFromMethod = useCallback(
-    (event: React.MouseEvent, methodId: number) => {
-      setContextMenuData({ origin: "method", methodId });
-      onContextMenuOpen(event);
-    },
-    [onContextMenuOpen]
-  );
+  // const handleContextMenuOpenFromMethod = useCallback(
+  //   (event: React.MouseEvent, methodId: number) => {
+  //     setContextMenuData({ origin: "method", methodId });
+  //     onContextMenuOpen(event);
+  //   },
+  //   [onContextMenuOpen]
+  // );
 
-  const handleContextMenuClose = useCallback(() => {
-    setContextMenuData(undefined);
-    onContextMenuClose();
-  }, [onContextMenuClose]);
+  // const handleContextMenuClose = useCallback(() => {
+  //   setContextMenuData(undefined);
+  //   onContextMenuClose();
+  // }, [onContextMenuClose]);
 
-  const handleCopyColor = useCallback(() => {
-    navigator.clipboard.writeText(color).then(
-      () => toast.success("Copied to clipboard"),
-      () => toast.error("Cannot copy to clipboard")
-    );
-  }, [color]);
+  // const handleCopyColor = useCallback(() => {
+  //   navigator.clipboard.writeText(color).then(
+  //     () => toast.success("Copied to clipboard"),
+  //     () => toast.error("Cannot copy to clipboard")
+  //   );
+  // }, [color]);
 
-  const {
-    attributeContainerRef,
-    attributeItems,
-    onAttributeAdd,
-    onAttributeChange,
-    onAttributeDuplicate,
-    onAttributeRemove,
-  } = useWrappedNodeAttributeState(data.attributes);
+  // const {
+  //   attributeContainerRef,
+  //   attributeItems,
+  //   onAttributeAdd,
+  //   onAttributeChange,
+  //   onAttributeDuplicate,
+  //   onAttributeRemove,
+  // } = useWrappedNodeAttributeState(data.attributes);
 
-  const handleAttributeDuplicate = useCallback(() => {
-    if (
-      contextMenuData === undefined ||
-      contextMenuData.origin !== "attr"
-    ) {
-      return;
-    }
-    onAttributeDuplicate(contextMenuData.attrId);
-  }, [contextMenuData, onAttributeDuplicate]);
+  // const handleAttributeDuplicate = useCallback(() => {
+  //   if (
+  //     contextMenuData === undefined ||
+  //     contextMenuData.origin !== "attr"
+  //   ) {
+  //     return;
+  //   }
+  //   onAttributeDuplicate(contextMenuData.attrId);
+  // }, [contextMenuData, onAttributeDuplicate]);
 
-  const handleAttributeRemove = useCallback(() => {
-    if (
-      contextMenuData === undefined ||
-      contextMenuData.origin !== "attr"
-    ) {
-      return;
-    }
-    onAttributeRemove(contextMenuData.attrId);
-  }, [contextMenuData, onAttributeRemove]);
+  // const handleAttributeRemove = useCallback(() => {
+  //   if (
+  //     contextMenuData === undefined ||
+  //     contextMenuData.origin !== "attr"
+  //   ) {
+  //     return;
+  //   }
+  //   onAttributeRemove(contextMenuData.attrId);
+  // }, [contextMenuData, onAttributeRemove]);
 
-  useEffect(() => {
-    onNodeAttributesChange(id, attributeItems);
-  }, [attributeItems, id, onNodeAttributesChange]);
+  // useEffect(() => {
+  //   onNodeAttributesChange(id, attributeItems);
+  // }, [attributeItems, id, onNodeAttributesChange]);
 
-  const handleMethodDuplicate = useCallback(() => {
-    if (
-      contextMenuData === undefined ||
-      contextMenuData.origin !== "method"
-    ) {
-      return;
-    }
-    onMethodDuplicate(contextMenuData.methodId);
-  }, [contextMenuData, onMethodDuplicate]);
+  // const handleMethodDuplicate = useCallback(() => {
+  //   if (
+  //     contextMenuData === undefined ||
+  //     contextMenuData.origin !== "method"
+  //   ) {
+  //     return;
+  //   }
+  //   onMethodDuplicate(contextMenuData.methodId);
+  // }, [contextMenuData, onMethodDuplicate]);
 
-  const handleMethodRemove = useCallback(() => {
-    if (
-      contextMenuData === undefined ||
-      contextMenuData.origin !== "method"
-    ) {
-      return;
-    }
-    onMethodRemove(contextMenuData.methodId);
-  }, [contextMenuData, onMethodRemove]);
+  // const handleMethodRemove = useCallback(() => {
+  //   if (
+  //     contextMenuData === undefined ||
+  //     contextMenuData.origin !== "method"
+  //   ) {
+  //     return;
+  //   }
+  //   onMethodRemove(contextMenuData.methodId);
+  // }, [contextMenuData, onMethodRemove]);
 
-  useEffect(() => {
-    onNodeAttributesChange(id, attributeItems);
-  }, [attributeItems, id, onNodeAttributesChange]);
+  // useEffect(() => {
+  //   onNodeAttributesChange(id, attributeItems);
+  // }, [attributeItems, id, onNodeAttributesChange]);
+
+  const [attributeContainerRef, , setAttributes] =
+    useDragAndDrop<
+      HTMLUListElement,
+      DiagramNodeAttributeData
+    >(data.attributes, {
+      group: "class-attribute",
+      plugins: [animations()],
+    });
 
   return (
     <>
@@ -172,7 +168,7 @@ export const StyledNode: FC<
 
       <Paper
         variant="outlined"
-        onContextMenu={onContextMenuOpen}
+        // onContextMenu={onContextMenuOpen}
         sx={{
           width: "100%",
           height: "100%",
@@ -186,7 +182,7 @@ export const StyledNode: FC<
         <Box
           className="node-handle"
           sx={{
-            backgroundColor: color,
+            // backgroundColor: color,
             display: "flex",
             flexDirection: "row",
             alignItems: "flex-start",
@@ -198,7 +194,7 @@ export const StyledNode: FC<
             value={name}
             onTextChange={setName}
             placeholder="unnamed"
-            sx={{ color: textColorContrast }}
+            // sx={{ color: textColorContrast }}
           />
         </Box>
         <Stack
@@ -213,7 +209,7 @@ export const StyledNode: FC<
           <ClassAttributeRegion
             nodeId={id}
             containerRef={attributeContainerRef}
-            items={attributeItems}
+            items={data.attributes}
             onChange={onAttributeChange}
             onContextMenu={handleContextMenuOpenFromAttr}
           />

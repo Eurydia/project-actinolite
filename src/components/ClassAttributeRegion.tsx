@@ -1,4 +1,4 @@
-import { DiagramClassAttribute } from "@/types/figure";
+import { DiagramNodeAttributeData } from "@/types/figure";
 import { Box } from "@mui/material";
 import React, { FC, Ref, useCallback } from "react";
 import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
@@ -6,8 +6,8 @@ import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
 type Props = {
   nodeId: string;
   containerRef: Ref<HTMLUListElement>;
-  items: DiagramClassAttribute[];
-  onChange: (value: DiagramClassAttribute) => void;
+  items: DiagramNodeAttributeData[];
+  onChange: (value: DiagramNodeAttributeData) => void;
   onContextMenu: (
     e: React.MouseEvent,
     attrId: number

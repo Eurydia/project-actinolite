@@ -1,14 +1,14 @@
-import { createClassAttribute } from "@/services/models";
+import { createDiagramNodeAttributeData } from "@/services/models";
 import {
   AccessLevel,
-  DiagramClassAttribute,
+  DiagramNodeAttributeData,
 } from "@/types/figure";
 import { animations } from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { useCallback } from "react";
 
 export const useWrappedNodeAttributeState = (
-  init: DiagramClassAttribute[]
+  init: DiagramNodeAttributeData[]
 ) => {
   const [
     attributeContainerRef,
@@ -16,14 +16,14 @@ export const useWrappedNodeAttributeState = (
     setAttributeItems,
   ] = useDragAndDrop<
     HTMLUListElement,
-    DiagramClassAttribute
+    DiagramNodeAttributeData
   >(init, {
     group: "class-attribute",
     plugins: [animations()],
   });
 
   const onAttributeChange = useCallback(
-    (value: DiagramClassAttribute) => {
+    (value: DiagramNodeAttributeData) => {
       setAttributeItems((prev) => {
         return prev.map((attr) =>
           attr.id !== value.id ? attr : value
@@ -51,7 +51,8 @@ export const useWrappedNodeAttributeState = (
         if (attr === undefined) {
           return prev;
         }
-        const nextAttr = createClassAttribute(attr);
+        const nextAttr =
+          createDiagramNodeAttributeData(attr);
         return prev.concat(nextAttr);
       });
     },
@@ -60,7 +61,7 @@ export const useWrappedNodeAttributeState = (
 
   const onAttributeAdd = useCallback(() => {
     setAttributeItems((prev) => {
-      const nextAttr = createClassAttribute({
+      const nextAttr = createDiagramNodeAttributeData({
         access_: AccessLevel.PRIVATE,
         primary: "",
         secondary: "",
