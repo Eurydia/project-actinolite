@@ -71,7 +71,6 @@ export const ClassAttributeRegionItem: FC<Props> = ({
         alignItems: "center",
         gap: 0.5,
         listStyle: "none",
-        height: 50,
       }}
       onContextMenu={onContextMenu}
     >

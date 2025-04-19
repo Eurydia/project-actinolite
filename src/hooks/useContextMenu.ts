@@ -27,18 +27,9 @@ export const useContextMenu = () => {
     setContextMenu(undefined);
   }, []);
 
-  const handlePreventDefaultContextMenu = useCallback(
-    (event: React.MouseEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-    },
-    []
-  );
-
   return {
     contextMenuPos,
     handleContextMenuClose,
     handleContextMenuOpen,
-    handlePreventDefaultContextMenu,
   };
 };
