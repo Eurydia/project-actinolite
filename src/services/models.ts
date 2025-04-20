@@ -1,7 +1,4 @@
-import {
-  DiagramNodeAttributeData,
-  DiagramNodeMethodData,
-} from "@/types/figure";
+import { DiagramNodeMethodData } from "@/types/figure";
 
 let GLOBAL_METHOD_ID = 0;
 export const createDiagramNodeMethodData = (
@@ -12,17 +9,5 @@ export const createDiagramNodeMethodData = (
     access_: value.access_,
     primary: value.primary,
     secondary: value.secondary,
-  };
-};
-
-let GLOBAL_ATTRIBUTE_ID = 0;
-export const createDiagramNodeAttributeData = (
-  init: Omit<DiagramNodeAttributeData, "id">
-): DiagramNodeAttributeData => {
-  return {
-    id: GLOBAL_ATTRIBUTE_ID++,
-    access_: init.access_,
-    primary: init.primary,
-    secondary: init.secondary,
   };
 };

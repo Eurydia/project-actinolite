@@ -2,13 +2,12 @@ import {
   AccessLevel,
   DiagramNodeAttributeData,
   DiagramNodeData,
-  DiagramNodeMethodData,
 } from "@/types/figure";
 import { Node } from "@xyflow/react";
 import { z } from "zod";
 
 const diagramClassMethodSchema = z
-  .object<DiagramNodeMethodData>({
+  .object({
     id: z.number().int().nonnegative(),
     access_: z.nativeEnum(AccessLevel),
     primary: z.string(),

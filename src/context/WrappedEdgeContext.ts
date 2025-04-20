@@ -17,4 +17,7 @@ export const WrappedEdgeContext = createContext<
   onEdgesChange: () => {
     throw new Error();
   },
+  onEdgeChangeMany: () => {
+    throw new Error();
+  },
 });

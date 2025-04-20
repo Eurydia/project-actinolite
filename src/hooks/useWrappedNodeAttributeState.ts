@@ -1,78 +1,94 @@
-import { createDiagramNodeAttributeData } from "@/services/models";
+import { WrappedNodeContext } from "@/context/WrappedNodeContext";
 import {
   AccessLevel,
   DiagramNodeAttributeData,
 } from "@/types/figure";
 import { animations } from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
-import { useCallback } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
+import { createDiagramNodeAttributeData } from "./useWrappedNodeState";
 
 export const useWrappedNodeAttributeState = (
-  init: DiagramNodeAttributeData[]
+  id: string
 ) => {
-  const [
-    attributeContainerRef,
-    attributeItems,
-    setAttributeItems,
-  ] = useDragAndDrop<
-    HTMLUListElement,
-    DiagramNodeAttributeData
-  >(init, {
-    group: "class-attribute",
-    plugins: [animations()],
-  });
+  const { nodes, onNodeAttributesChange } = useContext(
+    WrappedNodeContext
+  );
+
+  const attrs = useMemo(() => {
+    const attrs: DiagramNodeAttributeData[] = [];
+    for (const node of nodes) {
+      if (node.id === id) {
+        attrs.concat(node.data.attributes);
+        break;
+      }
+    }
+    return attrs;
+  }, [id, nodes]);
+
+  const [attributeContainerRef, , setAttributeItems] =
+    useDragAndDrop<
+      HTMLUListElement,
+      DiagramNodeAttributeData
+    >(attrs, {
+      group: "class-attribute",
+      plugins: [animations()],
+    });
+
+  useEffect(() => {
+    setAttributeItems(attrs);
+  }, [attrs, setAttributeItems]);
 
   const onAttributeChange = useCallback(
     (value: DiagramNodeAttributeData) => {
-      setAttributeItems((prev) => {
-        return prev.map((attr) =>
-          attr.id !== value.id ? attr : value
-        );
-      });
+      onNodeAttributesChange(
+        id,
+        attrs.map((attr) =>
+          attr.id === value.id ? value : attr
+        )
+      );
     },
-    [setAttributeItems]
+    [attrs, id, onNodeAttributesChange]
   );
 
   const onAttributeRemove = useCallback(
     (attrId: number) => {
-      setAttributeItems((prev) => {
-        return prev.filter((attr) => attr.id !== attrId);
-      });
+      onNodeAttributesChange(
+        id,
+        attrs.filter((attr) => attr.id !== attrId)
+      );
     },
-    [setAttributeItems]
+    [attrs, id, onNodeAttributesChange]
   );
 
   const onAttributeDuplicate = useCallback(
     (attrId: number) => {
-      setAttributeItems((prev) => {
-        const attr = prev.find(
-          (attr) => attr.id === attrId
-        );
-        if (attr === undefined) {
-          return prev;
-        }
-        const nextAttr =
-          createDiagramNodeAttributeData(attr);
-        return prev.concat(nextAttr);
-      });
+      const attr = attrs.find((attr) => attr.id === attrId);
+      if (attr === undefined) {
+        return;
+      }
+      const nextAttr = createDiagramNodeAttributeData(attr);
+      onNodeAttributesChange(id, attrs.concat(nextAttr));
     },
-    [setAttributeItems]
+    [attrs, id, onNodeAttributesChange]
   );
 
   const onAttributeAdd = useCallback(() => {
-    setAttributeItems((prev) => {
-      const nextAttr = createDiagramNodeAttributeData({
-        access_: AccessLevel.PRIVATE,
-        primary: "",
-        secondary: "",
-      });
-      return prev.concat(nextAttr);
+    const nextAttr = createDiagramNodeAttributeData({
+      access_: AccessLevel.PRIVATE,
+      primary: "",
+      secondary: "",
     });
-  }, [setAttributeItems]);
+    onNodeAttributesChange(id, attrs.concat(nextAttr));
+  }, [attrs, id, onNodeAttributesChange]);
 
   return {
     attributeContainerRef,
-    attributeItems,
     onAttributeAdd,
     onAttributeChange,
     onAttributeDuplicate,

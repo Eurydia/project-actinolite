@@ -5,10 +5,29 @@ import {
 import { Edge, useEdgesState } from "@xyflow/react";
 import { useCallback } from "react";
 
+export const createEdge = (
+  source: string,
+  target: string
+): Edge<DiagramEdgeData> => {
+  return {
+    id: `${source}-${target}`,
+    source,
+    target,
+    data: {
+      lineType: DiagramEdgeLineType.SOLID,
+      markerStart: undefined,
+      markerEnd: undefined,
+      multiplicityEnd: undefined,
+      multiplicityStart: undefined,
+      label: undefined,
+    },
+    style: { strokeWidth: 2 },
+  };
+};
+
 export const useWrappedEdgeState = () => {
-  const [edges, onEdgesChange] = useEdgesState<
-    Edge<DiagramEdgeData>
-  >([]);
+  const [edges, onEdgesChange, onEdgeChangeMany] =
+    useEdgesState<Edge<DiagramEdgeData>>([]);
 
   const onEdgeChange = useCallback(
     (value: Edge<DiagramEdgeData>) => {
@@ -33,20 +52,7 @@ export const useWrappedEdgeState = () => {
   const onEdgeAdd = useCallback(
     (source: string, target: string) => {
       onEdgesChange((prev) => {
-        return prev.concat({
-          id: `${source}-${target}`,
-          source,
-          target,
-          data: {
-            lineType: DiagramEdgeLineType.SOLID,
-            markerStart: undefined,
-            markerEnd: undefined,
-            multiplicityEnd: undefined,
-            multiplicityStart: undefined,
-            label: undefined,
-          },
-          style: { strokeWidth: 2 },
-        });
+        return prev.concat(createEdge(source, target));
       });
     },
     [onEdgesChange]
@@ -58,5 +64,6 @@ export const useWrappedEdgeState = () => {
     onEdgeDelete,
     onEdgeAdd,
     onEdgesChange,
+    onEdgeChangeMany,
   };
 };

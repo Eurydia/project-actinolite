@@ -10,11 +10,11 @@ import {
 } from "@xyflow/react";
 import { useCallback } from "react";
 
-let currentNodeId = 0;
-const getNextNodeId = () => currentNodeId++;
+let CURRENT_NODE_ID = 0;
+const getNextNodeId = () => CURRENT_NODE_ID++;
 
 let GLOBAL_METHOD_ID = 0;
-const createDiagramNodeMethodData = (
+export const createDiagramNodeMethodData = (
   value: Omit<DiagramNodeMethodData, "id">
 ): DiagramNodeMethodData => {
   return {
@@ -40,26 +40,47 @@ export const createDiagramNodeAttributeData = (
 export const useWrappedNodeState = () => {
   const { screenToFlowPosition } = useReactFlow();
 
-  const [nodes, onNodesChange] = useNodesState<
-    Node<DiagramNodeData>
-  >([]);
+  const [nodes, onNodesChange, onNodeChangeMany] =
+    useNodesState<Node<DiagramNodeData>>([]);
 
   const onNodesRestore = useCallback(
     (value: Node<DiagramNodeData>[]) => {
-      let maxNodeId = 0;
-      const seenIds = new Set<string>();
-      const checkedNodes: typeof value = [];
+      const nodeIds = new Set<string>();
+      const attrIds = new Set<number>();
+      const methodIds = new Set<number>();
+      const checkedNodes: Node<DiagramNodeData>[] = [];
       for (const node of value) {
-        if (seenIds.has(node.id)) {
+        if (nodeIds.has(node.id)) {
           continue;
         }
+        nodeIds.add(node.id);
+        const checkedAttrs: DiagramNodeAttributeData[] = [];
+        for (const attr of node.data.attributes) {
+          if (attrIds.has(attr.id)) {
+            continue;
+          }
+          attrIds.add(attr.id);
+          checkedAttrs.push(attr);
+        }
+        const checkedMethods: DiagramNodeMethodData[] = [];
+        for (const method of node.data.methods) {
+          if (methodIds.has(method.id)) {
+            continue;
+          }
+          methodIds.add(method.id);
+          checkedMethods.push(method);
+        }
+        node.data.attributes = checkedAttrs;
+        node.data.methods = checkedMethods;
         checkedNodes.push(node);
-        seenIds.add(node.id);
-        const nodeId = Number.parseInt(node.id);
-        maxNodeId = nodeId > maxNodeId ? nodeId : maxNodeId;
       }
-      currentNodeId = maxNodeId;
-      onNodesChange(checkedNodes);
+
+      CURRENT_NODE_ID = Math.max(
+        ...[...nodeIds].map((id) => Number.parseInt(id))
+      );
+      GLOBAL_ATTRIBUTE_ID = Math.max(...attrIds);
+      GLOBAL_METHOD_ID = Math.max(...methodIds);
+      onNodesChange(value);
     },
     [onNodesChange]
   );
@@ -129,8 +150,10 @@ export const useWrappedNodeState = () => {
   return {
     nodes,
     onNodesChange,
+    onNodesRestore,
     onNodeAdd,
     onNodeAttributesChange,
     onNodeMethodsChange,
+    onNodeChangeMany,
   };
 };
