@@ -1,3 +1,4 @@
+import { WrappedEdgeContext } from "@/context/WrappedEdgeContext";
 import {
   DiagramEdgeData,
   DiagramEdgeLineType,
@@ -31,8 +32,11 @@ import {
   Fragment,
   memo,
   useCallback,
+  useContext,
+  useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import {
   IoChevronBack,
@@ -44,6 +48,7 @@ import {
 } from "react-icons/io5";
 import { MenuButton } from "../form/MenuButton";
 import { StrictTextField } from "../StrictTextField";
+
 const lineTypeOptions = [
   {
     label: "Solid",
@@ -156,147 +161,94 @@ export const StyledEdge: FC<
   EdgeProps<Edge<DiagramEdgeData>>
 > = memo(({ id, selected, data, ...rest }) => {
   const [, labelX, labelY] = getSmoothStepPath(rest);
+  const { onEdgeDataChange, onEdgeDelete } = useContext(
+    WrappedEdgeContext
+  );
+
+  const [mulStart, setMulStart] = useState<string>();
+  const [mulEnd, setMulEnd] = useState<string>();
+  const [label, setLabel] = useState<string>();
+  const [markerStart, setMarkerStart] = useState(
+    data === undefined ? undefined : data.markerStart
+  );
+  const [markerEnd, setMarkerEnd] = useState(
+    data === undefined ? undefined : data.markerEnd
+  );
+  const [lineType, setLineType] = useState(
+    data === undefined
+      ? DiagramEdgeLineType.SOLID
+      : data.lineType
+  );
+
+  useEffect(() => {
+    onEdgeDataChange(id, {
+      multiplicityStart: mulStart,
+      multiplicityEnd: mulEnd,
+      label,
+      markerStart,
+      markerEnd,
+      lineType,
+    });
+  }, [
+    id,
+    label,
+    lineType,
+    markerEnd,
+    markerStart,
+    mulEnd,
+    mulStart,
+    onEdgeDataChange,
+  ]);
 
   const fabRef = useRef<HTMLDivElement>(null);
 
-  const handleMarkerStartChange = useCallback(
-    (value: DiagramEdgeData["markerStart"]) => {
-      if (data === undefined) {
-        return;
-      }
-      data.onMarkerStartChange(
-        id,
-        value === "" ? undefined : value
-      );
-    },
-    [data, id]
-  );
-
-  const handleMarkerEndChange = useCallback(
-    (value: DiagramEdgeData["markerEnd"]) => {
-      if (data === undefined) {
-        return;
-      }
-      data.onMarkerEndChange(
-        id,
-        value === "" ? undefined : value
-      );
-    },
-    [data, id]
-  );
-
   const handleMarkerSwap = useCallback(() => {
-    if (data === undefined) {
-      return;
-    }
-    data.onMarkerEndChange(id, data.markerStart);
-    data.onMarkerStartChange(id, data.markerEnd);
-  }, [data, id]);
-
-  const handleLineTypeChange = useCallback(
-    (value: DiagramEdgeData["lineType"]) => {
-      if (data === undefined) {
-        return;
-      }
-      data.onLineTypeChange(id, value);
-    },
-    [data, id]
-  );
+    const _markerStart = markerStart;
+    setMarkerStart(markerEnd);
+    setMarkerEnd(_markerStart);
+  }, [markerEnd, markerStart]);
 
   const handleDelete = useCallback(() => {
-    if (data === undefined) {
-      return;
-    }
-    data.onDelete(id);
-  }, [data, id]);
-
-  const handleLabelChange = useCallback(
-    (value: string) => {
-      if (data === undefined) {
-        return;
-      }
-      data.onLabelChange(id, value);
-    },
-    [data, id]
-  );
+    onEdgeDelete(id);
+  }, [id, onEdgeDelete]);
 
   const handleLabelToggle = useCallback(() => {
-    if (data === undefined) {
-      return;
-    }
-    data.onLabelChange(
-      id,
-      data.label === undefined ? "" : undefined
+    setLabel((prev) =>
+      prev === undefined ? "" : undefined
     );
-  }, [data, id]);
+  }, []);
 
-  const handleMultiplicityEndToggle = useCallback(() => {
-    if (data === undefined) {
-      return;
-    }
-    data.onMultiplicityEndChange(
-      id,
-      data.multiplicityEnd === undefined ? "" : undefined
+  const handleMulEndToggle = useCallback(() => {
+    setMulEnd((prev) =>
+      prev === undefined ? "" : undefined
     );
-  }, [data, id]);
+  }, []);
 
-  const handleMultiplicityEndChange = useCallback(
-    (value: string) => {
-      if (data === undefined) {
-        return;
-      }
-      data.onMultiplicityEndChange(id, value);
-    },
-    [data, id]
-  );
-
-  const handleMultiplicityStartToggle = useCallback(() => {
-    if (data === undefined) {
-      return;
-    }
-    data.onMultiplicityStartChange(
-      id,
-      data.multiplicityStart === undefined ? "" : undefined
+  const handleMulStartToggle = useCallback(() => {
+    setMulStart((prev) =>
+      prev === undefined ? "" : undefined
     );
-  }, [data, id]);
-
-  const handleMultiplicityStartChange = useCallback(
-    (value: string) => {
-      if (data === undefined) {
-        return;
-      }
-      data.onMultiplicityStartChange(id, value);
-    },
-    [data, id]
-  );
+  }, []);
 
   const hasLabel = useMemo(() => {
-    return data !== undefined && data.label !== undefined;
-  }, [data]);
+    return label !== undefined;
+  }, [label]);
 
-  const hasMultiplicityEnd = useMemo(() => {
-    return (
-      data !== undefined &&
-      data.multiplicityEnd !== undefined
-    );
-  }, [data]);
+  const hasMulEnd = useMemo(() => {
+    return mulEnd !== undefined;
+  }, [mulEnd]);
 
-  const hasMultiplicityStart = useMemo(() => {
-    return (
-      data !== undefined &&
-      data.multiplicityStart !== undefined
-    );
-  }, [data]);
-
-  if (data === undefined) {
-    return null;
-  }
+  const hasMulStart = useMemo(() => {
+    return mulStart !== undefined;
+  }, [mulStart]);
 
   return (
     <Fragment>
       <SmoothStepEdge
         id={id}
         {...rest}
+        markerEnd={`url(#${markerEnd})`}
+        markerStart={`url(#${markerStart})`}
       />
       <EdgeLabelRenderer>
         <div
@@ -309,8 +261,8 @@ export const StyledEdge: FC<
         >
           <StrictTextField
             placeholder="unlabelled"
-            value={data.label ?? ""}
-            onTextChange={handleLabelChange}
+            value={label ?? ""}
+            onTextChange={setLabel}
             sx={{
               textAlign: "center",
               maxWidth: 200,
@@ -332,18 +284,14 @@ export const StyledEdge: FC<
         >
           <StrictTextField
             placeholder="1..1"
-            value={data.multiplicityEnd ?? ""}
-            onTextChange={handleMultiplicityEndChange}
+            value={mulEnd ?? ""}
+            onTextChange={setMulEnd}
             sx={{
               textAlign: "center",
               maxWidth: 200,
               minWidth: 70,
-              display: !hasMultiplicityEnd
-                ? "none"
-                : undefined,
-              visibility: !hasMultiplicityEnd
-                ? "hidden"
-                : undefined,
+              display: !hasMulEnd ? "none" : undefined,
+              visibility: !hasMulEnd ? "hidden" : undefined,
               textShadow: TEXT_SHADOW,
             }}
           />
@@ -359,16 +307,14 @@ export const StyledEdge: FC<
         >
           <StrictTextField
             placeholder="1..1"
-            value={data.multiplicityStart ?? ""}
-            onTextChange={handleMultiplicityStartChange}
+            value={mulStart ?? ""}
+            onTextChange={setMulStart}
             sx={{
               textAlign: "center",
               maxWidth: 200,
               minWidth: 70,
-              display: !hasMultiplicityStart
-                ? "none"
-                : undefined,
-              visibility: !hasMultiplicityStart
+              display: !hasMulStart ? "none" : undefined,
+              visibility: !hasMulStart
                 ? "hidden"
                 : undefined,
               textShadow: TEXT_SHADOW,
@@ -402,8 +348,8 @@ export const StyledEdge: FC<
             >
               <Stack direction="row">
                 <MenuButton
-                  value={data.markerStart ?? ""}
-                  onChange={handleMarkerStartChange}
+                  value={markerStart ?? ""}
+                  onChange={setMarkerStart}
                   options={MARKER_START_OPTIONS}
                 />
                 <IconButton
@@ -413,14 +359,14 @@ export const StyledEdge: FC<
                   <SwapHorizRounded />
                 </IconButton>
                 <MenuButton
-                  value={data.markerEnd ?? ""}
-                  onChange={handleMarkerEndChange}
+                  value={markerEnd ?? ""}
+                  onChange={setMarkerEnd}
                   options={MARKER_END_OPTIONS}
                 />
               </Stack>
               <MenuButton
-                value={data.lineType}
-                onChange={handleLineTypeChange}
+                value={lineType}
+                onChange={setLineType}
                 options={lineTypeOptions}
               />
               <Stack
@@ -444,13 +390,11 @@ export const StyledEdge: FC<
                 >
                   <IconButton
                     disableRipple
-                    onClick={handleMultiplicityStartToggle}
+                    onClick={handleMulStartToggle}
                     color="default"
                   >
-                    {hasMultiplicityStart && (
-                      <TextDecreaseRounded />
-                    )}
-                    {!hasMultiplicityStart && (
+                    {hasMulStart && <TextDecreaseRounded />}
+                    {!hasMulStart && (
                       <TextIncreaseRounded />
                     )}
                   </IconButton>
@@ -464,15 +408,11 @@ export const StyledEdge: FC<
                 >
                   <IconButton
                     disableRipple
-                    onClick={handleMultiplicityEndToggle}
+                    onClick={handleMulEndToggle}
                     color="default"
                   >
-                    {hasMultiplicityEnd && (
-                      <TextDecreaseRounded />
-                    )}
-                    {!hasMultiplicityEnd && (
-                      <TextIncreaseRounded />
-                    )}
+                    {hasMulEnd && <TextDecreaseRounded />}
+                    {!hasMulEnd && <TextIncreaseRounded />}
                   </IconButton>
                 </Tooltip>
               </Stack>

@@ -55,12 +55,17 @@ export const useWrappedEdgeState = () => {
     onEdgesChange(init);
   }, [init, onEdgesChange]);
 
-  const onEdgeChange = useCallback(
-    (value: Edge<DiagramEdgeData>) => {
+  const onEdgeDataChange = useCallback(
+    (id: string, value: DiagramEdgeData) => {
       onEdgesChange((prev) => {
-        return prev.map((edge) =>
-          edge.id === value.id ? value : edge
-        );
+        return prev.map((edge) => {
+          if (edge.id !== id) {
+            return edge;
+          }
+          const nextEdge = structuredClone(edge);
+          nextEdge.data = value;
+          return nextEdge;
+        });
       });
     },
     [onEdgesChange]
@@ -86,7 +91,7 @@ export const useWrappedEdgeState = () => {
 
   return {
     edges,
-    onEdgeChange,
+    onEdgeDataChange,
     onEdgeDelete,
     onEdgeAdd,
     onEdgesChange,
