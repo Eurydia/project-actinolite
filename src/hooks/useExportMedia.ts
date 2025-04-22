@@ -12,17 +12,19 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 export const useExportMedia = () => {
-  const { getNodesBounds, getNodes } = useReactFlow();
+  const { getNodes, getNodesBounds } = useReactFlow();
 
   const onExport = useCallback(
     async (transformer: typeof toPng) => {
+      const imageWidth = 1980;
+      const imageHeight = 1080;
       const nodesBounds = getNodesBounds(getNodes());
       const viewport = getViewportForBounds(
         nodesBounds,
-        1600,
-        1200,
-        1,
-        1,
+        imageWidth,
+        imageHeight,
+        0.5,
+        0.5,
         { x: 20, y: 20 }
       );
 
@@ -35,11 +37,11 @@ export const useExportMedia = () => {
       transformer(canvas, {
         fontEmbedCSS,
         backgroundColor: "white",
-        width: 1600,
-        height: 1200,
+        width: imageWidth,
+        height: imageHeight,
         style: {
-          width: "1600px",
-          height: "1200px",
+          width: imageWidth,
+          height: imageHeight,
           transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
         },
       })
@@ -53,7 +55,7 @@ export const useExportMedia = () => {
           a.click();
           toast.success("Image saved!");
         })
-        .catch(() => toast.error("Something went wrong"));
+        .catch(() => toast.error("Export failed"));
     },
     [getNodes, getNodesBounds]
   );
