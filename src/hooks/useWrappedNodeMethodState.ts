@@ -8,6 +8,7 @@ import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { useCallback } from "react";
 
 export const useWrappedNodeMethodState = (
+  dragHandle: string,
   init: DiagramNodeMethodData[]
 ) => {
   const [containerRef, items, setItems] = useDragAndDrop<
@@ -16,6 +17,7 @@ export const useWrappedNodeMethodState = (
   >(init, {
     group: "class-method",
     plugins: [animations()],
+    dragHandle,
   });
 
   const onChange = useCallback(

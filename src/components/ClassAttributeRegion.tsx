@@ -4,6 +4,7 @@ import React, { FC, Ref, useCallback } from "react";
 import { ClassAttributeRegionItem } from "./ClassAttributeRegionItem";
 
 type Props = {
+  dragHandle: string;
   nodeId: string;
   containerRef: Ref<HTMLUListElement>;
   items: DiagramNodeAttributeData[];
@@ -19,6 +20,7 @@ export const ClassAttributeRegion: FC<Props> = ({
   items,
   onChange,
   onContextMenu,
+  dragHandle,
 }) => {
   const onContextMenuHandlerProvider = useCallback(
     (attrId: number) => (e: React.MouseEvent) =>
@@ -34,12 +36,14 @@ export const ClassAttributeRegion: FC<Props> = ({
         display: "flex",
         flexDirection: "column",
         gap: 0.5,
-        minHeight: 50,
-        minWidth: 400,
+        minHeight: 100,
+        listStyleType: "none",
+        padding: 0,
       }}
     >
       {items.map((item) => (
         <ClassAttributeRegionItem
+          dragHandle={dragHandle}
           key={`class-${nodeId}-attribute-${item.id}`}
           data={item}
           onChange={onChange}

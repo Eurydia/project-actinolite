@@ -4,6 +4,7 @@ import { FC, Ref, useCallback } from "react";
 import { ClassMethodRegionItem } from "./ClassMethodRegionItem";
 
 type Props = {
+  dragHandle: string;
   containerRef: Ref<HTMLUListElement>;
   nodeId: string;
   items: DiagramNodeMethodData[];
@@ -19,6 +20,7 @@ export const ClassMethodRegion: FC<Props> = ({
   containerRef,
   onChange,
   onContextMenu,
+  dragHandle,
 }) => {
   const onChangeHandlerProvider = useCallback(
     (methodId: number) => (e: React.MouseEvent) =>
@@ -34,12 +36,15 @@ export const ClassMethodRegion: FC<Props> = ({
         display: "flex",
         flexDirection: "column",
         gap: 0.5,
-        minHeight: 50,
-        minWidth: 400,
+        minHeight: 100,
+        listStyleType: "none",
+        paddingX: 0,
+        listStyle: "none",
       }}
     >
       {items.map((item) => (
         <ClassMethodRegionItem
+          dragHandle={dragHandle}
           key={`class-${nodeId}-method-${item.id}`}
           data={item}
           onChange={onChange}

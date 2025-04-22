@@ -1,13 +1,16 @@
 import { DiagramNodeMethodData } from "@/types/figure";
+import { OpenWithRounded } from "@mui/icons-material";
 import {
   Box,
-  InputAdornment,
+  Button,
+  Stack,
   Typography,
 } from "@mui/material";
-import { FC, memo, useCallback } from "react";
+import { FC, memo, useCallback, useState } from "react";
 import { StrictTextField } from "./StrictTextField";
 
 type Props = {
+  dragHandle: string;
   data: DiagramNodeMethodData;
   onChange: (value: DiagramNodeMethodData) => void;
   onContextMenu: (e: React.MouseEvent) => void;
@@ -17,7 +20,17 @@ export const ClassMethodRegionItem: FC<Props> = memo(
     data: { access_, id, primary, secondary },
     onChange,
     onContextMenu,
+    dragHandle,
   }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const handleMouseOver = useCallback(() => {
+      setIsHovered(true);
+    }, []);
+
+    const handleMouseOut = useCallback(() => {
+      setIsHovered(false);
+    }, []);
+
     const handleAccessChange = useCallback(() => {
       let nextAccess: DiagramNodeMethodData["access_"];
       switch (access_) {
@@ -67,36 +80,55 @@ export const ClassMethodRegionItem: FC<Props> = memo(
         component="li"
         sx={{
           cursor: "auto",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 0.5,
           width: "100%",
-          listStyle: "none",
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "row",
+          gap: 1,
         }}
         onContextMenu={onContextMenu}
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
       >
-        <InputAdornment position="start">
+        <OpenWithRounded
+          color="action"
+          className={dragHandle}
+          sx={{
+            visibility: isHovered ? "visible" : "hidden",
+            cursor: "move",
+          }}
+        />
+        <Button
+          variant="text"
+          onClick={handleAccessChange}
+          color="inherit"
+        >
           <Typography
-            fontFamily="monospace"
             fontWeight={900}
-            onClick={handleAccessChange}
             sx={{ cursor: "pointer" }}
           >
             {access_}
           </Typography>
-        </InputAdornment>
-        <StrictTextField
-          value={primary}
-          placeholder="unnamed"
-          onTextChange={handlePrimaryChange}
-        />
-        <Typography paddingX={1}>:</Typography>
-        <StrictTextField
-          value={secondary}
-          placeholder="untyped"
-          onTextChange={handleSecondaryChange}
-        />
+        </Button>
+        <Stack
+          direction="row"
+          flexGrow={1}
+          alignItems="center"
+        >
+          <StrictTextField
+            placeholder="unnamed"
+            value={primary}
+            onTextChange={handlePrimaryChange}
+            sx={{ flexGrow: 1 }}
+          />
+          <Typography paddingX={1}>:</Typography>
+          <StrictTextField
+            placeholder="untyped"
+            value={secondary}
+            onTextChange={handleSecondaryChange}
+            sx={{ flexGrow: 1 }}
+          />
+        </Stack>
       </Box>
     );
   }

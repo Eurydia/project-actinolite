@@ -8,6 +8,7 @@ import { useCallback } from "react";
 import { createDiagramNodeAttributeData } from "./useWrappedNodeState";
 
 export const useWrappedNodeAttributeState = (
+  dragHandle: string,
   initItems: DiagramNodeAttributeData[]
 ) => {
   const [containerRef, items, setItems] = useDragAndDrop<
@@ -15,6 +16,7 @@ export const useWrappedNodeAttributeState = (
     DiagramNodeAttributeData
   >(initItems, {
     group: "class-attribute",
+    dragHandle,
     plugins: [animations()],
   });
 

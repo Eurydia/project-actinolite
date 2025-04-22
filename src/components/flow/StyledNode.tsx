@@ -3,7 +3,10 @@ import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeSta
 import { useWrappedNodeMethodState } from "@/hooks/useWrappedNodeMethodState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import { DiagramNodeData } from "@/types/figure";
-import { DeleteRounded } from "@mui/icons-material";
+import {
+  DeleteRounded,
+  OpenWithRounded,
+} from "@mui/icons-material";
 import {
   Box,
   Divider,
@@ -41,6 +44,15 @@ export const StyledNode: FC<
 > = memo(({ id, data, selected }) => {
   const { palette } = useTheme();
   const { onNodeDataChange } = useWrappedNodeState();
+
+  const [isHovered, setIsHovered] = useState(false);
+  const handleMouseOver = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseOut = useCallback(() => {
+    setIsHovered(false);
+  }, []);
 
   const [color, setColor] = useState("#000");
   const [name, setName] = useState(data.name);
@@ -81,7 +93,10 @@ export const StyledNode: FC<
     onDuplicate: onAttrDuplicate,
     onRemove: onAttrRemove,
     items: attrItems,
-  } = useWrappedNodeAttributeState(data.attributes);
+  } = useWrappedNodeAttributeState(
+    ".attr-handle",
+    data.attributes
+  );
 
   const handleAttrDuplicate = useCallback(() => {
     if (
@@ -110,7 +125,10 @@ export const StyledNode: FC<
     onChange: onMethodChange,
     onDuplicate: onMethodDuplicate,
     onRemove: onMethodRemove,
-  } = useWrappedNodeMethodState(data.methods);
+  } = useWrappedNodeMethodState(
+    ".method-handle",
+    data.methods
+  );
 
   const handleMethodDuplicate = useCallback(() => {
     if (
@@ -158,6 +176,8 @@ export const StyledNode: FC<
       <NodeResizer
         isVisible={selected}
         minWidth={400}
+        color={color}
+        lineStyle={{ borderWidth: 2 }}
       />
       <Handle
         type="source"
@@ -167,7 +187,6 @@ export const StyledNode: FC<
         type="target"
         position={Position.Top}
       />
-
       <Paper
         variant="outlined"
         onContextMenu={onContextMenuOpen}
@@ -182,16 +201,28 @@ export const StyledNode: FC<
         }}
       >
         <Box
-          className="node-handle"
           sx={{
             backgroundColor: color,
             display: "flex",
             flexDirection: "row",
             alignItems: "flex-start",
             textAlign: "center",
-            padding: 1.5,
+            paddingY: 1.5,
+            paddingX: 0,
+            cursor: "auto",
           }}
+          component="div"
+          onMouseOver={handleMouseOver}
+          onMouseOut={handleMouseOut}
         >
+          <OpenWithRounded
+            htmlColor={textColorContrast}
+            className="node-handle"
+            sx={{
+              visibility: isHovered ? "visible" : "hidden",
+              cursor: "move",
+            }}
+          />
           <StrictTextField
             value={name}
             onTextChange={setName}
@@ -209,6 +240,7 @@ export const StyledNode: FC<
           }}
         >
           <ClassAttributeRegion
+            dragHandle="attr-handle"
             nodeId={id}
             containerRef={attrContainerRef}
             items={attrItems}
@@ -216,6 +248,7 @@ export const StyledNode: FC<
             onContextMenu={handleContextMenuOpenFromAttr}
           />
           <ClassMethodRegion
+            dragHandle="method-handle"
             nodeId={id}
             items={methodItems}
             containerRef={methodContainerRef}
