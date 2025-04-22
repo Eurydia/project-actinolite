@@ -62,7 +62,6 @@ export const StyledNode: FC<
     | { origin: "attr"; attrId: number }
     | { origin: "method"; methodId: number }
   >();
-
   const {
     contextMenuPos,
     onContextMenuClose,

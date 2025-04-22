@@ -8,12 +8,18 @@ import {
 } from "react";
 
 type Props = {
+  closeOnSelect?: boolean;
   anchorPosition: { left: number; top: number } | undefined;
-  onClose: () => void;
   children: ReactNode[];
+  onClose: () => void;
 };
 export const StyledContextMenu: FC<Props> = memo(
-  ({ anchorPosition, onClose, children }) => {
+  ({
+    anchorPosition,
+    closeOnSelect,
+    onClose,
+    children,
+  }) => {
     const handleContextMenu = useCallback(
       (e: MouseEvent) => {
         e.preventDefault();
@@ -22,11 +28,18 @@ export const StyledContextMenu: FC<Props> = memo(
       []
     );
 
+    const handleClick = useCallback(() => {
+      if (closeOnSelect) {
+        onClose();
+      }
+    }, [closeOnSelect, onClose]);
+
     return (
       <Menu
         open={anchorPosition !== undefined}
         onContextMenu={handleContextMenu}
         onClose={onClose}
+        onClick={handleClick}
         anchorReference="anchorPosition"
         anchorPosition={anchorPosition}
         slotProps={{

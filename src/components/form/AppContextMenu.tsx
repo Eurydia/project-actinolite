@@ -1,17 +1,10 @@
-import { WrappedNodeContext } from "@/context/WrappedNodeContext";
-import { useExportMedia } from "@/hooks/useExportMedia";
 import {
   Divider,
   ListItemText,
   Menu,
   MenuItem,
 } from "@mui/material";
-import React, {
-  FC,
-  memo,
-  useCallback,
-  useContext,
-} from "react";
+import React, { FC, memo, useCallback } from "react";
 
 type Props = {
   onClose: () => void;
@@ -27,18 +20,6 @@ export const AppContextMenu: FC<Props> = memo(
       },
       []
     );
-
-    const { exportAsJepg, exportAsPng, exportAsSvg } =
-      useExportMedia();
-
-    const { onNodeAdd } = useContext(WrappedNodeContext);
-
-    const handleNodeAdd = useCallback(() => {
-      if (anchorPosition === undefined) {
-        return;
-      }
-      onNodeAdd(anchorPosition);
-    }, [anchorPosition, onNodeAdd]);
 
     return (
       <Menu
