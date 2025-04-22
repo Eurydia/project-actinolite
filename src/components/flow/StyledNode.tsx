@@ -1,5 +1,6 @@
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeState";
+import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import { DiagramNodeData } from "@/types/figure";
 import { DeleteRounded } from "@mui/icons-material";
 import {
@@ -24,10 +25,12 @@ import {
   FC,
   memo,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 import { ClassAttributeRegion } from "../ClassAttributeRegion";
+import { ClassMethodRegion } from "../ClassMethodRegion";
 import { StrictTextField } from "../StrictTextField";
 import { ColorPicker } from "../form/ColorPicker";
 import { StyledContextMenu } from "../form/StyledContextMenu";
@@ -36,27 +39,10 @@ export const StyledNode: FC<
   NodeProps<Node<DiagramNodeData>>
 > = memo(({ id, data, selected }) => {
   const { palette } = useTheme();
+  const { onNodeAttributesChange } = useWrappedNodeState();
+
   const [color, setColor] = useState("#000");
-  const textColorContrast = useMemo(() => {
-    return palette.getContrastText(color);
-  }, [color, palette]);
-
   const [name, setName] = useState(data.name);
-
-  // const {
-  //   containerRef: methodContainerRef,
-  //   items: methodItems,
-  //   onAdd: onMethodAdd,
-  //   onChange: onMethodChange,
-  //   onDuplicate: onMethodDuplicate,
-  //   onRemove: onMethodRemove,
-  // } = useWrappedNodeMethodState(data.methods);
-
-  // useEffect(() => {
-  //   onNodeMethodsChange(id, methodItems);
-  // }, [id, methodItems, onNodeMethodsChange]);
-
-  // const { onNodesChange } = useContext(WrappedNodeContext);
 
   const [contextMenuData, setContextMenuData] = useState<
     | { origin: "attr"; attrId: number }
@@ -75,27 +61,30 @@ export const StyledNode: FC<
     },
     [onContextMenuOpen]
   );
-
-  // const handleContextMenuOpenFromMethod = useCallback(
-  //   (event: React.MouseEvent, methodId: number) => {
-  //     setContextMenuData({ origin: "method", methodId });
-  //     onContextMenuOpen(event);
-  //   },
-  //   [onContextMenuOpen]
-  // );
-
+  const handleContextMenuOpenFromMethod = useCallback(
+    (event: React.MouseEvent, methodId: number) => {
+      setContextMenuData({ origin: "method", methodId });
+      onContextMenuOpen(event);
+    },
+    [onContextMenuOpen]
+  );
   const handleContextMenuClose = useCallback(() => {
     setContextMenuData(undefined);
     onContextMenuClose();
   }, [onContextMenuClose]);
 
   const {
-    attributeContainerRef,
-    onAttributeAdd,
-    onAttributeChange,
-    onAttributeDuplicate,
-    onAttributeRemove,
-  } = useWrappedNodeAttributeState(id);
+    containerRef: attrContainerRef,
+    onAdd: onAttrAdd,
+    onChange: onAttrChange,
+    onDuplicate: onAttrDuplicate,
+    onRemove: onAttrRemove,
+    items: attrs,
+  } = useWrappedNodeAttributeState(data.attributes);
+
+  useEffect(() => {
+    onNodeAttributesChange(id, attrs);
+  }, [attrs, id, onNodeAttributesChange]);
 
   const handleAttrDuplicate = useCallback(() => {
     if (
@@ -104,8 +93,8 @@ export const StyledNode: FC<
     ) {
       return;
     }
-    onAttributeDuplicate(contextMenuData.attrId);
-  }, [contextMenuData, onAttributeDuplicate]);
+    onAttrDuplicate(contextMenuData.attrId);
+  }, [contextMenuData, onAttrDuplicate]);
 
   const handleAttrRemove = useCallback(() => {
     if (
@@ -114,8 +103,8 @@ export const StyledNode: FC<
     ) {
       return;
     }
-    onAttributeRemove(contextMenuData.attrId);
-  }, [contextMenuData, onAttributeRemove]);
+    onAttrRemove(contextMenuData.attrId);
+  }, [contextMenuData, onAttrRemove]);
 
   // const handleMethodDuplicate = useCallback(() => {
   //   if (
@@ -141,6 +130,10 @@ export const StyledNode: FC<
   //   onNodeAttributesChange(id, attributeItems);
   // }, [attributeItems, id, onNodeAttributesChange]);
 
+  const textColorContrast = useMemo(() => {
+    return palette.getContrastText(color);
+  }, [color, palette]);
+
   return (
     <>
       <NodeResizer
@@ -158,7 +151,7 @@ export const StyledNode: FC<
 
       <Paper
         variant="outlined"
-        // onContextMenu={onContextMenuOpen}
+        onContextMenu={onContextMenuOpen}
         sx={{
           width: "100%",
           height: "100%",
@@ -198,18 +191,18 @@ export const StyledNode: FC<
         >
           <ClassAttributeRegion
             nodeId={id}
-            containerRef={attributeContainerRef}
-            items={data.attributes}
-            onChange={onAttributeChange}
+            containerRef={attrContainerRef}
+            items={attrs}
+            onChange={onAttrChange}
             onContextMenu={handleContextMenuOpenFromAttr}
           />
-          {/* <ClassMethodRegion
+          <ClassMethodRegion
             nodeId={id}
             items={methodItems}
             containerRef={methodContainerRef}
             onChange={onMethodChange}
             onContextMenu={handleContextMenuOpenFromMethod}
-          /> */}
+          />
         </Stack>
       </Paper>
       <StyledContextMenu
@@ -222,7 +215,7 @@ export const StyledNode: FC<
         />
         <Divider flexItem />
         <MenuList onClick={handleContextMenuClose}>
-          <MenuItem onClick={onAttributeAdd}>
+          <MenuItem onClick={onAttrAdd}>
             <ListItemText inset>New attribute</ListItemText>
           </MenuItem>
           <MenuItem
