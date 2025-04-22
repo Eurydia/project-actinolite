@@ -3,7 +3,7 @@ import {
   DiagramEdgeLineType,
 } from "@/types/figure";
 import { Edge, useEdgesState } from "@xyflow/react";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 export const createEdge = (
   source: string,
@@ -26,8 +26,34 @@ export const createEdge = (
 };
 
 export const useWrappedEdgeState = () => {
+  const init = useMemo(() => {
+    const saved = localStorage.getItem(
+      "actinolite-autosave-edges"
+    );
+    if (saved === null) {
+      return [];
+    }
+    try {
+      return JSON.parse(saved) as Edge<DiagramEdgeData>[];
+    } catch {
+      localStorage.removeItem("actinolite-autosave-edges");
+      return [];
+    }
+  }, []);
+
   const [edges, onEdgesChange, onEdgeChangeMany] =
     useEdgesState<Edge<DiagramEdgeData>>([]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "actinolite-autosave-edges",
+      JSON.stringify(edges)
+    );
+  }, [edges]);
+
+  useEffect(() => {
+    onEdgesChange(init);
+  }, [init, onEdgesChange]);
 
   const onEdgeChange = useCallback(
     (value: Edge<DiagramEdgeData>) => {

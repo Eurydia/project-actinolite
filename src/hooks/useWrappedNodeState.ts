@@ -52,6 +52,7 @@ export const useWrappedNodeState = () => {
       return [];
     }
   }, []);
+
   const { screenToFlowPosition } = useReactFlow();
 
   const [nodes, onNodesChange, onNodeChangeMany] =
