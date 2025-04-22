@@ -1,5 +1,6 @@
 import { useContextMenu } from "@/hooks/useContextMenu";
 import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeState";
+import { useWrappedNodeMethodState } from "@/hooks/useWrappedNodeMethodState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import { DiagramNodeData } from "@/types/figure";
 import { DeleteRounded } from "@mui/icons-material";
@@ -39,7 +40,7 @@ export const StyledNode: FC<
   NodeProps<Node<DiagramNodeData>>
 > = memo(({ id, data, selected }) => {
   const { palette } = useTheme();
-  const { onNodeAttributesChange } = useWrappedNodeState();
+  const { onNodeDataChange } = useWrappedNodeState();
 
   const [color, setColor] = useState("#000");
   const [name, setName] = useState(data.name);
@@ -79,12 +80,8 @@ export const StyledNode: FC<
     onChange: onAttrChange,
     onDuplicate: onAttrDuplicate,
     onRemove: onAttrRemove,
-    items: attrs,
+    items: attrItems,
   } = useWrappedNodeAttributeState(data.attributes);
-
-  useEffect(() => {
-    onNodeAttributesChange(id, attrs);
-  }, [attrs, id, onNodeAttributesChange]);
 
   const handleAttrDuplicate = useCallback(() => {
     if (
@@ -106,29 +103,51 @@ export const StyledNode: FC<
     onAttrRemove(contextMenuData.attrId);
   }, [contextMenuData, onAttrRemove]);
 
-  // const handleMethodDuplicate = useCallback(() => {
-  //   if (
-  //     contextMenuData === undefined ||
-  //     contextMenuData.origin !== "method"
-  //   ) {
-  //     return;
-  //   }
-  //   onMethodDuplicate(contextMenuData.methodId);
-  // }, [contextMenuData, onMethodDuplicate]);
+  const {
+    containerRef: methodContainerRef,
+    items: methodItems,
+    onAdd: onMethodAdd,
+    onChange: onMethodChange,
+    onDuplicate: onMethodDuplicate,
+    onRemove: onMethodRemove,
+  } = useWrappedNodeMethodState(data.methods);
 
-  // const handleMethodRemove = useCallback(() => {
-  //   if (
-  //     contextMenuData === undefined ||
-  //     contextMenuData.origin !== "method"
-  //   ) {
-  //     return;
-  //   }
-  //   onMethodRemove(contextMenuData.methodId);
-  // }, [contextMenuData, onMethodRemove]);
+  const handleMethodDuplicate = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "method"
+    ) {
+      return;
+    }
+    onMethodDuplicate(contextMenuData.methodId);
+  }, [contextMenuData, onMethodDuplicate]);
 
-  // useEffect(() => {
-  //   onNodeAttributesChange(id, attributeItems);
-  // }, [attributeItems, id, onNodeAttributesChange]);
+  const handleMethodRemove = useCallback(() => {
+    if (
+      contextMenuData === undefined ||
+      contextMenuData.origin !== "method"
+    ) {
+      return;
+    }
+    onMethodRemove(contextMenuData.methodId);
+  }, [contextMenuData, onMethodRemove]);
+
+  useEffect(() => {
+    onNodeDataChange(id, {
+      attributes: attrItems,
+      color,
+      name,
+      methods: methodItems,
+    });
+  }, [
+    attrItems,
+    color,
+    id,
+    methodItems,
+    name,
+    onMethodChange,
+    onNodeDataChange,
+  ]);
 
   const textColorContrast = useMemo(() => {
     return palette.getContrastText(color);
@@ -192,7 +211,7 @@ export const StyledNode: FC<
           <ClassAttributeRegion
             nodeId={id}
             containerRef={attrContainerRef}
-            items={attrs}
+            items={attrItems}
             onChange={onAttrChange}
             onContextMenu={handleContextMenuOpenFromAttr}
           />
@@ -248,7 +267,7 @@ export const StyledNode: FC<
           </MenuItem>
         </MenuList>
         <Divider flexItem />
-        {/* <MenuList onClick={handleContextMenuClose}>
+        <MenuList onClick={handleContextMenuClose}>
           <MenuItem onClick={onMethodAdd}>
             <ListItemText inset>New method</ListItemText>
           </MenuItem>
@@ -278,7 +297,7 @@ export const StyledNode: FC<
           >
             <ListItemText inset>Remove method</ListItemText>
           </MenuItem>
-        </MenuList> */}
+        </MenuList>
         <Divider flexItem />
         <MenuList onClick={handleContextMenuClose}>
           <MenuItem>

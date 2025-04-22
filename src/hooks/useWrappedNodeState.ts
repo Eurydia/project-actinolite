@@ -8,10 +8,10 @@ import {
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
-let CURRENT_NODE_ID = 0;
-const getNextNodeId = () => CURRENT_NODE_ID++;
+let GLOBAL_NODE_ID = 0;
+const getNextNodeId = () => GLOBAL_NODE_ID++;
 
 let GLOBAL_METHOD_ID = 0;
 export const createDiagramNodeMethodData = (
@@ -38,52 +38,62 @@ export const createDiagramNodeAttributeData = (
 };
 
 export const useWrappedNodeState = () => {
+  const init = useMemo(() => {
+    const saved = localStorage.getItem(
+      "actinolite-autosave-nodes"
+    );
+    if (saved === null) {
+      return [];
+    }
+    try {
+      return JSON.parse(saved) as Node<DiagramNodeData>[];
+    } catch {
+      localStorage.removeItem("actinolite-autosave-nodes");
+      return [];
+    }
+  }, []);
   const { screenToFlowPosition } = useReactFlow();
 
   const [nodes, onNodesChange, onNodeChangeMany] =
     useNodesState<Node<DiagramNodeData>>([]);
 
-  const onNodesRestore = useCallback(
-    (value: Node<DiagramNodeData>[]) => {
-      const nodeIds = new Set<string>();
-      const attrIds = new Set<number>();
-      const methodIds = new Set<number>();
-      const checkedNodes: Node<DiagramNodeData>[] = [];
-      for (const node of value) {
-        if (nodeIds.has(node.id)) {
-          continue;
-        }
-        nodeIds.add(node.id);
-        const checkedAttrs: DiagramNodeAttributeData[] = [];
-        for (const attr of node.data.attributes) {
-          if (attrIds.has(attr.id)) {
-            continue;
-          }
-          attrIds.add(attr.id);
-          checkedAttrs.push(attr);
-        }
-        const checkedMethods: DiagramNodeMethodData[] = [];
-        for (const method of node.data.methods) {
-          if (methodIds.has(method.id)) {
-            continue;
-          }
-          methodIds.add(method.id);
-          checkedMethods.push(method);
-        }
-        node.data.attributes = checkedAttrs;
-        node.data.methods = checkedMethods;
-        checkedNodes.push(node);
-      }
+  useEffect(() => {
+    localStorage.setItem(
+      "actinolite-autosave-nodes",
+      JSON.stringify(nodes)
+    );
+  }, [nodes]);
 
-      CURRENT_NODE_ID = Math.max(
-        ...[...nodeIds].map((id) => Number.parseInt(id))
+  useEffect(() => {
+    let nodeIdMax = 0;
+    let nodeAttrIdMax = 0;
+    let nodeMthdIdMax = 0;
+    init.forEach((node) => {
+      nodeIdMax =
+        Number.parseInt(node.id) > nodeIdMax
+          ? Number.parseInt(node.id)
+          : nodeIdMax;
+      node.data.attributes.forEach(
+        (item) =>
+          (nodeAttrIdMax =
+            item.id > nodeAttrIdMax
+              ? item.id
+              : nodeAttrIdMax)
       );
-      GLOBAL_ATTRIBUTE_ID = Math.max(...attrIds);
-      GLOBAL_METHOD_ID = Math.max(...methodIds);
-      onNodesChange(value);
-    },
-    [onNodesChange]
-  );
+      node.data.methods.forEach(
+        (item) =>
+          (nodeMthdIdMax =
+            item.id > nodeMthdIdMax
+              ? item.id
+              : nodeMthdIdMax)
+      );
+      GLOBAL_NODE_ID = nodeIdMax + 1;
+      GLOBAL_ATTRIBUTE_ID = nodeAttrIdMax + 1;
+      GLOBAL_METHOD_ID = nodeMthdIdMax + 1;
+    });
+
+    onNodesChange(init);
+  }, [init, onNodesChange]);
 
   const onNodeAdd = useCallback(
     (position: { left: number; top: number }) => {
@@ -109,39 +119,17 @@ export const useWrappedNodeState = () => {
     [screenToFlowPosition, onNodesChange]
   );
 
-  const onNodeAttributesChange = useCallback(
-    (nodeId: string, value: DiagramNodeAttributeData[]) => {
+  const onNodeDataChange = useCallback(
+    (id: string, value: DiagramNodeData) => {
       onNodesChange((prev) => {
-        const next: typeof prev = [];
-        for (const node of prev) {
-          if (node.id !== nodeId) {
-            next.push(node);
-            continue;
+        return prev.map((node) => {
+          if (node.id !== id) {
+            return node;
           }
           const nextNode = structuredClone(node);
-          nextNode.data.attributes = value;
-          next.push(nextNode);
-        }
-        return next;
-      });
-    },
-    [onNodesChange]
-  );
-
-  const onNodeMethodsChange = useCallback(
-    (nodeId: string, value: DiagramNodeMethodData[]) => {
-      onNodesChange((prev) => {
-        const next: typeof prev = [];
-        for (const node of prev) {
-          if (node.id !== nodeId) {
-            next.push(node);
-            continue;
-          }
-          const nextNode = structuredClone(node);
-          nextNode.data.methods = value;
-          next.push(nextNode);
-        }
-        return next;
+          nextNode.data = value;
+          return nextNode;
+        });
       });
     },
     [onNodesChange]
@@ -150,10 +138,8 @@ export const useWrappedNodeState = () => {
   return {
     nodes,
     onNodesChange,
-    onNodesRestore,
     onNodeAdd,
-    onNodeAttributesChange,
-    onNodeMethodsChange,
     onNodeChangeMany,
+    onNodeDataChange,
   };
 };

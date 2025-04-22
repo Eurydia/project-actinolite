@@ -7,10 +7,6 @@ import { useExportMedia } from "@/hooks/useExportMedia";
 import { useWrappedEdgeState } from "@/hooks/useWrappedEdgeState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import {
-  DiagramEdgeData,
-  DiagramNodeData,
-} from "@/types/figure";
-import {
   Box,
   createTheme,
   CssBaseline,
@@ -19,25 +15,12 @@ import {
   MenuItem,
   ThemeProvider,
 } from "@mui/material";
-import {
-  Edge,
-  Node,
-  ReactFlowInstance,
-  ReactFlowProvider,
-} from "@xyflow/react";
+import { ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { ToastContainer } from "react-toastify";
 
 export const App = () => {
-  const [rInstance, setFlowInstance] =
-    useState<
-      ReactFlowInstance<
-        Node<DiagramNodeData>,
-        Edge<DiagramEdgeData>
-      >
-    >();
-
   const wrappedNodeState = useWrappedNodeState();
   const wrappedEdgeState = useWrappedEdgeState();
   const {
@@ -64,9 +47,10 @@ export const App = () => {
           component="div"
           onContextMenu={onContextMenuOpen}
         >
-          <FlowRenderArea onInit={setFlowInstance} />
+          <FlowRenderArea />
         </Box>
         <StyledContextMenu
+          closeOnSelect
           anchorPosition={contextMenuPos}
           onClose={onContextMenuClose}
         >
