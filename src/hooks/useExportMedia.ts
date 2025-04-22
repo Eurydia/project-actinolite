@@ -32,7 +32,9 @@ export const useExportMedia = () => {
         ".react-flow__viewport"
       ) as HTMLElement;
 
-      const fontEmbedCSS = await getFontEmbedCSS(canvas);
+      const fontEmbedCSS = await getFontEmbedCSS(
+        document.querySelector("body")!
+      );
       const now = new Date(Date.now());
       transformer(canvas, {
         fontEmbedCSS,
@@ -40,9 +42,10 @@ export const useExportMedia = () => {
         width: imageWidth,
         height: imageHeight,
         style: {
-          width: imageWidth,
-          height: imageHeight,
+          width: `${imageWidth}px`,
+          height: `${imageHeight}px`,
           transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+          fontFamily: "monosapce",
         },
       })
         .then((dataUrl) => {

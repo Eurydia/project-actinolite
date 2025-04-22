@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { FC, memo, useCallback, useState } from "react";
-import { StrictTextField } from "./StrictTextField";
+import { StrictTextField } from "./form/StrictTextField";
 
 type Props = {
   dragHandle: string;
