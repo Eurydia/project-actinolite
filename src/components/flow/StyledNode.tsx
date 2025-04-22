@@ -113,7 +113,10 @@ export const StyledNode: FC<
     onChange: onMethodChange,
     onDuplicate: onMethodDuplicate,
     onRemove: onMethodRemove,
-  } = useWrappedNodeMethodState(data.methods);
+  } = useWrappedNodeMethodState(
+    ".method-handle",
+    data.methods
+  );
 
   const handleMethodDuplicate = useCallback(() => {
     if (
@@ -220,6 +223,7 @@ export const StyledNode: FC<
             onContextMenu={handleContextMenuOpenFromAttr}
           />
           <ClassMethodRegion
+            dragHandle="method-handle"
             nodeId={id}
             items={methodItems}
             containerRef={methodContainerRef}

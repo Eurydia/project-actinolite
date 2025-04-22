@@ -36,12 +36,9 @@ export const ClassAttributeRegion: FC<Props> = ({
         display: "flex",
         flexDirection: "column",
         gap: 0.5,
-        minHeight: 50,
-        minWidth: 400,
-        flexGrow: 1,
+        minHeight: 100,
         listStyleType: "none",
-        paddingX: 0,
-        paddingY: 2,
+        padding: 0,
       }}
     >
       {items.map((item) => (
