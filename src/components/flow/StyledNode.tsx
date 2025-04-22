@@ -3,14 +3,10 @@ import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeSta
 import { useWrappedNodeMethodState } from "@/hooks/useWrappedNodeMethodState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import { DiagramNodeData } from "@/types/figure";
-import {
-  DeleteRounded,
-  OpenWithRounded,
-} from "@mui/icons-material";
+import { OpenWithRounded } from "@mui/icons-material";
 import {
   Box,
   Divider,
-  ListItemIcon,
   ListItemText,
   MenuItem,
   MenuList,
@@ -175,28 +171,31 @@ export const StyledNode: FC<
     <>
       <NodeResizer
         isVisible={selected}
-        minWidth={400}
         color={color}
         lineStyle={{ borderWidth: 2 }}
       />
       <Handle
         type="source"
         position={Position.Top}
+        style={{ width: 15, height: 15 }}
         id="a"
       />
       <Handle
         type="source"
         position={Position.Left}
+        style={{ width: 15, height: 15 }}
         id="b"
       />
       <Handle
         type="source"
         position={Position.Bottom}
+        style={{ width: 15, height: 15 }}
         id="c"
       />
       <Handle
         type="source"
         position={Position.Right}
+        style={{ width: 15, height: 15 }}
         id="d"
       />
       <Paper
@@ -247,11 +246,6 @@ export const StyledNode: FC<
         <Stack
           spacing={1}
           divider={<Divider variant="middle" />}
-          sx={{
-            height: "100%",
-            overflow: "auto",
-            scrollbarWidth: "thin",
-          }}
         >
           <ClassAttributeRegion
             dragHandle="attr-handle"
@@ -343,23 +337,6 @@ export const StyledNode: FC<
             }}
           >
             <ListItemText inset>Remove method</ListItemText>
-          </MenuItem>
-        </MenuList>
-        <Divider flexItem />
-        <MenuList onClick={handleContextMenuClose}>
-          <MenuItem>
-            <ListItemText inset>
-              Duplicate class
-            </ListItemText>
-          </MenuItem>
-        </MenuList>
-        <Divider flexItem />
-        <MenuList onClick={handleContextMenuClose}>
-          <MenuItem>
-            <ListItemIcon>
-              <DeleteRounded />
-            </ListItemIcon>
-            <ListItemText>Remove class</ListItemText>
           </MenuItem>
         </MenuList>
       </StyledContextMenu>

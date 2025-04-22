@@ -418,7 +418,6 @@ export const StyledEdge: FC<
               </Stack>
               <IconButton
                 disableRipple
-                color="error"
                 onClick={handleDelete}
               >
                 <DeleteRounded />
