@@ -3,7 +3,10 @@ import { useWrappedNodeAttributeState } from "@/hooks/useWrappedNodeAttributeSta
 import { useWrappedNodeMethodState } from "@/hooks/useWrappedNodeMethodState";
 import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import { DiagramNodeData } from "@/types/figure";
-import { DeleteRounded } from "@mui/icons-material";
+import {
+  DeleteRounded,
+  OpenWithRounded,
+} from "@mui/icons-material";
 import {
   Box,
   Divider,
@@ -41,6 +44,15 @@ export const StyledNode: FC<
 > = memo(({ id, data, selected }) => {
   const { palette } = useTheme();
   const { onNodeDataChange } = useWrappedNodeState();
+
+  const [isHovered, setIsHovered] = useState(false);
+  const handleMouseOver = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseOut = useCallback(() => {
+    setIsHovered(false);
+  }, []);
 
   const [color, setColor] = useState("#000");
   const [name, setName] = useState(data.name);
@@ -164,6 +176,8 @@ export const StyledNode: FC<
       <NodeResizer
         isVisible={selected}
         minWidth={400}
+        color={color}
+        lineStyle={{ borderWidth: 2 }}
       />
       <Handle
         type="source"
@@ -173,7 +187,6 @@ export const StyledNode: FC<
         type="target"
         position={Position.Top}
       />
-
       <Paper
         variant="outlined"
         onContextMenu={onContextMenuOpen}
@@ -188,7 +201,6 @@ export const StyledNode: FC<
         }}
       >
         <Box
-          className="node-handle"
           sx={{
             backgroundColor: color,
             display: "flex",
@@ -196,8 +208,20 @@ export const StyledNode: FC<
             alignItems: "flex-start",
             textAlign: "center",
             padding: 1.5,
+            cursor: "auto",
           }}
+          component="div"
+          onMouseOver={handleMouseOver}
+          onMouseOut={handleMouseOut}
         >
+          <OpenWithRounded
+            htmlColor={textColorContrast}
+            className="node-handle"
+            sx={{
+              visibility: isHovered ? "visible" : "hidden",
+              cursor: "move",
+            }}
+          />
           <StrictTextField
             value={name}
             onTextChange={setName}
