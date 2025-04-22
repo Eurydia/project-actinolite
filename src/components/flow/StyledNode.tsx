@@ -81,7 +81,10 @@ export const StyledNode: FC<
     onDuplicate: onAttrDuplicate,
     onRemove: onAttrRemove,
     items: attrItems,
-  } = useWrappedNodeAttributeState(data.attributes);
+  } = useWrappedNodeAttributeState(
+    ".attr-handle",
+    data.attributes
+  );
 
   const handleAttrDuplicate = useCallback(() => {
     if (
@@ -209,6 +212,7 @@ export const StyledNode: FC<
           }}
         >
           <ClassAttributeRegion
+            dragHandle="attr-handle"
             nodeId={id}
             containerRef={attrContainerRef}
             items={attrItems}

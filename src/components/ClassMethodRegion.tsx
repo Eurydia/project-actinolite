@@ -36,6 +36,7 @@ export const ClassMethodRegion: FC<Props> = ({
         gap: 0.5,
         minHeight: 50,
         minWidth: 400,
+        flexGrow: 1,
       }}
     >
       {items.map((item) => (
