@@ -5,9 +5,6 @@ export const WrappedEdgeContext = createContext<
   ReturnType<typeof useWrappedEdgeState>
 >({
   edges: [],
-  onEdgeAdd: () => {
-    throw new Error();
-  },
   onEdgeDataChange: () => {
     throw new Error();
   },
