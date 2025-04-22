@@ -7,11 +7,15 @@ import { useCallback, useEffect, useMemo } from "react";
 
 export const createEdge = (
   source: string,
-  target: string
+  target: string,
+  sourceHandle: string,
+  targetHandle: string
 ): Edge<DiagramEdgeData> => {
   return {
     id: `${source}-${target}`,
     source,
+    sourceHandle,
+    targetHandle,
     target,
     data: {
       lineType: DiagramEdgeLineType.SOLID,

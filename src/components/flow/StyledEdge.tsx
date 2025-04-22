@@ -47,7 +47,7 @@ import {
   IoTriangleOutline,
 } from "react-icons/io5";
 import { MenuButton } from "../form/MenuButton";
-import { StrictTextField } from "../StrictTextField";
+import { StrictTextField } from "../form/StrictTextField";
 
 const lineTypeOptions = [
   {

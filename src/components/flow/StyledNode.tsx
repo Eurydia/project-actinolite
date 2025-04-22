@@ -35,8 +35,8 @@ import {
 } from "react";
 import { ClassAttributeRegion } from "../ClassAttributeRegion";
 import { ClassMethodRegion } from "../ClassMethodRegion";
-import { StrictTextField } from "../StrictTextField";
 import { ColorPicker } from "../form/ColorPicker";
+import { StrictTextField } from "../form/StrictTextField";
 import { StyledContextMenu } from "../form/StyledContextMenu";
 
 export const StyledNode: FC<
@@ -181,11 +181,23 @@ export const StyledNode: FC<
       />
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Top}
+        id="a"
       />
       <Handle
-        type="target"
-        position={Position.Top}
+        type="source"
+        position={Position.Left}
+        id="b"
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="c"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="d"
       />
       <Paper
         variant="outlined"
@@ -227,7 +239,9 @@ export const StyledNode: FC<
             value={name}
             onTextChange={setName}
             placeholder="unnamed"
-            sx={{ color: textColorContrast }}
+            sx={{
+              color: textColorContrast,
+            }}
           />
         </Box>
         <Stack

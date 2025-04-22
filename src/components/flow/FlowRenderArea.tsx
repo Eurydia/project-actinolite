@@ -6,6 +6,7 @@ import {
   addEdge,
   Background,
   Connection,
+  ConnectionMode,
   Controls,
   EdgeTypes,
   FinalConnectionState,
@@ -51,31 +52,56 @@ export const FlowRenderArea: FC = memo(() => {
       connectionState: FinalConnectionState
     ) => {
       let targetNodeId: string | undefined = undefined;
+      let targetHandleId: string | undefined | null =
+        undefined;
 
       if (
         connectionState.isValid &&
-        connectionState.toNode !== null
+        connectionState.toNode !== null &&
+        connectionState.toHandle !== null
       ) {
         targetNodeId = connectionState.toNode.id;
+        targetHandleId = connectionState.toHandle.id;
       } else {
         const { clientX, clientY } =
           "changedTouches" in event
             ? event.changedTouches[0]
             : event;
-
         targetNodeId = onNodeAdd({
           top: clientY,
           left: clientX,
         });
       }
       const sourceNode = connectionState.fromNode;
+      const sourceHandle = connectionState.fromHandle;
       if (
         targetNodeId !== undefined &&
-        sourceNode !== null
+        sourceNode !== null &&
+        sourceHandle !== null
       ) {
+        switch (sourceHandle.id!) {
+          case "a":
+            targetHandleId = "c";
+            break;
+          case "b":
+            targetHandleId = "d";
+            break;
+          case "c":
+            targetHandleId = "a";
+            break;
+          case "d":
+            targetHandleId = "b";
+            break;
+        }
+
         onEdgesChange((prev) => {
           return prev.concat(
-            createEdge(sourceNode.id, targetNodeId)
+            createEdge(
+              sourceNode.id,
+              targetNodeId,
+              sourceHandle.id!,
+              targetHandleId!
+            )
           );
         });
       }
@@ -119,6 +145,7 @@ export const FlowRenderArea: FC = memo(() => {
         fitViewOptions={{ padding: 2 }}
         defaultViewport={{ zoom: 1, x: 0, y: 0 }}
         snapToGrid
+        connectionMode={ConnectionMode.Loose}
       >
         <Background
           gap={40}
