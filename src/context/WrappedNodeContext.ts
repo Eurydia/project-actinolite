@@ -14,9 +14,6 @@ export const WrappedNodeContext = createContext<
     throw new Error();
   },
   nodes: [],
-  onNodesRestore: () => {
-    throw new Error();
-  },
   onNodeChangeMany: () => {
     throw new Error();
   },

@@ -84,20 +84,10 @@ export const useWrappedEdgeState = () => {
     [onEdgesChange]
   );
 
-  const onEdgeAdd = useCallback(
-    (source: string, target: string) => {
-      onEdgesChange((prev) => {
-        return prev.concat(createEdge(source, target));
-      });
-    },
-    [onEdgesChange]
-  );
-
   return {
     edges,
     onEdgeDataChange,
     onEdgeDelete,
-    onEdgeAdd,
     onEdgesChange,
     onEdgeChangeMany,
   };
