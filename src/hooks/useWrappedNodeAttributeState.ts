@@ -1,80 +1,78 @@
-import { createClassAttribute } from "@/services/models";
 import {
   AccessLevel,
-  DiagramClassAttribute,
+  DiagramNodeAttributeData,
 } from "@/types/figure";
 import { animations } from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { useCallback } from "react";
+import { createDiagramNodeAttributeData } from "./useWrappedNodeState";
 
 export const useWrappedNodeAttributeState = (
-  init: DiagramClassAttribute[]
+  initItems: DiagramNodeAttributeData[]
 ) => {
-  const [
-    attributeContainerRef,
-    attributeItems,
-    setAttributeItems,
-  ] = useDragAndDrop<
+  const [containerRef, items, setItems] = useDragAndDrop<
     HTMLUListElement,
-    DiagramClassAttribute
-  >(init, {
+    DiagramNodeAttributeData
+  >(initItems, {
     group: "class-attribute",
     plugins: [animations()],
   });
 
-  const onAttributeChange = useCallback(
-    (value: DiagramClassAttribute) => {
-      setAttributeItems((prev) => {
-        return prev.map((attr) =>
-          attr.id !== value.id ? attr : value
+  const onChange = useCallback(
+    (value: DiagramNodeAttributeData) => {
+      setItems((prev) => {
+        return prev.map((item) =>
+          item.id === value.id ? value : item
         );
       });
     },
-    [setAttributeItems]
+    [setItems]
   );
 
-  const onAttributeRemove = useCallback(
+  const onRemove = useCallback(
     (attrId: number) => {
-      setAttributeItems((prev) => {
-        return prev.filter((attr) => attr.id !== attrId);
+      setItems((prev) => {
+        return prev.filter((item) => item.id !== attrId);
       });
     },
-    [setAttributeItems]
+    [setItems]
   );
 
-  const onAttributeDuplicate = useCallback(
+  const onDuplicate = useCallback(
     (attrId: number) => {
-      setAttributeItems((prev) => {
-        const attr = prev.find(
+      setItems((prev) => {
+        const target = prev.find(
           (attr) => attr.id === attrId
         );
-        if (attr === undefined) {
+        if (target === undefined) {
           return prev;
         }
-        const nextAttr = createClassAttribute(attr);
-        return prev.concat(nextAttr);
+        return prev.concat(
+          createDiagramNodeAttributeData(target)
+        );
       });
     },
-    [setAttributeItems]
+    [setItems]
   );
 
-  const onAttributeAdd = useCallback(() => {
-    setAttributeItems((prev) => {
-      const nextAttr = createClassAttribute({
-        access_: AccessLevel.PRIVATE,
-        primary: "",
-        secondary: "",
-      });
-      return prev.concat(nextAttr);
+  const onAdd = useCallback(() => {
+    setItems((prev) => {
+      return prev.concat(
+        createDiagramNodeAttributeData({
+          access_: AccessLevel.PRIVATE,
+          primary: "",
+          secondary: "",
+        })
+      );
     });
-  }, [setAttributeItems]);
+  }, [setItems]);
 
   return {
-    attributeContainerRef,
-    attributeItems,
-    onAttributeAdd,
-    onAttributeChange,
-    onAttributeDuplicate,
-    onAttributeRemove,
+    containerRef,
+    items,
+    onAdd,
+    onChange,
+    onDuplicate,
+    onRemove,
   };
 };

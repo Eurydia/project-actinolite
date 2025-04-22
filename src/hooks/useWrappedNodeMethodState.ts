@@ -1,25 +1,25 @@
-import { createDiagramClassMethod } from "@/services/models";
+import { createDiagramNodeMethodData } from "@/services/models";
 import {
   AccessLevel,
-  DiagramClassMethod,
+  DiagramNodeMethodData,
 } from "@/types/figure";
 import { animations } from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 import { useCallback } from "react";
 
 export const useWrappedNodeMethodState = (
-  init: DiagramClassMethod[]
+  init: DiagramNodeMethodData[]
 ) => {
   const [containerRef, items, setItems] = useDragAndDrop<
     HTMLUListElement,
-    DiagramClassMethod
+    DiagramNodeMethodData
   >(init, {
     group: "class-method",
     plugins: [animations()],
   });
 
   const onChange = useCallback(
-    (value: DiagramClassMethod) => {
+    (value: DiagramNodeMethodData) => {
       setItems((prev) => {
         return prev.map((item) =>
           item.id !== value.id ? item : value
@@ -47,7 +47,7 @@ export const useWrappedNodeMethodState = (
         if (item === undefined) {
           return prev;
         }
-        const nextItem = createDiagramClassMethod(item);
+        const nextItem = createDiagramNodeMethodData(item);
         return prev.concat(nextItem);
       });
     },
@@ -56,7 +56,7 @@ export const useWrappedNodeMethodState = (
 
   const onAdd = useCallback(() => {
     setItems((prev) => {
-      const nextItem = createDiagramClassMethod({
+      const nextItem = createDiagramNodeMethodData({
         access_: AccessLevel.PRIVATE,
         primary: "",
         secondary: "",

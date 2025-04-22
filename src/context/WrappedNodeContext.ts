@@ -2,15 +2,22 @@ import { useWrappedNodeState } from "@/hooks/useWrappedNodeState";
 import { createContext } from "react";
 
 export const WrappedNodeContext = createContext<
-  Omit<
-    ReturnType<typeof useWrappedNodeState>,
-    "nodes" | "onNodesChange" | "onNodeAdd"
-  >
+  ReturnType<typeof useWrappedNodeState>
 >({
-  onNodeAttributesChange: () => {
+  onNodeDataChange: () => {
     throw new Error();
   },
-  onNodeMethodsChange: () => {
+  onNodeAdd: () => {
+    throw new Error();
+  },
+  onNodesChange: () => {
+    throw new Error();
+  },
+  nodes: [],
+  onNodesRestore: () => {
+    throw new Error();
+  },
+  onNodeChangeMany: () => {
     throw new Error();
   },
 });

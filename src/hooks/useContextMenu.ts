@@ -6,7 +6,7 @@ export const useContextMenu = () => {
     top: number;
   }>();
 
-  const handleContextMenuOpen = useCallback(
+  const onContextMenuOpen = useCallback(
     (event: React.MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
@@ -23,22 +23,13 @@ export const useContextMenu = () => {
     [contextMenuPos]
   );
 
-  const handleContextMenuClose = useCallback(() => {
+  const onContextMenuClose = useCallback(() => {
     setContextMenu(undefined);
   }, []);
 
-  const handlePreventDefaultContextMenu = useCallback(
-    (event: React.MouseEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-    },
-    []
-  );
-
   return {
     contextMenuPos,
-    handleContextMenuClose,
-    handleContextMenuOpen,
-    handlePreventDefaultContextMenu,
+    onContextMenuClose,
+    onContextMenuOpen,
   };
 };
