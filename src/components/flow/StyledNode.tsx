@@ -207,7 +207,8 @@ export const StyledNode: FC<
             flexDirection: "row",
             alignItems: "flex-start",
             textAlign: "center",
-            padding: 1.5,
+            paddingY: 1.5,
+            paddingX: 0,
             cursor: "auto",
           }}
           component="div"

@@ -39,6 +39,7 @@ export const ClassMethodRegion: FC<Props> = ({
         minHeight: 100,
         listStyleType: "none",
         paddingX: 0,
+        listStyle: "none",
       }}
     >
       {items.map((item) => (

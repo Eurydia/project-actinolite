@@ -1,5 +1,5 @@
 import { DiagramNodeMethodData } from "@/types/figure";
-import { SwapVertRounded } from "@mui/icons-material";
+import { OpenWithRounded } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -85,13 +85,12 @@ export const ClassMethodRegionItem: FC<Props> = memo(
           alignItems: "center",
           flexDirection: "row",
           gap: 1,
-          paddingLeft: 3,
         }}
         onContextMenu={onContextMenu}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
-        <SwapVertRounded
+        <OpenWithRounded
           color="action"
           className={dragHandle}
           sx={{
