@@ -8,7 +8,7 @@ export const WrappedEdgeContext = createContext<
   onEdgeAdd: () => {
     throw new Error();
   },
-  onEdgeChange: () => {
+  onEdgeDataChange: () => {
     throw new Error();
   },
   onEdgeDelete: () => {
